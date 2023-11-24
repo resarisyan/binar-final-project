@@ -1,4 +1,4 @@
-package com.binar.byteacademy.config;
+package com.binar.byteacademy.common.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;

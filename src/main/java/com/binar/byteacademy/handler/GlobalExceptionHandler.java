@@ -3,10 +3,7 @@ package com.binar.byteacademy.handler;
 import com.binar.byteacademy.dto.response.base.APIResponse;
 import com.binar.byteacademy.dto.response.base.ApiErrorResponse;
 import com.binar.byteacademy.dto.response.base.ErrorDTO;
-import com.binar.byteacademy.exception.AccessDeniedException;
-import com.binar.byteacademy.exception.DataConflictException;
-import com.binar.byteacademy.exception.DataNotFoundException;
-import com.binar.byteacademy.exception.ServiceBusinessException;
+import com.binar.byteacademy.exception.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -71,6 +68,33 @@ public class GlobalExceptionHandler {
     public APIResponse handleHttpMessageNotReadable(HttpMessageNotReadableException exception) {
         return new APIResponse(
                 HttpStatus.BAD_REQUEST,
+                exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public APIResponse handleConflictException(ConflictException exception) {
+        return new APIResponse(
+                HttpStatus.CONFLICT,
+                exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public APIResponse handleForbiddenException(ForbiddenException exception) {
+        return new APIResponse(
+                HttpStatus.FORBIDDEN,
+                exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler(UserNotActiveException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public APIResponse handleUserNotActiveException(UserNotActiveException exception) {
+        return new APIResponse(
+                HttpStatus.FORBIDDEN,
                 exception.getMessage()
         );
     }
