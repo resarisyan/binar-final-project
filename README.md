@@ -286,7 +286,7 @@ Return All Free Course
 Return Detail Free Course by course id
 
 * **URL Params**  
-  *required:* `courseType=[String]/JVSB01`
+  *required:* `courseType=[FREE]/JVSB01`
 * **Data Params**  
   None
 * **Headers**  
@@ -322,7 +322,7 @@ Return Detail Free Course by course id
 Return Detail Paid Course by course id
 
 * **URL Params**  
-  *required:* `courseType=[String]/JVSB01`
+  *required:* `courseType=[PAID]/JVSB01`
 * **Data Params**  
   None
 * **Headers**  
