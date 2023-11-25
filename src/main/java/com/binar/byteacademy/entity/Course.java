@@ -82,4 +82,10 @@ public class Course {
     @ManyToOne
     @JoinColumn(name = "category_id", referencedColumnName = "category_id", nullable = false)
     private Category category;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "course_promo",
+            joinColumns = @JoinColumn(name = "course_id"),
+            inverseJoinColumns = @JoinColumn(name = "promo_id"))
+    private List<Promo> promos;
 }
