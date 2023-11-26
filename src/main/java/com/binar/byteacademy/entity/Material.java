@@ -28,8 +28,8 @@ public class Material {
     @Column(name = "video_link", nullable = false)
     private String videoLink;
 
-    @Column(name = "material_duration", columnDefinition = "interval", nullable = false)
-    private Duration materialDuration;
+    @Column(name = "material_duration", nullable = false)
+    private Integer materialDuration;
 
     @Column(name = "slug_material")
     private String slugMaterial;

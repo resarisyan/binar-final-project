@@ -28,8 +28,8 @@ public class Chapter {
     @Column(nullable = false)
     private String title;
 
-    @Column(name = "chapter_duration", columnDefinition = "interval")
-    private Duration chapterDuration;
+    @Column(name = "chapter_duration")
+    private Integer chapterDuration;
 
     @OneToMany(mappedBy = "chapter", cascade = CascadeType.ALL)
     private List<Material> materials;

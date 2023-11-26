@@ -46,8 +46,8 @@ public class Course {
     @Column(name = "total_modules")
     private Integer totalModules;
 
-    @Column(name = "course_duration", columnDefinition = "interval")
-    private Duration courseDuration;
+    @Column(name = "course_duration")
+    private Integer courseDuration;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
