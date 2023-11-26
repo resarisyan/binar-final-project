@@ -40,6 +40,12 @@ public class Course {
     @Column(nullable = false)
     private Double price;
 
+    @Column(name = "total_course_rate")
+    private Double totalCourseRate;
+
+    @Column(name = "total_modules")
+    private Integer totalModules;
+
     @Column(name = "course_duration", columnDefinition = "interval")
     private Duration courseDuration;
 
