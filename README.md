@@ -4,7 +4,7 @@ To use this FE demo, you're required to comply with this API contract
 
 ### User
 
-**POST /register**
+**POST /api/v1/auth/register**
 
 Registering new user
 
@@ -35,7 +35,7 @@ Registering new user
 }
 ```
 
-**POST /login**
+**POST /api/v1/auth/login**
 
 Login as User
 
@@ -63,7 +63,7 @@ Login as User
 }
 ```
 
-**POST /verify-account**
+**POST /api/v1/auth/verify-account**
 
 Verify Account
 
@@ -84,7 +84,7 @@ Verify Account
 }
 ```
 
-**POST /regenerate-otp**
+**POST /api/v1/auth/regenerate-otp**
 
 Regenerate Token OTP
 
@@ -105,7 +105,7 @@ Regenerate Token OTP
 }
 ```
 
-**POST /refresh-token**
+**POST /api/v1/auth/refresh-token**
 
 Refresh token
 
@@ -128,7 +128,7 @@ Refresh token
 
 ### Course
 
-**GET /list-courses**
+**GET /api/v1/course**
 
 Return all course
 
@@ -143,46 +143,43 @@ Return all course
   **Content:**
 
 ```
-[
-    {
-        courseName: "Backend Development",
-        courseSubTitle: "Java SpringBoot for beginner",
-        intructorName: "John Doe"
-        price: 0
-        courseDuration: 120
-        courseDescription: Java spring boot for backend development
-        slugCourse: /java-spring-boot
-        pathCourseImage: "http://yourimageurl.com/image_sub_path_1"
-        groupLink: "http://yourgroupurl.com/class
-        courseType: "FREE"
-        courseLevel: "BEGINNER"
-        courseStatus: "ACTIVE"
-        categoryId: JAVASPRB
-    },
-    {
-        courseName: "Web Development",
-        courseSubTitle: "JavaScript from zero to hero",
-        intructorName: "John Doe"
-        price: 150000
-        courseDuration: 150
-        courseDescription: "Java Script for front end development"
-        slugCourse: /java-script-zero-to-hero
-        pathCourseImage: "http://yourimageurl.com/image_sub_path_1"
-        groupLink: "http://yourgroupurl.com/class
-        courseType: "PAID"
-        courseLevel: "BEGINNER"
-        courseStatus: "ACTIVE"
-        categoryId: "JVSCRPT01"
-    }
-]
+{
+    "results": [
+        {
+            "courseName": "Sample Course",
+            "courseSubTitle": "Sample Subtitle",
+            "instructorName": "Instructor Name",
+            "price": 99.99,
+            "courseType": "FREE",
+            "courseLevel": null,
+            "totalCourseRate": 4.5,
+            "totalModules": 10,
+            "courseDuration": 30
+        },
+        {
+            "courseName": "Another Course",
+            "courseSubTitle": "Subtitle for Another Course",
+            "instructorName": "Another Instructor",
+            "price": 49.99,
+            "courseType": "PREMIUM",
+            "courseLevel": null,
+            "totalCourseRate": 4.2,
+            "totalModules": 8,
+            "courseDuration": 25
+        },
+    ],
+    "status": "OK",
+    "code": 200,
+    "message": "List of courses retrieved successfully"
+}
 ```
 
-**GET /list-courses/{courseType}**
+**GET /api/v1/course?{type}**
 
-Return All Paid Course 
+Return All PREMIUM Course 
 
 * **URL Params**  
-  *required:* `courseType=[PAID]`
+  *required:* `type=[PREMIUM]`
 * **Data Params**  
   None
 * **Headers**  
@@ -192,166 +189,216 @@ Return All Paid Course
   **Content:**
 
 ```
-[
-    {
-        courseName: "Backend Development",
-        courseSubTitle: "Java SpringBoot for beginner",
-        intructorName: "John Doe"
-        price: 0
-        courseDuration: 120
-        courseDescription: Java spring boot for backend development
-        slugCourse: /java-spring-boot
-        pathCourseImage: "http://yourimageurl.com/image_sub_path_1"
-        groupLink: "http://yourgroupurl.com/class
-        courseType: "PAID"
-        courseLevel: "BEGINNER"
-        courseStatus: "ACTIVE"
-        categoryId: JAVASPRB
-    },
-    {
-        courseName: "Web Development",
-        courseSubTitle: "JavaScript from zero to hero",
-        intructorName: "John Doe"
-        price: 150000
-        courseDuration: 150
-        courseDescription: "Java Script for front end development"
-        slugCourse: /java-script-zero-to-hero
-        pathCourseImage: "http://yourimageurl.com/image_sub_path_1"
-        groupLink: "http://yourgroupurl.com/class
-        courseType: "PAID"
-        courseLevel: "BEGINNER"
-        courseStatus: "ACTIVE"
-        categoryId: "JVSCRPT01"
-    }
-]
-```
-
-**GET /list-courses/{courseType}**
-
-Return All Free Course
-
-* **URL Params**  
-  *required:* `courseType=[FREE]`
-* **Data Params**  
-  None
-* **Headers**  
-  Content-Type: application/json
-* **Success Response:**
-* **Code:** 200  
-  **Content:**
-
-```
-[
-    {
-        courseName: "Backend Development",
-        courseSubTitle: "Java SpringBoot for beginner",
-        intructorName: "John Doe"
-        price: 0
-        courseDuration: 120
-        courseDescription: Java spring boot for backend development
-        slugCourse: /java-spring-boot
-        pathCourseImage: "http://yourimageurl.com/image_sub_path_1"
-        groupLink: "http://yourgroupurl.com/class
-        courseType: "FREE"
-        courseLevel: "BEGINNER"
-        courseStatus: "ACTIVE"
-        categoryId: {
-                chapterId: "JVSB01",
-                categoryName: "Java Spring Boot",
-                pathCategoryImage: "http://yourimageurl.com/category_image_path_2 "
+{
+    "results": [
+        {
+            "courseName": "Another Course",
+            "courseSubTitle": "Subtitle for Another Course",
+            "instructorName": "Another Instructor",
+            "price": 49.99,
+            "courseType": "PREMIUM",
+            "courseLevel": "BEGINNER",
+            "totalCourseRate": 4.2,
+            "totalModules": 8,
+            "courseDuration": 25
+        },
+        {
+            "courseName": "Another Course",
+            "courseSubTitle": "Subtitle for Another Course",
+            "instructorName": "Another Instructor",
+            "price": 49.99,
+            "courseType": "PREMIUM",
+            "courseLevel": "BEGINNER",
+            "totalCourseRate": 4.2,
+            "totalModules": 8,
+            "courseDuration": 25
         }
-    },
-        courseName: "Frontend Development",
-        courseSubTitle: "Modern JavaScript Frameworks",
-        intructorName: "John Doe"
-        price: 0
-        courseDuration: 120
-        courseDescription: "Master the latest JavaScript frameworks for frontend development."
-        slugCourse: "/java-spring-boot"
-        pathCourseImage: "http://yourimageurl.com/image_sub_path_1"
-        groupLink: "http://yourgroupurl.com/class
-        courseType: "FREE"
-        courseLevel: "INTERMEDIATE"
-        courseStatus: "ACTIVE" 
-        categoryId: {
-                chapterId: "JSFW01",
-                categoryName: "JavaScript Frameworks",
-                pathCategoryImage: "http://yourimageurl.com/category_image_path_2 "
-   }
-]
+    ],
+    "status": "OK",
+    "code": 200,
+    "message": "List of courses retrieved successfully"
+}
 ```
 
-**GET /list-course/{courseType}/{courseId}**
+**GET /api/v1/course?{type}**
+
+Return All FREE Course
+
+* **URL Params**  
+  *required:* `type=[FREE]`
+* **Data Params**  
+  None
+* **Headers**  
+  Content-Type: application/json
+* **Success Response:**
+* **Code:** 200  
+  **Content:**
+
+```
+{
+    "results": [
+        {
+            "courseName": "Sample Course",
+            "courseSubTitle": "Sample Subtitle",
+            "instructorName": "Instructor Name",
+            "price": 99.99,
+            "courseType": "FREE",
+            "courseLevel": "BEGINNER",
+            "totalCourseRate": 4.5,
+            "totalModules": 10,
+            "courseDuration": 30
+        },
+        {
+            "courseName": "Sample Course",
+            "courseSubTitle": "Sample Subtitle",
+            "instructorName": "Instructor Name",
+            "price": 99.99,
+            "courseType": "FREE",
+            "courseLevel": "BEGINNER",
+            "totalCourseRate": 4.5,
+            "totalModules": 10,
+            "courseDuration": 30
+        }
+    ],
+    "status": "OK",
+    "code": 200,
+    "message": "List of courses retrieved successfully"
+}
+```
+
+**GET /api/v1/course?{type}/{courseId}**
 
 Return Detail Free Course by course id
+# SOON
 
-* **URL Params**  
-  *required:* `courseType=[String]/JVSB01`
-* **Data Params**  
-  None
-* **Headers**  
-  Content-Type: application/json
-* **Success Response:**
-* **Code:** 200  
-  **Content:**
+[//]: # ()
+[//]: # (* **URL Params**  )
 
-```
-{
-   courseName: "Frontend Development",
-   courseSubTitle: "Modern JavaScript Frameworks",
-   intructorName: "John Doe"
-   price: 0
-   courseDuration: 120
-   courseDescription: "Master the latest JavaScript frameworks for frontend development."
-   slugCourse: "/java-spring-boot"
-   pathCourseImage: "http://yourimageurl.com/image_sub_path_1"
-   groupLink: "http://yourgroupurl.com/class
-   courseType: "FREE"
-   courseLevel: "INTERMEDIATE"
-   courseStatus: "ACTIVE" 
-   categoryId: {
-          chapterId: "JSFW01",
-          categoryName: "JavaScript Frameworks",
-          pathCategoryImage: "http://yourimageurl.com/category_image_path_2 "
-   }
-}
-```
+[//]: # (  *required:* `type=[FREE]/JVSB01`)
 
-**GET /list-courses/{courseType}/{courseId}**
+[//]: # (* **Data Params**  )
 
-Return Detail Paid Course by course id
+[//]: # (  None)
 
-* **URL Params**  
-  *required:* `courseType=[String]/JVSB01`
-* **Data Params**  
-  None
-* **Headers**  
-  Content-Type: application/json
-* **Success Response:**
-* **Code:** 200  
-  **Content:**
+[//]: # (* **Headers**  )
 
-```
-{
-   courseName: "Backend Development",
-   courseSubTitle: "Java SpringBoot for beginner",
-   intructorName: "John Doe"
-   price: 0
-   courseDuration: 120
-   courseDescription: Java spring boot for backend development
-   slugCourse: /java-spring-boot
-   pathCourseImage: "http://yourimageurl.com/image_sub_path_1"
-   groupLink: "http://yourgroupurl.com/class
-   courseType: "PAID"
-   courseLevel: "BEGINNER"
-   courseStatus: "ACTIVE"
-   categoryId: {
-          chapterId: "JVSPB01",
-          categoryName: "Java Spring Boot",
-          pathCategoryImage: "http://yourimageurl.com/category_image_path_2"
-   }
-}
-```
+[//]: # (  Content-Type: application/json)
+
+[//]: # (* **Success Response:**)
+
+[//]: # (* **Code:** 200  )
+
+[//]: # (  **Content:**)
+
+[//]: # ()
+[//]: # (```)
+
+[//]: # ({)
+
+[//]: # (   courseName: "Frontend Development",)
+
+[//]: # (   courseSubTitle: "Modern JavaScript Frameworks",)
+
+[//]: # (   intructorName: "John Doe")
+
+[//]: # (   price: 0)
+
+[//]: # (   courseDuration: 120)
+
+[//]: # (   courseDescription: "Master the latest JavaScript frameworks for frontend development.")
+
+[//]: # (   slugCourse: "/java-spring-boot")
+
+[//]: # (   pathCourseImage: "http://yourimageurl.com/image_sub_path_1")
+
+[//]: # (   groupLink: "http://yourgroupurl.com/class)
+
+[//]: # (   courseType: "FREE")
+
+[//]: # (   courseLevel: "INTERMEDIATE")
+
+[//]: # (   courseStatus: "ACTIVE" )
+
+[//]: # (   categoryId: {)
+
+[//]: # (          chapterId: "JSFW01",)
+
+[//]: # (          categoryName: "JavaScript Frameworks",)
+
+[//]: # (          pathCategoryImage: "http://yourimageurl.com/category_image_path_2 ")
+
+[//]: # (   })
+
+[//]: # (})
+
+[//]: # (```)
+
+[//]: # ()
+[//]: # (**GET /list-courses/{courseType}/{courseId}**)
+
+[//]: # ()
+[//]: # (Return Detail Paid Course by course id)
+
+[//]: # ()
+[//]: # (* **URL Params**  )
+
+[//]: # (  *required:* `courseType=[String]/JVSB01`)
+
+[//]: # (* **Data Params**  )
+
+[//]: # (  None)
+
+[//]: # (* **Headers**  )
+
+[//]: # (  Content-Type: application/json)
+
+[//]: # (* **Success Response:**)
+
+[//]: # (* **Code:** 200  )
+
+[//]: # (  **Content:**)
+
+[//]: # ()
+[//]: # (```)
+
+[//]: # ({)
+
+[//]: # (   courseName: "Backend Development",)
+
+[//]: # (   courseSubTitle: "Java SpringBoot for beginner",)
+
+[//]: # (   intructorName: "John Doe")
+
+[//]: # (   price: 0)
+
+[//]: # (   courseDuration: 120)
+
+[//]: # (   courseDescription: Java spring boot for backend development)
+
+[//]: # (   slugCourse: /java-spring-boot)
+
+[//]: # (   pathCourseImage: "http://yourimageurl.com/image_sub_path_1")
+
+[//]: # (   groupLink: "http://yourgroupurl.com/class)
+
+[//]: # (   courseType: "PAID")
+
+[//]: # (   courseLevel: "BEGINNER")
+
+[//]: # (   courseStatus: "ACTIVE")
+
+[//]: # (   categoryId: {)
+
+[//]: # (          chapterId: "JVSPB01",)
+
+[//]: # (          categoryName: "Java Spring Boot",)
+
+[//]: # (          pathCategoryImage: "http://yourimageurl.com/category_image_path_2")
+
+[//]: # (   })
+
+[//]: # (})
+[//]: # (```)
 
 ### Admin
 
