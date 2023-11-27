@@ -19,6 +19,7 @@ public class Constants {
     public static final class CommonPats {
         public static final String[] WHITE_LIST_PATS = {
                 "/api/v1/auth/**",
+                "/api/v1/course/**",
                 "/v1/auth/**",
                 "/v2/api-docs",
                 "/v3/api-docs",
@@ -30,7 +31,8 @@ public class Constants {
                 "/swagger-ui/**",
                 "/webjars/**",
                 "/swagger-ui.html",
-                "/docs"
+                "/docs",
+
         };
     }
 
