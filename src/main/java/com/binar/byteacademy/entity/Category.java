@@ -21,7 +21,7 @@ public class Category {
     @Column(name = "category_id")
     private UUID id;
 
-    @Column(name = "category_name", nullable = false)
+    @Column(name = "category_name", nullable = false, unique = true)
     private String categoryName;
 
     @Column(name = "path_category_image")
