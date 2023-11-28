@@ -5,6 +5,7 @@ import com.binar.byteacademy.dto.response.base.ApiErrorResponse;
 import com.binar.byteacademy.dto.response.base.ErrorDTO;
 import com.binar.byteacademy.exception.*;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -102,6 +103,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public APIResponse handlerIllegalArgumentException(IllegalArgumentException exception) {
+        return new APIResponse(
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler(ConversionFailedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public APIResponse handlerConversionFailedException(ConversionFailedException exception) {
         return new APIResponse(
                 HttpStatus.BAD_REQUEST,
                 exception.getMessage()
