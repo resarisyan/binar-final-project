@@ -4,21 +4,16 @@ import com.binar.byteacademy.entity.Category;
 import com.binar.byteacademy.entity.Chapter;
 import com.binar.byteacademy.enumeration.EnumCourseLevel;
 import com.binar.byteacademy.enumeration.EnumCourseType;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.util.List;
-import java.util.UUID;
-
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CourseResponse {
-    private UUID id;
     private String courseName;
     private String instructorName;
     private Double price;
@@ -31,4 +26,3 @@ public class CourseResponse {
     private String pathCourseImage;
     private CategoryResponse category;
 }
-

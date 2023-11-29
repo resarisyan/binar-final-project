@@ -14,14 +14,15 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "category")
+@Table(name = "categorys")
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "category_id")
     private UUID id;
 
-    @Column(name = "category_name", nullable = false)
+    @Column(name = "category_name", nullable = false, unique = true)
+
     private String categoryName;
 
     @Column(name = "path_category_image")

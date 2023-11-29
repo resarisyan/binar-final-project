@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,7 +30,11 @@ public class Chapter {
     @Column(name = "chapter_duration")
     private Integer chapterDuration;
 
+<<<<<<< dev_akbar
     @OneToMany(mappedBy = "chapter", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+=======
+    @OneToMany(mappedBy = "chapter", cascade = CascadeType.ALL)
+>>>>>>> main
     private List<Material> materials;
 
     @ManyToOne
