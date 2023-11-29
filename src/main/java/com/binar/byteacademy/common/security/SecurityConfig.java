@@ -12,7 +12,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import static com.binar.byteacademy.common.util.Constants.CoursePats.COURSE_PATS;
+import static com.binar.byteacademy.common.util.Constants.CoursePats.*;
 import static com.binar.byteacademy.enumeration.EnumPermission.*;
 import static org.springframework.http.HttpMethod.*;
 
@@ -44,6 +44,8 @@ public class SecurityConfig {
                                 .requestMatchers(POST, COURSE_PATS).hasAnyAuthority(ADMIN_CREATE.getPermission())
                                 .requestMatchers(PUT, COURSE_PATS).hasAnyAuthority(ADMIN_UPDATE.getPermission())
                                 .requestMatchers(DELETE, COURSE_PATS).hasAnyAuthority(ADMIN_DELETE.getPermission())
+                                .requestMatchers(GET, COURSE_PATS_ADMIN).hasAnyAuthority(ADMIN_READ.getPermission())
+                                .requestMatchers(GET, COURSE_PATS_CUSTOMER).hasAnyAuthority(CUSTOMER_READ.getPermission())
                                 .requestMatchers("/api/v1/**")
                                 .authenticated()
                 )
