@@ -9,7 +9,7 @@ public class StringToEnumCourseLevelConverter implements Converter<String, EnumC
         try {
             return EnumCourseLevel.valueOf(source.toUpperCase());
         } catch (IllegalArgumentException e) {
-            return null;
+            throw new IllegalArgumentException("Wrong enum 'course level' value");
         }
     }
 }

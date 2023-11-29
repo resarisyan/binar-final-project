@@ -1,13 +1,13 @@
 package com.binar.byteacademy.dto.response;
 
-import com.binar.byteacademy.entity.Category;
-import com.binar.byteacademy.entity.Chapter;
 import com.binar.byteacademy.enumeration.EnumCourseLevel;
 import com.binar.byteacademy.enumeration.EnumCourseType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 @Data
 @Builder
 @AllArgsConstructor
