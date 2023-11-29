@@ -33,7 +33,7 @@ public class Chapter {
     @Column(name = "chapter_duration")
     private Integer chapterDuration;
 
-    @OneToMany(mappedBy = "chapter", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "chapter", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Material> materials;
 
     @CreationTimestamp

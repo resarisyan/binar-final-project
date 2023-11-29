@@ -33,7 +33,8 @@ public class Constants {
                 "/swagger-ui/**",
                 "/webjars/**",
                 "/swagger-ui.html",
-                "/docs"
+                "/docs",
+                "/api/v1/course"
         };
     }
 

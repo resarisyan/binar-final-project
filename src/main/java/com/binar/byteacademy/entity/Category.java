@@ -17,7 +17,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "category")
+@Table(name = "categories")
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -25,6 +25,7 @@ public class Category {
     private UUID id;
 
     @Column(name = "category_name", nullable = false, unique = true)
+
     private String categoryName;
 
     @Column(name = "path_category_image")
