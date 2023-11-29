@@ -53,6 +53,12 @@ public class User implements UserDetails {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private CustomerDetail customerDetail;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Purchase> purchase;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<UserProgress> userProgresses;
+
     @OneToMany(mappedBy = "user")
     private List<Token> tokens;
 

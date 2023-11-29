@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -30,9 +29,6 @@ public class Course {
 
     @Column(name = "course_name", nullable = false)
     private String courseName;
-
-    @Column(name = "course_sub_title", nullable = false)
-    private String courseSubTitle;
 
     @Column(name = "instructor_name", nullable = false)
     private String instructorName;
@@ -84,6 +80,12 @@ public class Course {
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
     private List<Chapter> chapters;
+
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    private List<UserProgress> userProgresses;
+
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    private List<Purchase> purchases;
 
     @ManyToOne
     @JoinColumn(name = "category_id", referencedColumnName = "category_id", nullable = false)
