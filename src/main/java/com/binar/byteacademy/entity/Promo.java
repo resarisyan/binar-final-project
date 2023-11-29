@@ -22,6 +22,7 @@ public class Promo {
     private UUID id;
 
     @Column(name = "promo_code", unique = true)
+
     private String promoCode;
 
     @Column(nullable = false)

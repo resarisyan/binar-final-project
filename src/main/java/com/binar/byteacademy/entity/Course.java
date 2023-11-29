@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -82,7 +81,10 @@ public class Course {
     @Enumerated(EnumType.STRING)
     private EnumStatus courseStatus;
 
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+
     private List<Chapter> chapters;
 
     @ManyToOne
