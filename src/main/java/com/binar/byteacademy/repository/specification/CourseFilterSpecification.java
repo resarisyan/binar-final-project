@@ -1,8 +1,6 @@
 package com.binar.byteacademy.repository.specification;
 
-import com.binar.byteacademy.entity.Category;
-import com.binar.byteacademy.entity.Course;
-import com.binar.byteacademy.entity.Promo;
+import com.binar.byteacademy.entity.*;
 import com.binar.byteacademy.enumeration.EnumCourseLevel;
 import com.binar.byteacademy.enumeration.EnumCourseType;
 import com.binar.byteacademy.enumeration.EnumFilterCoursesBy;
@@ -21,7 +19,8 @@ public class CourseFilterSpecification {
             List<EnumCourseType> courseTypes,
             List<EnumStatus> courseStatuses,
             List<EnumFilterCoursesBy> filterCoursesBy,
-            String keyword
+            String keyword,
+            String username
     ) {
         return ((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -40,7 +39,15 @@ public class CourseFilterSpecification {
                 predicates.add(root.get("courseStatus").in(courseStatuses));
             }
             if (keyword != null) {
-                predicates.add(criteriaBuilder.like(root.get("courseName"), "%"+keyword+"%"));
+                predicates.add(criteriaBuilder.like(root.get("courseName"), "%"+keyword.toLowerCase()+"%"));
+            }
+            if (username != null) {
+                Join<Course, Purchase> purchaseJoin = root.join("purchases");
+                Join<Course, UserProgress> userProgressJoin = root.join("userProgresses");
+                Join<Purchase, User> userJoin1 = purchaseJoin.join("user");
+                Join<UserProgress, User> userJoin2 = userProgressJoin.join("user");
+                predicates.add(criteriaBuilder.equal(userJoin1.get("username"), username));
+                predicates.add(criteriaBuilder.equal(userJoin2.get("username"), username));
             }
             if (filterCoursesBy.contains(EnumFilterCoursesBy.PROMO)) {
                 Join<Course, Promo> promoJoin = root.join("promos", JoinType.LEFT);

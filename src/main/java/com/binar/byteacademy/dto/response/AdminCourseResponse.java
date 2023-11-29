@@ -2,6 +2,7 @@ package com.binar.byteacademy.dto.response;
 
 import com.binar.byteacademy.enumeration.EnumCourseLevel;
 import com.binar.byteacademy.enumeration.EnumCourseType;
+import com.binar.byteacademy.enumeration.EnumStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,18 +14,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class CourseResponse {
+public class AdminCourseResponse {
+    private String slugCourse;
     private String courseName;
     private String categoryName;
-    private String instructorName;
-    private String pathImage;
     private Double price;
-    private Double totalCourseRate;
-    private Integer totalModules;
-    private Integer courseDuration;
-    private String slugCourse;
     private EnumCourseType courseType;
     private EnumCourseLevel courseLevel;
-    private String pathCourseImage;
-    private CategoryResponse category;
+    private EnumStatus courseStatus;
 }
