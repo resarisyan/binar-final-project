@@ -17,18 +17,18 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CourseResponse {
+public class CourseDetailResponse {
     private UUID id;
     private String courseName;
     private String instructorName;
-    private Double price;
     private Double totalCourseRate;
     private Integer totalModules;
     private Integer courseDuration;
     private String slugCourse;
+    private String pathCourseImage;
+    private String groupLink;
     private EnumCourseType courseType;
     private EnumCourseLevel courseLevel;
-    private String pathCourseImage;
+    private List<ChapterResponse> listChapter;
     private CategoryResponse category;
 }
-

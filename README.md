@@ -144,33 +144,47 @@ Return all course
 
 ```
 {
-    "results": [
-        {
-            "courseName": "Sample Course",
-            "courseSubTitle": "Sample Subtitle",
-            "instructorName": "Instructor Name",
-            "price": 99.99,
-            "courseType": "FREE",
-            "courseLevel": null,
-            "totalCourseRate": 4.5,
-            "totalModules": 10,
-            "courseDuration": 30
-        },
-        {
-            "courseName": "Another Course",
-            "courseSubTitle": "Subtitle for Another Course",
-            "instructorName": "Another Instructor",
-            "price": 49.99,
-            "courseType": "PREMIUM",
-            "courseLevel": null,
-            "totalCourseRate": 4.2,
-            "totalModules": 8,
-            "courseDuration": 25
-        },
-    ],
-    "status": "OK",
-    "code": 200,
-    "message": "List of courses retrieved successfully"
+  "results": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440001",
+      "courseName": "Introduction to Programming",
+      "instructorName": "Jane Smith",
+      "price": 0,
+      "totalCourseRate": 4,
+      "totalModules": 8,
+      "courseDuration": 20,
+      "slugCourse": "introduction-to-programming",
+      "courseType": "FREE",
+      "courseLevel": "BEGINNER",
+      "pathCourseImage": "/images/intro-to-programming.jpg",
+      "category": {
+        "categoryId": "550e8400-e29b-41d4-a716-446655440000",
+        "categoryName": "Programming",
+        "pathCategoryImage": "/images/example.jpg"
+      }
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440004",
+      "courseName": "Full Stack Web Development Bootcamp",
+      "instructorName": "Alex Turner",
+      "price": 79.99,
+      "totalCourseRate": 4.9,
+      "totalModules": 20,
+      "courseDuration": 60,
+      "slugCourse": "full-stack-web-development-bootcamp",
+      "courseType": "PREMIUM",
+      "courseLevel": "INTERMEDIATE",
+      "pathCourseImage": "/images/webdev-bootcamp.jpg",
+      "category": {
+        "categoryId": "550e8400-e29b-41d4-a716-446655440002",
+        "categoryName": "Web Development",
+        "pathCategoryImage": "/images/webdev.jpg"
+      }
+    }
+  ],
+  "status": "OK",
+  "code": 200,
+  "message": "List of courses retrieved successfully"
 }
 ```
 
@@ -190,33 +204,47 @@ Return All PREMIUM Course
 
 ```
 {
-    "results": [
-        {
-            "courseName": "Another Course",
-            "courseSubTitle": "Subtitle for Another Course",
-            "instructorName": "Another Instructor",
-            "price": 49.99,
-            "courseType": "PREMIUM",
-            "courseLevel": "BEGINNER",
-            "totalCourseRate": 4.2,
-            "totalModules": 8,
-            "courseDuration": 25
-        },
-        {
-            "courseName": "Another Course",
-            "courseSubTitle": "Subtitle for Another Course",
-            "instructorName": "Another Instructor",
-            "price": 49.99,
-            "courseType": "PREMIUM",
-            "courseLevel": "BEGINNER",
-            "totalCourseRate": 4.2,
-            "totalModules": 8,
-            "courseDuration": 25
-        }
-    ],
-    "status": "OK",
-    "code": 200,
-    "message": "List of courses retrieved successfully"
+  "results": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440003",
+      "courseName": "Advanced Machine Learning",
+      "instructorName": "Chris Anderson",
+      "price": 49.99,
+      "totalCourseRate": 4.8,
+      "totalModules": 15,
+      "courseDuration": 40,
+      "slugCourse": "advanced-machine-learning",
+      "courseType": "PREMIUM",
+      "courseLevel": "ADVANCE",
+      "pathCourseImage": "/images/advanced-ml.jpg",
+      "category": {
+        "categoryId": "550e8400-e29b-41d4-a716-446655440001",
+        "categoryName": "Data Science",
+        "pathCategoryImage": "/images/datascience.jpg"
+      }
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440004",
+      "courseName": "Full Stack Web Development Bootcamp",
+      "instructorName": "Alex Turner",
+      "price": 79.99,
+      "totalCourseRate": 4.9,
+      "totalModules": 20,
+      "courseDuration": 60,
+      "slugCourse": "full-stack-web-development-bootcamp",
+      "courseType": "PREMIUM",
+      "courseLevel": "INTERMEDIATE",
+      "pathCourseImage": "/images/webdev-bootcamp.jpg",
+      "category": {
+        "categoryId": "550e8400-e29b-41d4-a716-446655440002",
+        "categoryName": "Web Development",
+        "pathCategoryImage": "/images/webdev.jpg"
+      }
+    }
+  ],
+  "status": "OK",
+  "code": 200,
+  "message": "List of courses retrieved successfully"
 }
 ```
 
@@ -236,169 +264,215 @@ Return All FREE Course
 
 ```
 {
-    "results": [
-        {
-            "courseName": "Sample Course",
-            "courseSubTitle": "Sample Subtitle",
-            "instructorName": "Instructor Name",
-            "price": 99.99,
-            "courseType": "FREE",
-            "courseLevel": "BEGINNER",
-            "totalCourseRate": 4.5,
-            "totalModules": 10,
-            "courseDuration": 30
-        },
-        {
-            "courseName": "Sample Course",
-            "courseSubTitle": "Sample Subtitle",
-            "instructorName": "Instructor Name",
-            "price": 99.99,
-            "courseType": "FREE",
-            "courseLevel": "BEGINNER",
-            "totalCourseRate": 4.5,
-            "totalModules": 10,
-            "courseDuration": 30
-        }
-    ],
-    "status": "OK",
-    "code": 200,
-    "message": "List of courses retrieved successfully"
+  "results": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440001",
+      "courseName": "Introduction to Programming",
+      "instructorName": "Jane Smith",
+      "price": 0,
+      "totalCourseRate": 4,
+      "totalModules": 8,
+      "courseDuration": 20,
+      "slugCourse": "introduction-to-programming",
+      "courseType": "FREE",
+      "courseLevel": "BEGINNER",
+      "pathCourseImage": "/images/intro-to-programming.jpg",
+      "category": {
+        "categoryId": "550e8400-e29b-41d4-a716-446655440000",
+        "categoryName": "Programming",
+        "pathCategoryImage": "/images/example.jpg"
+      }
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440002",
+      "courseName": "Introduction to Web Development",
+      "instructorName": "Mike Johnson",
+      "price": 0,
+      "totalCourseRate": 4.2,
+      "totalModules": 10,
+      "courseDuration": 25,
+      "slugCourse": "introduction-to-web-development",
+      "courseType": "FREE",
+      "courseLevel": "BEGINNER",
+      "pathCourseImage": "/images/intro-to-webdev.jpg",
+      "category": {
+        "categoryId": "550e8400-e29b-41d4-a716-446655440002",
+        "categoryName": "Web Development",
+        "pathCategoryImage": "/images/webdev.jpg"
+      }
+    }
+  ],
+  "status": "OK",
+  "code": 200,
+  "message": "List of courses retrieved successfully"
 }
 ```
 
-**GET /api/v1/course?{type}/{courseId}**
+**GET /api/v1/course?{type}&{courseId}**
 
 Return Detail Free Course by course id
-# SOON
 
-[//]: # ()
-[//]: # (* **URL Params**  )
+* **URL Params**
+  *required:* `type=[FREE]&id=[UUID]`
+* **Data Params**
+  None
+* **Headers**
+  Content-Type: application/json
+* **Success Response:**
+* **Code:** 200
+* **Content:**
+```
 
-[//]: # (  *required:* `type=[FREE]/JVSB01`)
+{
+  "results": {
+    "id": "550e8400-e29b-41d4-a716-446655440001",
+    "courseName": "Introduction to Programming",
+    "instructorName": "Jane Smith",
+    "totalCourseRate": 4,
+    "totalModules": 8,
+    "courseDuration": 20,
+    "slugCourse": "intro-to-programming",
+    "pathCourseImage": "/images/intro-to-programming.jpg",
+    "groupLink": "https://example.com/intro-group",
+    "courseType": "FREE",
+    "courseLevel": "BEGINNER",
+    "listChapter": [
+      {
+        "chapterId": "6b7920a1-b96e-4d89-9b60-2c3ba6e3f476",
+        "noChapter": 1,
+        "title": "Introduction to the Course",
+        "chapterDuration": 15,
+        "materials": [
+          {
+            "materialId": "5e4b52ba-98d0-4a9f-8ebd-c6c8a9b908de",
+            "serialNumber": 1,
+            "videoLink": "https://videos.com/chapter1/video1.mp4",
+            "materialDuration": 120,
+            "slugMaterial": "video1-material",
+            "materialType": "FREE"
+          },
+          {
+            "materialId": "7f7b3ea2-9d5d-4d0b-b66c-8e41a977e4e1",
+            "serialNumber": 2,
+            "videoLink": "https://videos.com/chapter1/video2.mp4",
+            "materialDuration": 90,
+            "slugMaterial": "video2-material",
+            "materialType": "FREE"
+          }
+        ]
+      },
+      {
+        "chapterId": "6b7920a1-b96e-4d89-9b60-2c3ba6e3f477",
+        "noChapter": 2,
+        "title": "what is programming?",
+        "chapterDuration": 30,
+        "materials": [
+          {
+            "materialId": "a5e7f8d9-12c4-4b32-aeb2-34b58092f318",
+            "serialNumber": 1,
+            "videoLink": "https://docs.com/chapter2/document1.pdf",
+            "materialDuration": 60,
+            "slugMaterial": "document1-material",
+            "materialType": "PAID"
+          }
+        ]
+      }
+    ],
+    "category": {
+      "categoryId": "550e8400-e29b-41d4-a716-446655440000",
+      "categoryName": "Programming",
+      "pathCategoryImage": "/images/example.jpg"
+    }
+  },
+  "status": "OK",
+  "code": 200,
+  "message": "Course details retrieved successfully"
+}
 
-[//]: # (* **Data Params**  )
+```
 
-[//]: # (  None)
+**GET /api/v1/course?{type}&{id}**
 
-[//]: # (* **Headers**  )
+Return Detail Premium Course by course id
 
-[//]: # (  Content-Type: application/json)
+* **URL Params**
+  *required:* `type=[String]&id=[UUID]`
+* **Data Params**
+  None
+* **Headers**
+  Content-Type: application/json
+* **Success Response:**
+* **Code:** 200
+  
+* **Content:**
 
-[//]: # (* **Success Response:**)
-
-[//]: # (* **Code:** 200  )
-
-[//]: # (  **Content:**)
-
-[//]: # ()
-[//]: # (```)
-
-[//]: # ({)
-
-[//]: # (   courseName: "Frontend Development",)
-
-[//]: # (   courseSubTitle: "Modern JavaScript Frameworks",)
-
-[//]: # (   intructorName: "John Doe")
-
-[//]: # (   price: 0)
-
-[//]: # (   courseDuration: 120)
-
-[//]: # (   courseDescription: "Master the latest JavaScript frameworks for frontend development.")
-
-[//]: # (   slugCourse: "/java-spring-boot")
-
-[//]: # (   pathCourseImage: "http://yourimageurl.com/image_sub_path_1")
-
-[//]: # (   groupLink: "http://yourgroupurl.com/class)
-
-[//]: # (   courseType: "FREE")
-
-[//]: # (   courseLevel: "INTERMEDIATE")
-
-[//]: # (   courseStatus: "ACTIVE" )
-
-[//]: # (   categoryId: {)
-
-[//]: # (          chapterId: "JSFW01",)
-
-[//]: # (          categoryName: "JavaScript Frameworks",)
-
-[//]: # (          pathCategoryImage: "http://yourimageurl.com/category_image_path_2 ")
-
-[//]: # (   })
-
-[//]: # (})
-
-[//]: # (```)
-
-[//]: # ()
-[//]: # (**GET /list-courses/{courseType}/{courseId}**)
-
-[//]: # ()
-[//]: # (Return Detail Paid Course by course id)
-
-[//]: # ()
-[//]: # (* **URL Params**  )
-
-[//]: # (  *required:* `courseType=[String]/JVSB01`)
-
-[//]: # (* **Data Params**  )
-
-[//]: # (  None)
-
-[//]: # (* **Headers**  )
-
-[//]: # (  Content-Type: application/json)
-
-[//]: # (* **Success Response:**)
-
-[//]: # (* **Code:** 200  )
-
-[//]: # (  **Content:**)
-
-[//]: # ()
-[//]: # (```)
-
-[//]: # ({)
-
-[//]: # (   courseName: "Backend Development",)
-
-[//]: # (   courseSubTitle: "Java SpringBoot for beginner",)
-
-[//]: # (   intructorName: "John Doe")
-
-[//]: # (   price: 0)
-
-[//]: # (   courseDuration: 120)
-
-[//]: # (   courseDescription: Java spring boot for backend development)
-
-[//]: # (   slugCourse: /java-spring-boot)
-
-[//]: # (   pathCourseImage: "http://yourimageurl.com/image_sub_path_1")
-
-[//]: # (   groupLink: "http://yourgroupurl.com/class)
-
-[//]: # (   courseType: "PAID")
-
-[//]: # (   courseLevel: "BEGINNER")
-
-[//]: # (   courseStatus: "ACTIVE")
-
-[//]: # (   categoryId: {)
-
-[//]: # (          chapterId: "JVSPB01",)
-
-[//]: # (          categoryName: "Java Spring Boot",)
-
-[//]: # (          pathCategoryImage: "http://yourimageurl.com/category_image_path_2")
-
-[//]: # (   })
-
-[//]: # (})
-[//]: # (```)
+```
+{
+  "results": {
+    "id": "550e8400-e29b-41d4-a716-446655440003",
+    "courseName": "Advanced Machine Learning",
+    "instructorName": "Chris Anderson",
+    "totalCourseRate": 4.8,
+    "totalModules": 15,
+    "courseDuration": 40,
+    "slugCourse": "advanced-ml",
+    "pathCourseImage": "/images/advanced-ml.jpg",
+    "groupLink": "https://example.com/ml-group",
+    "courseType": "PREMIUM",
+    "courseLevel": "ADVANCE",
+    "listChapter": [
+      {
+        "chapterId": "550e8400-e29b-41d4-a716-446655440004",
+        "noChapter": 1,
+        "title": "Introduction to Advanced Machine Learning",
+        "chapterDuration": 10,
+        "materials": [
+          {
+            "materialId": "550e8400-e29b-41d4-a716-446655440006",
+            "serialNumber": 1,
+            "videoLink": "https://videos.com/chapter1/video1.mp4",
+            "materialDuration": 120,
+            "slugMaterial": "video1-material",
+            "materialType": "FREE"
+          },
+          {
+            "materialId": "550e8400-e29b-41d4-a716-446655440007",
+            "serialNumber": 2,
+            "videoLink": "https://videos.com/chapter1/video2.mp4",
+            "materialDuration": 90,
+            "slugMaterial": "video2-material",
+            "materialType": "PAID"
+          }
+        ]
+      },
+      {
+        "chapterId": "550e8400-e29b-41d4-a716-446655440005",
+        "noChapter": 2,
+        "title": "Deep Learning Techniques",
+        "chapterDuration": 15,
+        "materials": [
+          {
+            "materialId": "550e8400-e29b-41d4-a716-446655440008",
+            "serialNumber": 1,
+            "videoLink": "https://docs.com/chapter2/document1.pdf",
+            "materialDuration": 60,
+            "slugMaterial": "document1-material",
+            "materialType": "PAID"
+          }
+        ]
+      }
+    ],
+    "category": {
+      "categoryId": "550e8400-e29b-41d4-a716-446655440001",
+      "categoryName": "Data Science",
+      "pathCategoryImage": "/images/datascience.jpg"
+    }
+  },
+  "status": "OK",
+  "code": 200,
+  "message": "Course details retrieved successfully"
+}
+```
 
 ### Admin
 

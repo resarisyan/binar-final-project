@@ -81,7 +81,7 @@ public class Course {
     @Enumerated(EnumType.STRING)
     private EnumStatus courseStatus;
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Chapter> chapters;
 
     @ManyToOne
