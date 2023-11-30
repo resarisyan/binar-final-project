@@ -1,7 +1,9 @@
 package com.binar.byteacademy.controller;
 
+import com.binar.byteacademy.dto.request.ForgotPasswordRequest;
 import com.binar.byteacademy.dto.request.LoginRequest;
 import com.binar.byteacademy.dto.request.RegisterRequest;
+import com.binar.byteacademy.dto.request.ResetPasswordRequest;
 import com.binar.byteacademy.dto.response.LoginResponse;
 import com.binar.byteacademy.dto.response.RefreshTokenResponse;
 import com.binar.byteacademy.dto.response.RegisterResponse;
@@ -9,6 +11,7 @@ import com.binar.byteacademy.dto.response.base.APIResponse;
 import com.binar.byteacademy.dto.response.base.APIResultResponse;
 import com.binar.byteacademy.service.AuthenticationService;
 import com.binar.byteacademy.service.OtpService;
+import com.binar.byteacademy.service.ResetPasswordService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -30,6 +33,7 @@ import static com.binar.byteacademy.common.util.Constants.AuthPats.AUTH_PATS;
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
     private final OtpService otpService;
+    private final ResetPasswordService resetPasswordService;
 
     @PostMapping("/register")
     @Schema(name = "RegisterRequest", description = "Register request body")
@@ -93,6 +97,26 @@ public class AuthenticationController {
                 refreshTokenResponse
         );
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<APIResponse> forgotPassord(@RequestBody @Valid ForgotPasswordRequest request) {
+        resetPasswordService.sendEmail(request);
+        APIResponse response =  new APIResponse(
+                HttpStatus.OK,
+                "OTP successfully sent"
+        );
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/reset-password/{token}")
+    public ResponseEntity<APIResponse> resetPassword(@PathVariable String token, @RequestBody @Valid ResetPasswordRequest request) {
+        resetPasswordService.resetPassword(token, request);
+        APIResponse response =  new APIResponse(
+                HttpStatus.OK,
+                "Password successfully reset"
+        );
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
 

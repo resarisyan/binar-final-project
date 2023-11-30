@@ -49,4 +49,10 @@ public class Material {
     @ManyToOne
     @JoinColumn(name = "chapter_id", referencedColumnName = "chapter_id", nullable = false)
     private Chapter chapter;
+
+    @Column(name = "start_date", nullable = false)
+    private LocalDateTime startDate;
+
+    @Column(name = "end_date", nullable = false)
+    private LocalDateTime endDate;
 }

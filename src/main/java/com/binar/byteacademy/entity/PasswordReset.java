@@ -27,7 +27,7 @@ public class PasswordReset {
     @Column(name = "exp_time", nullable = false)
     LocalDateTime expTime;
 
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 }

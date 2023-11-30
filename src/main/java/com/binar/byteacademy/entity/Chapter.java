@@ -34,6 +34,7 @@ public class Chapter {
     private Integer chapterDuration;
 
     @OneToMany(mappedBy = "chapter", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+
     private List<Material> materials;
 
     @CreationTimestamp

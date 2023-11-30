@@ -15,7 +15,6 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CourseResponse {
     private String courseName;
-    private String categoryName;
     private String instructorName;
     private String pathImage;
     private Double price;

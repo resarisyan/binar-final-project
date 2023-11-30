@@ -1,21 +1,20 @@
 package com.binar.byteacademy.dto.response;
 
+import com.binar.byteacademy.enumeration.EnumMaterialType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ChapterResponse {
-    private Integer noChapter;
-    private String title;
-    private Integer chapterDuration;
-    private List<MaterialResponse> materials;
+public class MaterialCourseDetailResponse {
+    private Integer serialNumber;
+    private Integer materialDuration;
+    private String slugMaterial;
+    private EnumMaterialType materialType;
 }
