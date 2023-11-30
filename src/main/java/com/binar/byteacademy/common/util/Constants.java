@@ -14,11 +14,14 @@ public class Constants {
     }
     public static final class CoursePats {
         public static final String COURSE_PATS = BASE_URL + "/course";
+        public static final String ADMIN_COURSE_PATS = BASE_URL + "/admin/course";
         public static final String COURSE_PATS_ALL = BASE_URL + "/course/**";
     }
+
     public static final class CommonPats {
         public static final String[] WHITE_LIST_PATS = {
                 "/api/v1/auth/**",
+                "/api/v1/course/**",
                 "/v1/auth/**",
                 "/v2/api-docs",
                 "/v3/api-docs",
@@ -30,8 +33,13 @@ public class Constants {
                 "/swagger-ui/**",
                 "/webjars/**",
                 "/swagger-ui.html",
-                "/docs"
+                "/docs",
+                "/api/v1/course"
         };
+    }
+
+    public static final class ControllerMessage{
+        public static final String SUCCESS_GET_COURSE = "Course successfully retrieved";
     }
 
 //    public static final class Exception {
