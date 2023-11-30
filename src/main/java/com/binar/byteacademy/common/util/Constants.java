@@ -16,12 +16,14 @@ public class Constants {
         public static final String COURSE_PATS = BASE_URL + "/course";
         public static final String ADMIN_COURSE_PATS = BASE_URL + "/admin/course";
         public static final String COURSE_PATS_ALL = BASE_URL + "/course/**";
+        public static final String COURSE_PATS_ADMIN = COURSE_PATS + "/all";
+        public static final String COURSE_PATS_CUSTOMER = COURSE_PATS + "/my-course";
     }
 
     public static final class CommonPats {
         public static final String[] WHITE_LIST_PATS = {
                 "/api/v1/auth/**",
-                "/api/v1/course/**",
+                "/api/v1/course/search",
                 "/v1/auth/**",
                 "/v2/api-docs",
                 "/v3/api-docs",

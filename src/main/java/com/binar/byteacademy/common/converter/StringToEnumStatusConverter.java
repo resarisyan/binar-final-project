@@ -9,7 +9,7 @@ public class StringToEnumStatusConverter implements Converter<String, EnumStatus
         try {
             return EnumStatus.valueOf(source.toUpperCase());
         } catch (IllegalArgumentException e) {
-            return null;
+            throw new IllegalArgumentException("Wrong enum 'status' value");
         }
     }
 }

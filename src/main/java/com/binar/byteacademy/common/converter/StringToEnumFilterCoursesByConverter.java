@@ -9,7 +9,7 @@ public class StringToEnumFilterCoursesByConverter implements Converter<String, E
         try {
             return EnumFilterCoursesBy.valueOf(source.toUpperCase());
         } catch (IllegalArgumentException e) {
-            return null;
+            throw new IllegalArgumentException("Wrong enum 'filter courses by' value");
         }
     }
 }

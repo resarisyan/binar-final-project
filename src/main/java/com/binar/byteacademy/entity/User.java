@@ -57,6 +57,12 @@ public class User implements UserDetails {
     private PasswordReset passwordReset;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Purchase> purchase;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<UserProgress> userProgresses;
+
+    @OneToMany(mappedBy = "user")
     private List<Token> tokens;
 
     @CreationTimestamp

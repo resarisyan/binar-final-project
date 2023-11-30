@@ -1,6 +1,5 @@
 package com.binar.byteacademy.common.converter;
 
-import com.binar.byteacademy.enumeration.EnumCourseLevel;
 import com.binar.byteacademy.enumeration.EnumCourseType;
 import org.springframework.core.convert.converter.Converter;
 
@@ -11,7 +10,7 @@ public class StringToEnumCourseTypeConverter implements Converter<String, EnumCo
         try {
             return EnumCourseType.valueOf(source.toUpperCase());
         } catch (IllegalArgumentException e) {
-            return null;
+            throw new IllegalArgumentException("Wrong enum 'course type' value");
         }
     }
 }

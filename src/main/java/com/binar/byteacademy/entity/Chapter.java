@@ -37,13 +37,13 @@ public class Chapter {
 
     private List<Material> materials;
 
-    @ManyToOne
-    @JoinColumn(name = "course_id", referencedColumnName = "course_id", nullable = false)
-    private Course course;
-
     @CreationTimestamp
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "course_id", referencedColumnName = "course_id", nullable = false)
+    private Course course;
 }

@@ -1,7 +1,9 @@
 package com.binar.byteacademy.service;
 
+import com.binar.byteacademy.common.util.JwtUtil;
 import com.binar.byteacademy.dto.response.*;
 import com.binar.byteacademy.entity.Course;
+import com.binar.byteacademy.entity.User;
 import com.binar.byteacademy.enumeration.EnumCourseLevel;
 import com.binar.byteacademy.enumeration.EnumCourseType;
 import com.binar.byteacademy.enumeration.EnumFilterCoursesBy;
@@ -27,6 +29,7 @@ import java.util.stream.Collectors;
 public class CourseServiceImpl implements CourseService {
 
     private final CourseRepository courseRepository;
+    private final JwtUtil jwtUtil;
 
     @Override
     public Page<CourseResponse> getListCourses(Pageable pageable) {
@@ -36,7 +39,6 @@ public class CourseServiceImpl implements CourseService {
                     .orElseThrow(() -> new DataNotFoundException("Course Not  Found"));
             return coursePage.map(course -> CourseResponse.builder()
                     .courseName(course.getCourseName())
-                    .courseSubTitle(course.getCourseSubTitle())
                     .instructorName(course.getInstructorName())
                     .courseLevel(course.getCourseLevel())
                     .courseType(course.getCourseType())
@@ -61,7 +63,42 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Page<CourseResponse> getAllCourseByCriteria(
+    public Page<Course> getAllCourseByCriteria(
+            List<String> categoryNames,
+            List<EnumCourseLevel> courseLevels,
+            List<EnumCourseType> courseTypes,
+            List<EnumStatus> courseStatuses,
+            List<EnumFilterCoursesBy> filterCoursesBy,
+            String keyword,
+            String username,
+            Pageable pageable) throws DataNotFoundException {
+        categoryNames = Optional.ofNullable(categoryNames)
+                .map(val -> val.stream().map(String::toLowerCase).collect(Collectors.toList()))
+                .orElse(Collections.emptyList());
+        courseLevels = Optional.ofNullable(courseLevels)
+                .orElse(Collections.emptyList());
+        courseTypes = Optional.ofNullable(courseTypes)
+                .orElse(Collections.emptyList());
+        courseStatuses = Optional.ofNullable(courseStatuses)
+                .orElse(Collections.emptyList());
+        filterCoursesBy = Optional.ofNullable(filterCoursesBy)
+                .orElse(Collections.emptyList());
+        return Optional.of(courseRepository.findAll(
+                        CourseFilterSpecification.filterCourses(
+                                categoryNames,
+                                courseLevels,
+                                courseTypes,
+                                courseStatuses,
+                                filterCoursesBy,
+                                keyword,
+                                username
+                        ), pageable))
+                .filter(Page::hasContent)
+                .orElseThrow(() -> new DataNotFoundException("Course Not  Found"));
+    }
+
+    @Override
+    public Page<CourseResponse> getCourseListForWeb(
             List<String> categoryNames,
             List<EnumCourseLevel> courseLevels,
             List<EnumCourseType> courseTypes,
@@ -71,43 +108,83 @@ public class CourseServiceImpl implements CourseService {
             Pageable pageable
     ) {
         try {
-            categoryNames = Optional.ofNullable(categoryNames)
-                    .orElse(Collections.emptyList());
-            courseLevels = Optional.ofNullable(courseLevels)
-                    .orElse(Collections.emptyList());
-            courseTypes = Optional.ofNullable(courseTypes)
-                    .orElse(Collections.emptyList());
-            courseStatuses = Optional.ofNullable(courseStatuses)
-                    .orElse(Collections.emptyList());
-            filterCoursesBy = Optional.ofNullable(filterCoursesBy)
-                    .orElse(Collections.emptyList());
-            Page<Course> coursePage = Optional.of(courseRepository.findAll(
-                            CourseFilterSpecification.filterCourses(
-                                    categoryNames,
-                                    courseLevels,
-                                    courseTypes,
-                                    courseStatuses,
-                                    filterCoursesBy,
-                                    keyword
-                            ), pageable))
-                    .filter(Page::hasContent)
-                    .orElseThrow(() -> new DataNotFoundException("Course Not  Found"));
+            Page<Course> coursePage = getAllCourseByCriteria(
+                    categoryNames, courseLevels, courseTypes, courseStatuses,
+                    filterCoursesBy, keyword, null, pageable);
             return coursePage.map(course -> CourseResponse.builder()
                     .courseName(course.getCourseName())
-                    .courseSubTitle(course.getCourseSubTitle())
                     .instructorName(course.getInstructorName())
-                    .courseLevel(course.getCourseLevel())
-                    .courseType(course.getCourseType())
+                    .pathImage(course.getPathCourseImage())
                     .price(course.getPrice())
+                    .courseType(course.getCourseType())
+                    .courseLevel(course.getCourseLevel())
                     .totalCourseRate(course.getTotalCourseRate())
-                    .courseDuration(course.getCourseDuration())
                     .totalModules(course.getTotalModules())
+                    .courseDuration(course.getCourseDuration())
                     .build());
-        } catch (DataNotFoundException | IllegalArgumentException e) {
+        } catch (DataNotFoundException e) {
             throw e;
         } catch (Exception e) {
+            log.error("Failed to get course with filter");
             throw new ServiceBusinessException("Failed get course with filter");
         }
+    }
+
+    @Override
+    public Page<AdminCourseResponse> getCourseListForAdmin(
+            List<String> categoryNames,
+            List<EnumCourseLevel> courseLevels,
+            List<EnumCourseType> courseTypes,
+            List<EnumStatus> courseStatuses,
+            List<EnumFilterCoursesBy> filterCoursesBy,
+            String keyword,
+            Pageable pageable) {
+        try {
+            Page<Course> coursePage = getAllCourseByCriteria(
+                    categoryNames, courseLevels, courseTypes, courseStatuses,
+                    filterCoursesBy, keyword, null, pageable);
+            return coursePage.map(course -> AdminCourseResponse.builder()
+                    .slugCourse(course.getSlugCourse())
+                    .courseName(course.getCourseName())
+                    .categoryName(course.getCategory().getCategoryName())
+                    .price(course.getPrice())
+                    .courseType(course.getCourseType())
+                    .courseLevel(course.getCourseLevel())
+                    .courseStatus(course.getCourseStatus())
+                    .build());
+        } catch (DataNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Failed to get course with filter");
+            throw new ServiceBusinessException("Failed get course with filter");
+        }
+    }
+
+    @Override
+    public Page<MyCourseResponse> getMyCourseList(
+            List<String> categoryNames,
+            List<EnumCourseLevel> courseLevels,
+            List<EnumCourseType> courseTypes,
+            List<EnumStatus> courseStatuses,
+            List<EnumFilterCoursesBy> filterCoursesBy,
+            String keyword,
+            Pageable pageable) {
+        User user = jwtUtil.getUser();
+        Page<Course> coursePage = getAllCourseByCriteria(
+                categoryNames, courseLevels, courseTypes, courseStatuses,
+                filterCoursesBy, keyword, user.getUsername(), pageable);
+        return coursePage.map(course -> MyCourseResponse.builder()
+                .courseName(course.getCourseName())
+                .categoryName(course.getCategory().getCategoryName())
+                .courseLevel(course.getCourseLevel())
+                .instructorName(course.getInstructorName())
+                .pathImage(course.getPathCourseImage())
+                .courseLevel(course.getCourseLevel())
+                .totalCourseRate(course.getTotalCourseRate())
+                .totalModules(course.getTotalModules())
+                .courseDuration(course.getCourseDuration())
+                .coursePercentage(course.getUserProgresses().get(0).getCoursePercentage())
+                .build());
     }
 
     @Override
