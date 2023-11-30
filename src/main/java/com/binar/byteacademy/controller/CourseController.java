@@ -1,9 +1,11 @@
 package com.binar.byteacademy.controller;
 
-import com.binar.byteacademy.dto.response.CourseDetailResponse;
-import com.binar.byteacademy.dto.response.CourseResponse;
+import com.binar.byteacademy.dto.response.*;
 import com.binar.byteacademy.dto.response.base.APIResultResponse;
+import com.binar.byteacademy.enumeration.EnumCourseLevel;
 import com.binar.byteacademy.enumeration.EnumCourseType;
+import com.binar.byteacademy.enumeration.EnumFilterCoursesBy;
+import com.binar.byteacademy.enumeration.EnumStatus;
 import com.binar.byteacademy.service.CourseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -11,6 +13,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +32,6 @@ import static com.binar.byteacademy.common.util.Constants.CoursePats.COURSE_PATS
 @RequiredArgsConstructor
 @Tag(name = "Course", description = "Course API")
 public class CourseController {
-
-    @Autowired
     private final CourseService courseService;
 
     @GetMapping()
@@ -69,4 +72,31 @@ public class CourseController {
         }
     }
 
+    @GetMapping("/search")
+    @Schema(name = "GetActiveCourseByCriteria", description = "Get active course by criteria")
+    @Operation(summary = "Endpoint to handle get active course by criteria")
+    public ResponseEntity<APIResultResponse<Page<SearchCourseResponse>>> getActiveCourseByCriteria(
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "categoryName", required = false) List<String> categoryNames,
+            @RequestParam(value = "courseLevels", required = false) List<EnumCourseLevel> courseLevels,
+            @RequestParam(value = "courseType", required = false) List<EnumCourseType> courseTypes,
+            @RequestParam(value = "filterCoursesBy", required = false) List<EnumFilterCoursesBy> filterCoursesBy,
+            @RequestParam(value = "page") int page) {
+        Pageable pageable = PageRequest.of(page,6);
+        List<EnumStatus> courseStatuses = List.of(EnumStatus.ACTIVE);
+        Page<SearchCourseResponse> courseResponsePage = courseService.getCourseListForWeb(
+                categoryNames,
+                courseLevels,
+                courseTypes,
+                courseStatuses,
+                filterCoursesBy,
+                keyword,
+                pageable);
+        APIResultResponse<Page<SearchCourseResponse>> responseDTO = new APIResultResponse<>(
+                HttpStatus.OK,
+                "Course successfully retrieved",
+                courseResponsePage
+        );
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
 }

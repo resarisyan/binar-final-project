@@ -57,7 +57,7 @@ public class Course {
     @Column(name = "target_market", columnDefinition = "text")
     private String targetMarket;
 
-    @Column(name = "slug_course")
+    @Column(name = "slug_course", unique = true)
     private String slugCourse;
 
     @Column(name = "path_course_image")
