@@ -26,7 +26,7 @@ public class Otp {
     @Column(name = "otp_code", nullable = false)
     private String otpCode;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", unique = true)
     private User user;
 
