@@ -1,9 +1,6 @@
 package com.binar.byteacademy.service;
 
-import com.binar.byteacademy.dto.response.AdminCourseResponse;
-import com.binar.byteacademy.dto.response.CourseDetailResponse;
-import com.binar.byteacademy.dto.response.CourseResponse;
-import com.binar.byteacademy.dto.response.MyCourseResponse;
+import com.binar.byteacademy.dto.response.*;
 import com.binar.byteacademy.entity.Course;
 import com.binar.byteacademy.enumeration.EnumCourseLevel;
 import com.binar.byteacademy.enumeration.EnumCourseType;
@@ -26,13 +23,13 @@ public interface CourseService {
                                         String keyword,
                                         String username,
                                         Pageable pageable);
-    Page<CourseResponse> getCourseListForWeb(List<String> categoryNames,
-                                             List<EnumCourseLevel> courseLevels,
-                                             List<EnumCourseType> courseTypes,
-                                             List<EnumStatus> courseStatuses,
-                                             List<EnumFilterCoursesBy> filterCoursesBy,
-                                             String keyword,
-                                             Pageable pageable);
+    Page<SearchCourseResponse> getCourseListForWeb(List<String> categoryNames,
+                                                   List<EnumCourseLevel> courseLevels,
+                                                   List<EnumCourseType> courseTypes,
+                                                   List<EnumStatus> courseStatuses,
+                                                   List<EnumFilterCoursesBy> filterCoursesBy,
+                                                   String keyword,
+                                                   Pageable pageable);
 
     Page<AdminCourseResponse> getCourseListForAdmin(List<String> categoryNames,
                                                     List<EnumCourseLevel> courseLevels,

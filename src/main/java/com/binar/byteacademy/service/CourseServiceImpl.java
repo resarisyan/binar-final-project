@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -27,7 +28,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class CourseServiceImpl implements CourseService {
-
     private final CourseRepository courseRepository;
     private final JwtUtil jwtUtil;
 
@@ -62,6 +62,7 @@ public class CourseServiceImpl implements CourseService {
         }
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<Course> getAllCourseByCriteria(
             List<String> categoryNames,
@@ -92,13 +93,13 @@ public class CourseServiceImpl implements CourseService {
                                 filterCoursesBy,
                                 keyword,
                                 username
-                        ), pageable))
+                        ),pageable))
                 .filter(Page::hasContent)
-                .orElseThrow(() -> new DataNotFoundException("Course Not  Found"));
+                .orElseThrow(() -> new  DataNotFoundException("Course Not  Found"));
     }
 
     @Override
-    public Page<CourseResponse> getCourseListForWeb(
+    public Page<SearchCourseResponse> getCourseListForWeb(
             List<String> categoryNames,
             List<EnumCourseLevel> courseLevels,
             List<EnumCourseType> courseTypes,
@@ -109,10 +110,11 @@ public class CourseServiceImpl implements CourseService {
     ) {
         try {
             Page<Course> coursePage = getAllCourseByCriteria(
-                    categoryNames, courseLevels, courseTypes, courseStatuses,
+                    categoryNames, courseLevels,courseTypes, courseStatuses,
                     filterCoursesBy, keyword, null, pageable);
-            return coursePage.map(course -> CourseResponse.builder()
+            return coursePage.map(course -> SearchCourseResponse.builder()
                     .courseName(course.getCourseName())
+                    .categoryName(course.getCategory().getCategoryName())
                     .instructorName(course.getInstructorName())
                     .pathImage(course.getPathCourseImage())
                     .price(course.getPrice())
@@ -141,7 +143,7 @@ public class CourseServiceImpl implements CourseService {
             Pageable pageable) {
         try {
             Page<Course> coursePage = getAllCourseByCriteria(
-                    categoryNames, courseLevels, courseTypes, courseStatuses,
+                    categoryNames, courseLevels,courseTypes, courseStatuses,
                     filterCoursesBy, keyword, null, pageable);
             return coursePage.map(course -> AdminCourseResponse.builder()
                     .slugCourse(course.getSlugCourse())
@@ -169,22 +171,29 @@ public class CourseServiceImpl implements CourseService {
             List<EnumFilterCoursesBy> filterCoursesBy,
             String keyword,
             Pageable pageable) {
-        User user = jwtUtil.getUser();
-        Page<Course> coursePage = getAllCourseByCriteria(
-                categoryNames, courseLevels, courseTypes, courseStatuses,
-                filterCoursesBy, keyword, user.getUsername(), pageable);
-        return coursePage.map(course -> MyCourseResponse.builder()
-                .courseName(course.getCourseName())
-                .categoryName(course.getCategory().getCategoryName())
-                .courseLevel(course.getCourseLevel())
-                .instructorName(course.getInstructorName())
-                .pathImage(course.getPathCourseImage())
-                .courseLevel(course.getCourseLevel())
-                .totalCourseRate(course.getTotalCourseRate())
-                .totalModules(course.getTotalModules())
-                .courseDuration(course.getCourseDuration())
-                .coursePercentage(course.getUserProgresses().get(0).getCoursePercentage())
-                .build());
+        try {
+            User user = jwtUtil.getUser();
+            Page<Course> coursePage = getAllCourseByCriteria(
+                    categoryNames, courseLevels,courseTypes, courseStatuses,
+                    filterCoursesBy, keyword, user.getUsername(), pageable);
+            return coursePage.map(course -> MyCourseResponse.builder()
+                    .courseName(course.getCourseName())
+                    .categoryName(course.getCategory().getCategoryName())
+                    .courseLevel(course.getCourseLevel())
+                    .instructorName(course.getInstructorName())
+                    .pathImage(course.getPathCourseImage())
+                    .courseLevel(course.getCourseLevel())
+                    .totalCourseRate(course.getTotalCourseRate())
+                    .totalModules(course.getTotalModules())
+                    .courseDuration(course.getCourseDuration())
+                    .coursePercentage(course.getUserProgresses().get(0).getCoursePercentage())
+                    .build());
+        } catch (DataNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Failed to get my course with filter");
+            throw new ServiceBusinessException("Failed get my course with filter");
+        }
     }
 
     @Override
