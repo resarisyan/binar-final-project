@@ -11,6 +11,6 @@ import static com.binar.byteacademy.common.util.Constants.CoursePats.ADMIN_COURS
 @RequestMapping(value = ADMIN_COURSE_PATS, produces = "application/json")
 @RequiredArgsConstructor
 @Tag(name = "Course Admin", description = "Course API Admin")
-public class CourseController {
+public class AdminCourseController {
 
 }
