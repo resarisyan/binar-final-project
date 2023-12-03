@@ -13,9 +13,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ChapterResponse {
+public class ChapterCourseDetailResponse {
     private Integer noChapter;
     private String title;
     private Integer chapterDuration;
-    private List<MaterialResponse> materials;
+    private List<MaterialCourseDetailResponse> materials;
 }

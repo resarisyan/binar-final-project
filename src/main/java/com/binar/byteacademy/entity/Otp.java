@@ -23,11 +23,11 @@ public class Otp {
     @Column(name = "otp_id")
     private UUID id;
 
-    @Column(name = "otp_code", nullable = false)
+    @Column(name = "otp_code", nullable = false, unique = true, length = 6)
     private String otpCode;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", unique = true)
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", unique = true, nullable = false)
     private User user;
 
     @Column(name= "exp_time", nullable = false)

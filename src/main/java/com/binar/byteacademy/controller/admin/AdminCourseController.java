@@ -23,16 +23,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-import static com.binar.byteacademy.common.util.Constants.CoursePats.COURSE_PATS;
+import static com.binar.byteacademy.common.util.Constants.CoursePats.ADMIN_COURSE_PATS;
 
 @RestController
-@RequestMapping(value = COURSE_PATS, produces = "application/json")
+@RequestMapping(value = ADMIN_COURSE_PATS, produces = "application/json")
 @RequiredArgsConstructor
-@Tag(name = "Admin Course", description = "Admin Course API")
+@Tag(name = "Course Admin", description = "Course API Admin")
 public class AdminCourseController {
     private final CourseService courseService;
 
-    @GetMapping("/all")
+    @GetMapping
     @Schema(name = "GetAllCourseByCriteria", description = "Get all course by criteria")
     @Operation(summary = "Endpoint to handle get all course by criteria (User Role : Admin)")
     public ResponseEntity<APIResultResponse<Page<AdminCourseResponse>>> getAllCourseByCriteria(

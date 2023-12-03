@@ -23,16 +23,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-import static com.binar.byteacademy.common.util.Constants.CoursePats.COURSE_PATS;
+import static com.binar.byteacademy.common.util.Constants.CoursePats.CUSTOMER_COURSE_PATS;
 
 @RestController
-@RequestMapping(value = COURSE_PATS, produces = "application/json")
+@RequestMapping(value = CUSTOMER_COURSE_PATS, produces = "application/json")
 @RequiredArgsConstructor
 @Tag(name = "Customer Course", description = "Customer Course API")
 public class CustomerCourseController {
     private final CourseService courseService;
 
-    @GetMapping("/my-course")
+    @GetMapping
     @Schema(name = "GetMyCourseByCriteria", description = "Get my course by criteria")
     @Operation(summary = "Endpoint to handle get my course by criteria (User Role : Customer)")
     public ResponseEntity<APIResultResponse<Page<MyCourseResponse>>> getMyCourseByCriteria(

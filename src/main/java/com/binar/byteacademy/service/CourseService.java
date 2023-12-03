@@ -10,17 +10,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 public interface CourseService {
 
-    List<CourseResponse> listCourses();
-
-    List<CourseResponse> listCoursesByCourseType(EnumCourseType courseType);
-
-    Optional<CourseDetailResponse> courseDetail(EnumCourseType courseType, UUID courseId);
-
+    Page<CourseResponse> getListCourses(Pageable pageable);
+    CourseDetailResponse getCourseDetail(String slugCourse);
     Page<Course> getAllCourseByCriteria(List<String> categoryNames,
                                         List<EnumCourseLevel> courseLevels,
                                         List<EnumCourseType> courseTypes,

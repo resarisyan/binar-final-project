@@ -39,17 +39,11 @@ public class Course {
     @Column(name = "total_course_rate")
     private Double totalCourseRate;
 
-    @Column(name = "total_modules")
+    @Column(name = "total_modules", nullable = false)
     private Integer totalModules;
 
-    @Column(name = "course_duration")
+    @Column(name = "course_duration", nullable = false)
     private Integer courseDuration;
-
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
 
     @Column(name = "course_description", columnDefinition = "text")
     private String courseDescription;
@@ -57,7 +51,7 @@ public class Course {
     @Column(name = "target_market", columnDefinition = "text")
     private String targetMarket;
 
-    @Column(name = "slug_course", unique = true)
+    @Column(name = "slug_course", unique = true, nullable = false)
     private String slugCourse;
 
     @Column(name = "path_course_image")
@@ -74,7 +68,7 @@ public class Course {
     @Enumerated(EnumType.STRING)
     private EnumCourseLevel courseLevel;
 
-    @Column(name = "course_status")
+    @Column(name = "course_status", nullable = false)
     @Enumerated(EnumType.STRING)
     private EnumStatus courseStatus;
 
@@ -96,4 +90,11 @@ public class Course {
             joinColumns = @JoinColumn(name = "course_id"),
             inverseJoinColumns = @JoinColumn(name = "promo_id"))
     private List<Promo> promos;
+
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 }

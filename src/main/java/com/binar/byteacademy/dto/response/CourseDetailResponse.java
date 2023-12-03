@@ -1,24 +1,22 @@
 package com.binar.byteacademy.dto.response;
 
-import com.binar.byteacademy.entity.Category;
-import com.binar.byteacademy.entity.Chapter;
 import com.binar.byteacademy.enumeration.EnumCourseLevel;
 import com.binar.byteacademy.enumeration.EnumCourseType;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.UUID;
 
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CourseDetailResponse {
-    private UUID id;
     private String courseName;
     private String instructorName;
     private Double totalCourseRate;
@@ -29,6 +27,6 @@ public class CourseDetailResponse {
     private String groupLink;
     private EnumCourseType courseType;
     private EnumCourseLevel courseLevel;
-    private List<ChapterResponse> listChapter;
+    private List<ChapterCourseDetailResponse> chapters;
     private CategoryResponse category;
 }

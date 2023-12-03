@@ -14,10 +14,11 @@ public class Constants {
     }
     public static final class CoursePats {
         public static final String COURSE_PATS = BASE_URL + "/course";
+        public static final String CUSTOMER_COURSE_PATS = COURSE_PATS + "/my-course";
+        public static final String ADMIN_COURSE_PATS = BASE_URL + "/admin/course";
         public static final String COURSE_PATS_ALL = BASE_URL + "/course/**";
-        public static final String COURSE_PATS_ADMIN = COURSE_PATS + "/all";
-        public static final String COURSE_PATS_CUSTOMER = COURSE_PATS + "/my-course";
     }
+
     public static final class CommonPats {
         public static final String[] WHITE_LIST_PATS = {
                 "/api/v1/auth/**",
@@ -36,6 +37,10 @@ public class Constants {
                 "/docs",
                 "/api/v1/course"
         };
+    }
+
+    public static final class ControllerMessage{
+        public static final String SUCCESS_GET_COURSE = "Course successfully retrieved";
     }
 
 //    public static final class Exception {
