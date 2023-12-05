@@ -2,5 +2,5 @@ package com.binar.byteacademy.enumeration;
 
 public enum EnumFilterCoursesBy {
     PROMO,
-    LATEST, 
+    LATEST, MOST_POPULAR,
 }
