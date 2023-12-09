@@ -33,7 +33,7 @@ public class Material {
     @Column(name = "material_duration", nullable = false)
     private Integer materialDuration;
 
-    @Column(name = "slug_material")
+    @Column(name = "slug_material", unique = true)
     private String slugMaterial;
 
     @CreationTimestamp

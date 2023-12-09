@@ -14,10 +14,9 @@ public class Constants {
     }
     public static final class CoursePats {
         public static final String COURSE_PATS = BASE_URL + "/course";
+        public static final String CUSTOMER_COURSE_PATS = COURSE_PATS + "/my-course";
         public static final String ADMIN_COURSE_PATS = BASE_URL + "/admin/course";
         public static final String COURSE_PATS_ALL = BASE_URL + "/course/**";
-        public static final String COURSE_PATS_ADMIN = COURSE_PATS + "/all";
-        public static final String COURSE_PATS_CUSTOMER = COURSE_PATS + "/my-course";
     }
 
     public static final class CommonPats {

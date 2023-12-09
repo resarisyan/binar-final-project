@@ -1,9 +1,6 @@
 package com.binar.byteacademy.controller;
 
-import com.binar.byteacademy.dto.response.AdminCourseResponse;
-import com.binar.byteacademy.dto.response.CourseDetailResponse;
-import com.binar.byteacademy.dto.response.CourseResponse;
-import com.binar.byteacademy.dto.response.MyCourseResponse;
+import com.binar.byteacademy.dto.response.*;
 import com.binar.byteacademy.dto.response.base.APIResultResponse;
 import com.binar.byteacademy.enumeration.EnumCourseLevel;
 import com.binar.byteacademy.enumeration.EnumCourseType;
@@ -61,7 +58,7 @@ public class CourseController {
     @GetMapping("/search")
     @Schema(name = "GetActiveCourseByCriteria", description = "Get active course by criteria")
     @Operation(summary = "Endpoint to handle get active course by criteria")
-    public ResponseEntity<APIResultResponse<Page<CourseResponse>>> getActiveCourseByCriteria(
+    public ResponseEntity<APIResultResponse<Page<SearchCourseResponse>>> getActiveCourseByCriteria(
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "categoryName", required = false) List<String> categoryNames,
             @RequestParam(value = "courseLevels", required = false) List<EnumCourseLevel> courseLevels,
@@ -70,7 +67,7 @@ public class CourseController {
             @RequestParam(value = "page") int page) {
         Pageable pageable = PageRequest.of(page,6);
         List<EnumStatus> courseStatuses = List.of(EnumStatus.ACTIVE);
-        Page<CourseResponse> courseResponsePage = courseService.getCourseListForWeb(
+        Page<SearchCourseResponse> courseResponsePage = courseService.getCourseListForWeb(
                 categoryNames,
                 courseLevels,
                 courseTypes,
@@ -78,65 +75,9 @@ public class CourseController {
                 filterCoursesBy,
                 keyword,
                 pageable);
-        APIResultResponse<Page<CourseResponse>> responseDTO = new APIResultResponse<>(
+        APIResultResponse<Page<SearchCourseResponse>> responseDTO = new APIResultResponse<>(
                 HttpStatus.OK,
-                SUCCESS_GET_COURSE,
-                courseResponsePage
-        );
-        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
-    }
-
-    @GetMapping("/all")
-    @Schema(name = "GetAllCourseByCriteria", description = "Get all course by criteria")
-    @Operation(summary = "Endpoint to handle get all course by criteria (User Role : Admin)")
-    public ResponseEntity<APIResultResponse<Page<AdminCourseResponse>>> getAllCourseByCriteria(
-            @RequestParam(value = "keyword", required = false) String keyword,
-            @RequestParam(value = "categoryName", required = false) List<String> categoryNames,
-            @RequestParam(value = "courseLevels", required = false) List<EnumCourseLevel> courseLevels,
-            @RequestParam(value = "courseType", required = false) List<EnumCourseType> courseTypes,
-            @RequestParam(value = "courseStatuses", required = false) List<EnumStatus> courseStatuses,
-            @RequestParam(value = "filterCoursesBy", required = false) List<EnumFilterCoursesBy> filterCoursesBy,
-            @RequestParam(value = "page") int page) {
-        Pageable pageable = PageRequest.of(page,6);
-        Page<AdminCourseResponse> courseResponsePage = courseService.getCourseListForAdmin(
-                categoryNames,
-                courseLevels,
-                courseTypes,
-                courseStatuses,
-                filterCoursesBy,
-                keyword,
-                pageable);
-        APIResultResponse<Page<AdminCourseResponse>> responseDTO = new APIResultResponse<>(
-                HttpStatus.OK,
-                SUCCESS_GET_COURSE,
-                courseResponsePage
-        );
-        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
-    }
-
-    @GetMapping("/my-course")
-    @Schema(name = "GetMyCourseByCriteria", description = "Get my course by criteria")
-    @Operation(summary = "Endpoint to handle get my course by criteria (User Role : Customer)")
-    public ResponseEntity<APIResultResponse<Page<MyCourseResponse>>> getMyCourseByCriteria(
-            @RequestParam(value = "keyword", required = false) String keyword,
-            @RequestParam(value = "categoryName", required = false) List<String> categoryNames,
-            @RequestParam(value = "courseLevels", required = false) List<EnumCourseLevel> courseLevels,
-            @RequestParam(value = "courseType", required = false) List<EnumCourseType> courseTypes,
-            @RequestParam(value = "filterCoursesBy", required = false) List<EnumFilterCoursesBy> filterCoursesBy,
-            @RequestParam(value = "page") int page) {
-        Pageable pageable = PageRequest.of(page,6);
-        List<EnumStatus> courseStatuses = List.of(EnumStatus.ACTIVE);
-        Page<MyCourseResponse> courseResponsePage = courseService.getMyCourseList(
-                categoryNames,
-                courseLevels,
-                courseTypes,
-                courseStatuses,
-                filterCoursesBy,
-                keyword,
-                pageable);
-        APIResultResponse<Page<MyCourseResponse>> responseDTO = new APIResultResponse<>(
-                HttpStatus.OK,
-                SUCCESS_GET_COURSE,
+                "Course successfully retrieved",
                 courseResponsePage
         );
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
