@@ -19,6 +19,17 @@ public class Constants {
         public static final String COURSE_PATS_ALL = BASE_URL + "/course/**";
     }
 
+    public static final class PurchasePats {
+        public static final String PURCHASE_PATS = BASE_URL + "/purchase";
+        public static final String ADMIN_PURCHASE_PATS = BASE_URL + "/admin/purchase";
+        public static final String PURCHASE_PATS_ALL = BASE_URL + "/purchase/**";
+    }
+
+    public static final class BankTransferDetailPats {
+        public static final String BANK_TRANSFER_DETAIL_PATS = BASE_URL + "/bank-transfer-detail";
+        public static final String BANK_TRANSFER_DETAIL_PATS_ALL = BASE_URL + "/bank-transfer-detail/**";
+    }
+
     public static final class CommonPats {
         public static final String[] WHITE_LIST_PATS = {
                 "/api/v1/auth/**",
