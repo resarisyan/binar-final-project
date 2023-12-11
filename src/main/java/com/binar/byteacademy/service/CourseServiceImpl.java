@@ -17,12 +17,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -62,7 +60,6 @@ public class CourseServiceImpl implements CourseService {
         }
     }
 
-    @Transactional(readOnly = true)
     @Override
     public Page<Course> getAllCourseByCriteria(
             List<String> categoryNames,
@@ -74,7 +71,7 @@ public class CourseServiceImpl implements CourseService {
             String username,
             Pageable pageable) throws DataNotFoundException {
         categoryNames = Optional.ofNullable(categoryNames)
-                .map(val -> val.stream().map(String::toLowerCase).collect(Collectors.toList()))
+                .map(val -> val.stream().map(String::toLowerCase).toList())
                 .orElse(Collections.emptyList());
         courseLevels = Optional.ofNullable(courseLevels)
                 .orElse(Collections.emptyList());
@@ -84,6 +81,9 @@ public class CourseServiceImpl implements CourseService {
                 .orElse(Collections.emptyList());
         filterCoursesBy = Optional.ofNullable(filterCoursesBy)
                 .orElse(Collections.emptyList());
+        keyword = Optional.ofNullable(keyword)
+                .map(String::toLowerCase)
+                .orElse(null);
         return Optional.of(courseRepository.findAll(
                         CourseFilterSpecification.filterCourses(
                                 categoryNames,
@@ -99,7 +99,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Page<SearchCourseResponse> getCourseListForWeb(
+    public Page<CourseResponse> getCourseListForWeb(
             List<String> categoryNames,
             List<EnumCourseLevel> courseLevels,
             List<EnumCourseType> courseTypes,
@@ -112,17 +112,21 @@ public class CourseServiceImpl implements CourseService {
             Page<Course> coursePage = getAllCourseByCriteria(
                     categoryNames, courseLevels,courseTypes, courseStatuses,
                     filterCoursesBy, keyword, null, pageable);
-            return coursePage.map(course -> SearchCourseResponse.builder()
+            return coursePage.map(course -> CourseResponse.builder()
                     .courseName(course.getCourseName())
-                    .categoryName(course.getCategory().getCategoryName())
                     .instructorName(course.getInstructorName())
-                    .pathImage(course.getPathCourseImage())
                     .price(course.getPrice())
-                    .courseType(course.getCourseType())
-                    .courseLevel(course.getCourseLevel())
                     .totalCourseRate(course.getTotalCourseRate())
                     .totalModules(course.getTotalModules())
                     .courseDuration(course.getCourseDuration())
+                    .slugCourse(course.getSlugCourse())
+                    .pathCourseImage(course.getPathCourseImage())
+                    .courseType(course.getCourseType())
+                    .courseLevel(course.getCourseLevel())
+                    .category(CategoryResponse.builder()
+                            .categoryName(course.getCategory().getCategoryName())
+                            .pathCategoryImage(course.getCategory().getPathCategoryImage())
+                            .build())
                     .build());
         } catch (DataNotFoundException e) {
             throw e;
@@ -148,11 +152,14 @@ public class CourseServiceImpl implements CourseService {
             return coursePage.map(course -> AdminCourseResponse.builder()
                     .slugCourse(course.getSlugCourse())
                     .courseName(course.getCourseName())
-                    .categoryName(course.getCategory().getCategoryName())
                     .price(course.getPrice())
                     .courseType(course.getCourseType())
                     .courseLevel(course.getCourseLevel())
                     .courseStatus(course.getCourseStatus())
+                    .category(CategoryResponse.builder()
+                            .categoryName(course.getCategory().getCategoryName())
+                            .pathCategoryImage(course.getCategory().getPathCategoryImage())
+                            .build())
                     .build());
         } catch (DataNotFoundException e) {
             throw e;
@@ -178,15 +185,22 @@ public class CourseServiceImpl implements CourseService {
                     filterCoursesBy, keyword, user.getUsername(), pageable);
             return coursePage.map(course -> MyCourseResponse.builder()
                     .courseName(course.getCourseName())
-                    .categoryName(course.getCategory().getCategoryName())
-                    .courseLevel(course.getCourseLevel())
                     .instructorName(course.getInstructorName())
-                    .pathImage(course.getPathCourseImage())
-                    .courseLevel(course.getCourseLevel())
                     .totalCourseRate(course.getTotalCourseRate())
                     .totalModules(course.getTotalModules())
                     .courseDuration(course.getCourseDuration())
-                    .coursePercentage(course.getUserProgresses().get(0).getCoursePercentage())
+                    .slugCourse(course.getSlugCourse())
+                    .courseLevel(course.getCourseLevel())
+                    .pathCourseImage(course.getPathCourseImage())
+                    .category(CategoryResponse.builder()
+                            .categoryName(course.getCategory().getCategoryName())
+                            .pathCategoryImage(course.getCategory().getPathCategoryImage())
+                            .build())
+                    .userProgressResponse(UserProgressResponse.builder()
+                            .completionDate(course.getUserProgresses().get(0).getCompletionDate())
+                            .coursePercentage(course.getUserProgresses().get(0).getCoursePercentage())
+                            .isCompleted(course.getUserProgresses().get(0).getIsCompleted())
+                            .build())
                     .build());
         } catch (DataNotFoundException e) {
             throw e;
@@ -229,9 +243,9 @@ public class CourseServiceImpl implements CourseService {
                                                     .materialDuration(material.getMaterialDuration())
                                                     .slugMaterial(material.getSlugMaterial())
                                                     .build())
-                                            .collect(Collectors.toList()))
+                                            .toList())
                                     .build())
-                            .collect(Collectors.toList()))
+                            .toList())
                     .build();
         } catch (DataNotFoundException e) {
             throw e;

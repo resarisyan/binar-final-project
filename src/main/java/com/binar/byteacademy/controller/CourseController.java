@@ -58,7 +58,7 @@ public class CourseController {
     @GetMapping("/search")
     @Schema(name = "GetActiveCourseByCriteria", description = "Get active course by criteria")
     @Operation(summary = "Endpoint to handle get active course by criteria")
-    public ResponseEntity<APIResultResponse<Page<SearchCourseResponse>>> getActiveCourseByCriteria(
+    public ResponseEntity<APIResultResponse<Page<CourseResponse>>> getActiveCourseByCriteria(
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "categoryName", required = false) List<String> categoryNames,
             @RequestParam(value = "courseLevels", required = false) List<EnumCourseLevel> courseLevels,
@@ -67,7 +67,7 @@ public class CourseController {
             @RequestParam(value = "page") int page) {
         Pageable pageable = PageRequest.of(page,6);
         List<EnumStatus> courseStatuses = List.of(EnumStatus.ACTIVE);
-        Page<SearchCourseResponse> courseResponsePage = courseService.getCourseListForWeb(
+        Page<CourseResponse> courseResponsePage = courseService.getCourseListForWeb(
                 categoryNames,
                 courseLevels,
                 courseTypes,
@@ -75,7 +75,7 @@ public class CourseController {
                 filterCoursesBy,
                 keyword,
                 pageable);
-        APIResultResponse<Page<SearchCourseResponse>> responseDTO = new APIResultResponse<>(
+        APIResultResponse<Page<CourseResponse>> responseDTO = new APIResultResponse<>(
                 HttpStatus.OK,
                 "Course successfully retrieved",
                 courseResponsePage
