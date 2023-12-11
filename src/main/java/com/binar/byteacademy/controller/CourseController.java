@@ -28,20 +28,6 @@ import static com.binar.byteacademy.common.util.Constants.ControllerMessage.SUCC
 public class CourseController {
     private final CourseService courseService;
 
-    @GetMapping()
-    @Schema(name = "GetCourse", description = "Get course")
-    @Operation(summary = "Endpoint to handle get course")
-    public ResponseEntity<APIResultResponse<Page<CourseResponse>>> getCourse(@RequestParam("page") int page) {
-        Pageable pageable = PageRequest.of(page,9);
-        Page<CourseResponse> courseResponsePage = courseService.getListCourses(pageable);
-        APIResultResponse<Page<CourseResponse>> responseDTO = new APIResultResponse<>(
-                HttpStatus.OK,
-                SUCCESS_GET_COURSE,
-                courseResponsePage
-        );
-        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
-    }
-
     @GetMapping("/{slugCourse}")
     @Schema(name = "GetCourseDetail", description = "Get course detail")
     @Operation(summary = "Endpoint to handle get course detail")

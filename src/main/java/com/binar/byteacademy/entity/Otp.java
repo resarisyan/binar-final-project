@@ -1,5 +1,7 @@
 package com.binar.byteacademy.entity;
 
+import com.binar.byteacademy.enumeration.EnumOtpType;
+import com.binar.byteacademy.enumeration.EnumRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,11 +28,18 @@ public class Otp {
     @Column(name = "otp_code", nullable = false, unique = true, length = 6)
     private String otpCode;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", unique = true, nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "otp_type", nullable = false)
+    private EnumOtpType otpType;
+
+    @Column(name = "phone_number", unique = true)
+    private String phoneNumber;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name= "exp_time", nullable = false)
+    @Column(name = "exp_time", nullable = false)
     LocalDateTime expTime;
 
     @CreationTimestamp

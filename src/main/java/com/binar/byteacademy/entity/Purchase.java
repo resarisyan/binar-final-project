@@ -48,12 +48,6 @@ public class Purchase {
     @Enumerated(EnumType.STRING)
     private EnumPaymentMethod paymentMethod;
 
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
-
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
     private User user;
@@ -61,4 +55,10 @@ public class Purchase {
     @ManyToOne
     @JoinColumn(name = "course_id", referencedColumnName = "course_id", nullable = false)
     private Course course;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 }

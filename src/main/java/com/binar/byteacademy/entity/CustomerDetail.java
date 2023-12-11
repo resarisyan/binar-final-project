@@ -32,11 +32,8 @@ public class CustomerDetail {
     @Column(name = "city")
     private String city;
 
-    @Column(name = "phone_number", nullable = false)
-    private String phoneNumber;
-
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", nullable = false, referencedColumnName = "user_id")
     private User user;
 
     @CreationTimestamp

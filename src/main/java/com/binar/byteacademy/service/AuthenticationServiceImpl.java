@@ -1,5 +1,6 @@
 package com.binar.byteacademy.service;
 
+import com.binar.byteacademy.dto.request.ChangePasswordRequest;
 import com.binar.byteacademy.dto.request.LoginRequest;
 import com.binar.byteacademy.dto.request.RegisterRequest;
 import com.binar.byteacademy.dto.response.LoginResponse;
@@ -8,13 +9,8 @@ import com.binar.byteacademy.dto.response.RegisterResponse;
 import com.binar.byteacademy.entity.CustomerDetail;
 import com.binar.byteacademy.entity.Token;
 import com.binar.byteacademy.entity.User;
-import com.binar.byteacademy.enumeration.EnumRole;
-import com.binar.byteacademy.enumeration.EnumStatus;
-import com.binar.byteacademy.enumeration.EnumTokenType;
-import com.binar.byteacademy.exception.DataConflictException;
-import com.binar.byteacademy.exception.DataNotFoundException;
-import com.binar.byteacademy.exception.ServiceBusinessException;
-import com.binar.byteacademy.exception.UserNotActiveException;
+import com.binar.byteacademy.enumeration.*;
+import com.binar.byteacademy.exception.*;
 import com.binar.byteacademy.repository.CustomerDetailRepository;
 import com.binar.byteacademy.repository.TokenRepository;
 import com.binar.byteacademy.repository.UserRepository;
@@ -31,6 +27,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.security.Principal;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -44,15 +42,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
     private final OtpService otpService;
+    private final EmailVerificationService emailVerificationService;
     public LoginResponse login(LoginRequest request) {
         try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            request.getCredential(),
-                            request.getPassword()
-                    )
-            );
-
             boolean isEmail = request.getCredential().contains("@");
             User user;
             if (isEmail) {
@@ -65,7 +57,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 );
             }
 
-            if (!user.isVerified()) {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            user.getUsername(),
+                            request.getPassword()
+                    )
+            );
+
+            if (!user.isVerifiedEmail() || !user.isVerifiedPhoneNumber()) {
                 throw new UserNotActiveException("User is not verified");
             }
             if (user.getStatus() == EnumStatus.INACTIVE) {
@@ -95,6 +94,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             User user = User.builder()
                     .username(request.getUsername())
                     .email(request.getEmail())
+                    .phoneNumber(request.getPhoneNumber())
                     .password(passwordEncoder.encode(request.getPassword()))
                     .role(EnumRole.CUSTOMER)
                     .status(EnumStatus.ACTIVE)
@@ -103,7 +103,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
             CustomerDetail customerDetail = CustomerDetail.builder()
                     .name(request.getName())
-                    .phoneNumber(request.getPhoneNumber())
                     .user(user)
                     .build();
             customerDetailRepository.save(customerDetail);
@@ -112,10 +111,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .username(user.getUsername())
                     .email(user.getEmail())
                     .name(customerDetail.getName())
-                    .phoneNumber(customerDetail.getPhoneNumber())
+                    .phoneNumber(user.getPhoneNumber())
                     .build();
 
-            otpService.generateOtp(user.getUsername(), customerDetail.getPhoneNumber());
+            emailVerificationService.sendEmail(user.getEmail(), EnumEmailVerificationType.REGISTER);
+            otpService.sendOtp(user.getPhoneNumber(), EnumOtpType.REGISTER);
         } catch (DataConflictException e) {
             throw e;
         } catch (Exception e) {
@@ -123,6 +123,26 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
         return registerResponse;
+    }
+
+    public void changePassword(ChangePasswordRequest request, Principal connectedUser) {
+        try {
+            User user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
+
+            if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+                throw new ValidationException("Current password is wrong");
+            }
+            if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+                throw new ValidationException("Password are not the same");
+            }
+
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+            userRepository.save(user);
+        } catch (ValidationException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ServiceBusinessException(e.getMessage());
+        }
     }
 
     @Override
