@@ -16,7 +16,6 @@ import lombok.NoArgsConstructor;
 public class CourseResponse {
     private String courseName;
     private String instructorName;
-    private String pathImage;
     private Double price;
     private Double totalCourseRate;
     private Integer totalModules;
@@ -26,4 +25,5 @@ public class CourseResponse {
     private EnumCourseLevel courseLevel;
     private String pathCourseImage;
     private CategoryResponse category;
+    private String targetMarket;
 }

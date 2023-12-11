@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
 @Data
 @Builder
 @AllArgsConstructor
@@ -16,4 +14,5 @@ import java.util.UUID;
 public class CategoryResponse {
     private String categoryName;
     private String pathCategoryImage;
+    private String slugCategory;
 }

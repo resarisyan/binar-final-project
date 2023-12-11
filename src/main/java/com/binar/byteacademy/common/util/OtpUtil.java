@@ -6,6 +6,7 @@ import com.binar.byteacademy.exception.ServiceBusinessException;
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -24,22 +25,22 @@ public class OtpUtil {
     public String generateOtp() {
         Random random = new Random();
         int randomNumber = random.nextInt(999999);
-        String output = Integer.toString(randomNumber);
+        StringBuilder output = new StringBuilder(Integer.toString(randomNumber));
 
         while (output.length() < 6) {
-            output = "0" + output;
+            output.insert(0, "0");
         }
-        return output;
+        return output.toString();
     }
 
     @Async
-    public void sendOtpMessage(String receiver, String otpCode) {
+    public void sendOtpMessage(String receiver, String message) {
         try {
             Twilio.init(accountSid, authToken);
             Message.creator(
                     new PhoneNumber(receiver),
                     new PhoneNumber(phoneNumber),
-                    "Your OTP Code is " + otpCode
+                    message
             ).create();
         } catch (Exception e) {
             throw new ServiceBusinessException(e.getMessage());

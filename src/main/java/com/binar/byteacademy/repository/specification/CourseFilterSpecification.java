@@ -63,7 +63,11 @@ public class CourseFilterSpecification {
             if (!filterCoursesBy.isEmpty()) {
                 predicates.add(criteriaBuilder.or(filterByPredicates.toArray(new Predicate[0])));
             }
-            query.distinct(true).where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
+            if(filterCoursesBy.contains(EnumFilterCoursesBy.PROMO)) {
+                query.distinct(true).where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
+            } else {
+                query.where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
+            }
             return query.getRestriction();
         });
     }

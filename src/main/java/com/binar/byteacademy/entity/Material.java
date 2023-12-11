@@ -24,6 +24,9 @@ public class Material {
     @Column(name = "material_id")
     private UUID id;
 
+    @Column(name = "material_name", nullable = false)
+    private String materialName;
+
     @Column(name = "serial_number", nullable = false)
     private Integer serialNumber;
 
@@ -33,26 +36,20 @@ public class Material {
     @Column(name = "material_duration", nullable = false)
     private Integer materialDuration;
 
-    @Column(name = "slug_material")
+    @Column(name = "slug_material", unique = true)
     private String slugMaterial;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "material_type", nullable = false)
+    private EnumMaterialType materialType;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "chapter_id", referencedColumnName = "chapter_id", nullable = false)
+    private Chapter chapter;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "material_type", nullable = false)
-    private EnumMaterialType materialType;
-
-    @ManyToOne
-    @JoinColumn(name = "chapter_id", referencedColumnName = "chapter_id", nullable = false)
-    private Chapter chapter;
-
-    @Column(name = "start_date", nullable = false)
-    private LocalDateTime startDate;
-
-    @Column(name = "end_date", nullable = false)
-    private LocalDateTime endDate;
 }

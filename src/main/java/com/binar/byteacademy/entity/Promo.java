@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -23,8 +24,10 @@ public class Promo {
     @Column(name = "promo_id")
     private UUID id;
 
-    @Column(name = "promo_code", unique = true)
+    @Column(name = "promo_name", nullable = false)
+    private String promoName;
 
+    @Column(name = "promo_code", unique = true)
     private String promoCode;
 
     @Column(nullable = false)
@@ -36,12 +39,15 @@ public class Promo {
     @Column(name = "start_date", nullable = false)
     private LocalDateTime startDate;
 
+    @Column(name = "end_date", nullable = false)
+    private LocalDateTime endDate;
+
+    @OneToMany(mappedBy = "promo", cascade = {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    private List<CoursePromo> coursePromos;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-
-    @Column(name = "end_date", nullable = false)
-    private LocalDateTime endDate;
 }
