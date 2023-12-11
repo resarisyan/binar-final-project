@@ -31,7 +31,7 @@ public class UserProgress {
     @JoinColumn(name = "course_id", referencedColumnName = "course_id", nullable = false)
     private Course course;
 
-    @Column(name = "is_completed")
+    @Column(name = "is_completed", nullable = false)
     private Boolean isCompleted;
 
     @Column(name = "course_percentage")
