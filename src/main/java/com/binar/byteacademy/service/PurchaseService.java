@@ -9,12 +9,13 @@ import com.binar.byteacademy.dto.response.PurchaseResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.concurrent.CompletableFuture;
+
 
 public interface PurchaseService {
     PurchaseResponse makeBankTransferPurchase(BankTransferPurchaseRequest request);
     PurchaseResponse makeCreditCardPurchase(CreditCardPurchaseRequest request);
     Page<PurchaseDetailResponse> getAllPurchaseDetailsForCustomer(Pageable pageable);
     Page<AdminPurchaseDetailResponse> getAllPurchaseDetailsForAdmin(Pageable pageable);
-
-    void updatePurchaseStatus(UpdatePurchaseStatusRequest request);
+    CompletableFuture<Void> updatePurchaseStatus(UpdatePurchaseStatusRequest request, String slugPurchase);
 }

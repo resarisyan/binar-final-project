@@ -14,8 +14,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import static com.binar.byteacademy.common.util.Constants.BankTransferDetailPats.BANK_TRANSFER_DETAIL_PATS_ALL;
 import static com.binar.byteacademy.common.util.Constants.CoursePats.*;
-import static com.binar.byteacademy.common.util.Constants.PurchasePats.ADMIN_PURCHASE_PATS;
-import static com.binar.byteacademy.common.util.Constants.PurchasePats.PURCHASE_PATS_ALL;
+import static com.binar.byteacademy.common.util.Constants.PurchasePats.*;
 import static com.binar.byteacademy.enumeration.EnumPermission.*;
 import static org.springframework.http.HttpMethod.*;
 
@@ -48,10 +47,14 @@ public class SecurityConfig {
                                 .requestMatchers(PUT, COURSE_PATS).hasAnyAuthority(ADMIN_UPDATE.getPermission())
                                 .requestMatchers(DELETE, COURSE_PATS).hasAnyAuthority(ADMIN_DELETE.getPermission())
                                 .requestMatchers(GET, ADMIN_COURSE_PATS).hasAnyAuthority(ADMIN_READ.getPermission())
+                                .requestMatchers(POST, ADMIN_COURSE_PATS).hasAnyAuthority(ADMIN_CREATE.getPermission())
+                                .requestMatchers(PUT, ADMIN_COURSE_PATS).hasAnyAuthority(ADMIN_UPDATE.getPermission())
+                                .requestMatchers(DELETE, ADMIN_COURSE_PATS).hasAnyAuthority(ADMIN_DELETE.getPermission())
                                 .requestMatchers(GET, CUSTOMER_COURSE_PATS).hasAnyAuthority(CUSTOMER_READ.getPermission())
                                 .requestMatchers(POST, PURCHASE_PATS_ALL).hasAnyAuthority(CUSTOMER_CREATE.getPermission())
                                 .requestMatchers(GET, PURCHASE_PATS_ALL).hasAnyAuthority(CUSTOMER_READ.getPermission())
                                 .requestMatchers(GET, ADMIN_PURCHASE_PATS).hasAnyAuthority(ADMIN_READ.getPermission())
+                                .requestMatchers(PUT, ADMIN_PURCHASE_PATS_ALL).hasAnyAuthority(ADMIN_UPDATE.getPermission())
                                 .requestMatchers(POST, BANK_TRANSFER_DETAIL_PATS_ALL).hasAnyAuthority(ADMIN_CREATE.getPermission())
                                 .requestMatchers(PUT, BANK_TRANSFER_DETAIL_PATS_ALL).hasAnyAuthority(ADMIN_UPDATE.getPermission())
                                 .requestMatchers(DELETE, BANK_TRANSFER_DETAIL_PATS_ALL).hasAnyAuthority(ADMIN_DELETE.getPermission())

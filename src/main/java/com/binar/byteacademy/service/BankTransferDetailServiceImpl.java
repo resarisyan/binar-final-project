@@ -1,5 +1,6 @@
 package com.binar.byteacademy.service;
 
+import com.binar.byteacademy.common.util.CheckDataUtil;
 import com.binar.byteacademy.dto.request.CreateBankTransferDetailRequest;
 import com.binar.byteacademy.dto.request.UpdateBankTransferDetailRequest;
 import com.binar.byteacademy.dto.response.BankTransferDetailResponse;
@@ -15,11 +16,14 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+import static com.binar.byteacademy.common.util.Constants.TableName.BANK_TRANSFER_DETAIL_TABLE;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class BankTransferDetailServiceImpl implements BankTransferDetailService {
     private final BankTransferDetailRepository bankTransferDetailRepository;
+    private final CheckDataUtil checkDataUtil;
 
     @Override
     public BankTransferDetailResponse addNewBankTransferDetail(CreateBankTransferDetailRequest request) {
@@ -42,11 +46,16 @@ public class BankTransferDetailServiceImpl implements BankTransferDetailService 
     @Override
     public void updateBankTransferDetail(String bankName, UpdateBankTransferDetailRequest request) {
         try {
-            BankTransferDetail bankTransferDetail = bankTransferDetailRepository.findFirstByBankName(bankName.toLowerCase())
-                    .orElseThrow(() -> new  DataNotFoundException("Bank transfer detail not found"));
-            bankTransferDetail.setBankName(request.getBankName().toLowerCase());
-            bankTransferDetail.setAccountNumber(request.getAccountNumber().toLowerCase());
-            bankTransferDetailRepository.save(bankTransferDetail);
+            bankTransferDetailRepository.findFirstByBankName(bankName.toLowerCase())
+                    .map(bankTransferDetail -> {
+                        checkDataUtil.checkDataField(BANK_TRANSFER_DETAIL_TABLE, "bank_name", request.getBankName(), "bank_transfer_detail_id", bankTransferDetail.getId());
+                        bankTransferDetail.setBankName(request.getBankName().toLowerCase());
+                        bankTransferDetail.setAccountNumber(request.getAccountNumber().toLowerCase());
+                        return bankTransferDetail;
+                    })
+                    .ifPresentOrElse(bankTransferDetailRepository::save, () -> {
+                        throw new DataNotFoundException("Bank transfer detail not found");
+                    });
         } catch (DataNotFoundException e) {
             throw e;
         } catch (Exception e) {

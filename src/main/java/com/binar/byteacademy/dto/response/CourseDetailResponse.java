@@ -29,4 +29,5 @@ public class CourseDetailResponse {
     private EnumCourseLevel courseLevel;
     private List<ChapterCourseDetailResponse> chapters;
     private CategoryResponse category;
+//    private isOrdere;
 }

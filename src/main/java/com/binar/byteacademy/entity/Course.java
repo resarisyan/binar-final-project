@@ -1,8 +1,8 @@
 package com.binar.byteacademy.entity;
 
 import com.binar.byteacademy.enumeration.EnumCourseLevel;
-import com.binar.byteacademy.enumeration.EnumCourseType;
 import com.binar.byteacademy.enumeration.EnumStatus;
+import com.binar.byteacademy.enumeration.EnumCourseType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -72,25 +72,21 @@ public class Course {
     @Enumerated(EnumType.STRING)
     private EnumStatus courseStatus;
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "course", cascade = {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private List<Chapter> chapters;
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "course", cascade = {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private List<UserProgress> userProgresses;
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "course", cascade = {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private List<Purchase> purchases;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id", referencedColumnName = "category_id", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "category_id", referencedColumnName = "category_id")
     private Category category;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "course_promo",
-            joinColumns = @JoinColumn(name = "course_id"),
-            inverseJoinColumns = @JoinColumn(name = "promo_id"))
-    private List<Promo> promos;
-
+    @OneToMany(mappedBy = "course", cascade = {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    private List<CoursePromo> coursePromos;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

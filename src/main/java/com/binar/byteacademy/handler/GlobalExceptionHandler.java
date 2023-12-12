@@ -37,6 +37,15 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(ValidationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public APIResponse handledDataValidationException(ValidationException exception) {
+        return new APIResponse(
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage()
+        );
+    }
+
     @ExceptionHandler(DataConflictException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public APIResponse handledDataConflictException(DataConflictException exception) {

@@ -25,4 +25,5 @@ public class CourseResponse {
     private EnumCourseLevel courseLevel;
     private String pathCourseImage;
     private CategoryResponse category;
+    private String targetMarket;
 }

@@ -38,8 +38,14 @@ public class User implements UserDetails {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "is_verified", nullable = false, columnDefinition = "boolean default false")
-    private boolean isVerified;
+    @Column(name = "is_verified_email", nullable = false, columnDefinition = "boolean default false")
+    private boolean isVerifiedEmail;
+
+    @Column(name = "is_verified_phone_number", nullable = false, columnDefinition = "boolean default false")
+    private boolean isVerifiedPhoneNumber;
+
+    @Column(name = "phone_number", nullable = false, unique = true)
+    private String phoneNumber;
 
     @Enumerated(EnumType.STRING)
     private EnumRole role;
@@ -47,22 +53,19 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private EnumStatus status;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private Otp otp;
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    private List<Otp> otp;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToOne(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private CustomerDetail customerDetail;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private PasswordReset passwordReset;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private List<Purchase> purchase;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private List<UserProgress> userProgresses;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.MERGE} , fetch = FetchType.LAZY)
     private List<Token> tokens;
 
     @CreationTimestamp

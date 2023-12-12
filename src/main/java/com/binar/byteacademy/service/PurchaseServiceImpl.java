@@ -1,6 +1,7 @@
 package com.binar.byteacademy.service;
 
 import com.binar.byteacademy.common.util.JwtUtil;
+import com.binar.byteacademy.common.util.SlugUtil;
 import com.binar.byteacademy.dto.request.UpdatePurchaseStatusRequest;
 import com.binar.byteacademy.dto.request.purchase.BankTransferPurchaseRequest;
 import com.binar.byteacademy.dto.request.purchase.CreditCardPurchaseRequest;
@@ -21,10 +22,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+
+import static com.binar.byteacademy.common.util.Constants.ControllerMessage.*;
+import static com.binar.byteacademy.common.util.Constants.TableName.PURCHASE_TABLE;
 
 @Service
 @Slf4j
@@ -36,6 +45,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     private final UserProgressRepository userProgressRepository;
     private final PaymentProofRepository paymentProofRepository;
     private final JwtUtil jwtUtil;
+    private final SlugUtil slugUtil;
     private static final Double PPN_PERCENTAGE = 0.11;
 
     @Transactional
@@ -44,10 +54,10 @@ public class PurchaseServiceImpl implements PurchaseService {
         try {
             User user = jwtUtil.getUser();
             Course course = courseRepository.findFirstBySlugCourseAndCourseStatus(request.getSlugCourse(), EnumStatus.ACTIVE)
-                    .orElseThrow(() -> new DataNotFoundException("Course Not Found"));
+                    .orElseThrow(() -> new DataNotFoundException(COURSE_NOT_FOUND));
             List<EnumPurchaseStatus> purchaseStatuses = Arrays.asList(EnumPurchaseStatus.WAITING_FOR_PAYMENT, EnumPurchaseStatus.PAID);
             if (purchaseRepository.existsByUserAndCourseAndPurchaseStatusIn(user, course, purchaseStatuses)) {
-                throw new DataConflictException("Purchase already exists");
+                throw new IllegalArgumentException("Purchase already exists");
             }
             UserProgressKey userProgressKey = new UserProgressKey();
             userProgressKey.setUserId(user.getId());
@@ -62,23 +72,24 @@ public class PurchaseServiceImpl implements PurchaseService {
                         .build();
                 userProgressRepository.save(userProgress);
             }
-            PaymentProof paymentProof = PaymentProof.builder()
-                    .pathPaymentProofImage(null)
-                    .build();
-            paymentProof = paymentProofRepository.save(paymentProof);
-            //TODO: Buat slugCourse
+            String slugInput = user.getUsername().toLowerCase()+"-"+course.getSlugCourse();
+            String slug = slugUtil.toSlug(PURCHASE_TABLE, "slug_purchase", slugInput);
             Purchase purchase = Purchase.builder()
                     .ppn(course.getPrice()*PPN_PERCENTAGE)
-                    .amountPaid(course.getPrice())
+                    .amountPaid(course.getPrice()+(course.getPrice()*PPN_PERCENTAGE))
                     .endPaymentDate(LocalDateTime.now().plusDays(1))
                     .purchaseStatus(EnumPurchaseStatus.WAITING_FOR_PAYMENT)
                     .paymentMethod(EnumPaymentMethod.BANK_TRANSFER)
-                    //TODO: Masukan slugCourse
+                    .slugPurchase(slug)
                     .user(user)
                     .course(course)
-                    .paymentProof(paymentProof)
                     .build();
             purchase = purchaseRepository.save(purchase);
+            PaymentProof paymentProof = PaymentProof.builder()
+                    .pathPaymentProofImage(null)
+                    .purchase(purchase)
+                    .build();
+            paymentProofRepository.save(paymentProof);
             return PurchaseResponse.builder()
                     .amountPaid(purchase.getAmountPaid())
                     .ppn(purchase.getPpn())
@@ -104,7 +115,7 @@ public class PurchaseServiceImpl implements PurchaseService {
                             .build())
                     .slugPurchase(purchase.getSlugPurchase())
                     .build();
-        } catch (DataNotFoundException | DataConflictException e) {
+        } catch (DataNotFoundException | IllegalArgumentException e) {
             throw e;
         } catch (Exception e) {
             log.error("Failed to make purchase using transfer bank");
@@ -118,11 +129,13 @@ public class PurchaseServiceImpl implements PurchaseService {
         try {
             User user = jwtUtil.getUser();
             Course course = courseRepository.findFirstBySlugCourseAndCourseStatus(request.getSlugCourse(), EnumStatus.ACTIVE)
-                    .orElseThrow(() -> new DataNotFoundException("Course Not Found"));
+                    .orElseThrow(() -> new DataNotFoundException(COURSE_NOT_FOUND));
             List<EnumPurchaseStatus> purchaseStatuses = Arrays.asList(EnumPurchaseStatus.WAITING_FOR_PAYMENT, EnumPurchaseStatus.PAID);
             if (purchaseRepository.existsByUserAndCourseAndPurchaseStatusIn(user, course, purchaseStatuses)) {
                 throw new DataConflictException("Purchase already exists");
             }
+            YearMonth yearMonth = YearMonth.parse(request.getExpiryDate(), DateTimeFormatter.ofPattern("MM/yy"));
+            LocalDate localDate = yearMonth.atDay(1);
             UserProgressKey userProgressKey = new UserProgressKey();
             userProgressKey.setUserId(user.getId());
             userProgressKey.setCourseId(course.getId());
@@ -136,28 +149,29 @@ public class PurchaseServiceImpl implements PurchaseService {
                         .build();
                 userProgressRepository.save(userProgress);
             }
-            PaymentProof paymentProof = PaymentProof.builder()
-                    .pathPaymentProofImage(null)
-                    .build();
-            paymentProof = paymentProofRepository.save(paymentProof);
-            //TODO: Buat slugCourse
+            String slugInput = user.getUsername().toLowerCase()+"-"+course.getSlugCourse();
+            String slug = slugUtil.toSlug(PURCHASE_TABLE, "slug_purchase", slugInput);
             Purchase purchase = Purchase.builder()
                     .ppn(course.getPrice()*PPN_PERCENTAGE)
-                    .amountPaid(course.getPrice())
+                    .amountPaid(course.getPrice()+(course.getPrice()*PPN_PERCENTAGE))
                     .endPaymentDate(LocalDateTime.now().plusDays(1))
                     .purchaseStatus(EnumPurchaseStatus.WAITING_FOR_PAYMENT)
                     .paymentMethod(EnumPaymentMethod.CREDIT_CARD)
-                    //TODO: Masukan slugCourse
+                    .slugPurchase(slug)
                     .user(user)
                     .course(course)
-                    .paymentProof(paymentProof)
                     .build();
             purchase = purchaseRepository.save(purchase);
+            PaymentProof paymentProof = PaymentProof.builder()
+                    .pathPaymentProofImage(null)
+                    .purchase(purchase)
+                    .build();
+            paymentProofRepository.save(paymentProof);
             CreditCardDetail creditCardDetail = CreditCardDetail.builder()
                     .cardHolderName(request.getCardHolderName())
                     .cardNumber(request.getCardNumber())
                     .cvv(request.getCvv())
-                    .expiryDate(request.getExpiryDate())
+                    .expiryDate(localDate)
                     .purchase(purchase)
                     .build();
             creditCardDetailRepository.save(creditCardDetail);
@@ -205,7 +219,7 @@ public class PurchaseServiceImpl implements PurchaseService {
                             EnumPurchaseStatus.WAITING_FOR_PAYMENT,
                             pageable))
                     .filter(Page::hasContent)
-                    .orElseThrow(() -> new  DataNotFoundException("Purchase details not found"));
+                    .orElseThrow(() -> new  DataNotFoundException(PURCHASE_DETAILS_NOT_FOUND));
             return purchasePage.map(purchase -> PurchaseDetailResponse.builder()
                     .amountPaid(purchase.getAmountPaid())
                     .ppn(purchase.getPpn())
@@ -252,7 +266,7 @@ public class PurchaseServiceImpl implements PurchaseService {
                             EnumPurchaseStatus.WAITING_FOR_PAYMENT,
                             pageable))
                     .filter(Page::hasContent)
-                    .orElseThrow(() -> new  DataNotFoundException("Purchase details not found"));
+                    .orElseThrow(() -> new  DataNotFoundException(PURCHASE_DETAILS_NOT_FOUND));
             return purchasePage.map(purchase -> AdminPurchaseDetailResponse.builder()
                     .username(purchase.getUser().getUsername())
                     .amountPaid(purchase.getAmountPaid())
@@ -294,17 +308,23 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     @Transactional
     @Override
-    public void updatePurchaseStatus(UpdatePurchaseStatusRequest request) {
-        try {
-            Purchase purchase = purchaseRepository.findFirstBySlugPurchase(request.getSlugPurchase())
-                    .orElseThrow(() -> new DataNotFoundException("Purchase not found"));
-            purchase.setPurchaseStatus(request.getPurchaseStatus());
-            purchaseRepository.save(purchase);
-        } catch (DataNotFoundException e) {
-            throw e;
-        }  catch (Exception e) {
-            log.error("Failed to get purchase details for admin");
-            throw new ServiceBusinessException("Failed to get purchase details for admin");
-        }
+    public CompletableFuture<Void> updatePurchaseStatus(UpdatePurchaseStatusRequest request, String slugPurchase) {
+        return CompletableFuture.runAsync(() -> {
+            try {
+                purchaseRepository.findFirstBySlugPurchase(slugPurchase)
+                        .map(purchase -> {
+                            purchase.setPurchaseStatus(request.getPurchaseStatus());
+                            return purchase;
+                        })
+                        .ifPresentOrElse(purchaseRepository::save, () -> {
+                            throw new DataNotFoundException(PURCHASE_NOT_FOUND);
+                        });
+            } catch (DataNotFoundException e) {
+                throw e;
+            }  catch (Exception e) {
+                log.error("Failed to get purchase details for admin");
+                throw new ServiceBusinessException("Failed to get purchase details for admin");
+            }
+        });
     }
 }

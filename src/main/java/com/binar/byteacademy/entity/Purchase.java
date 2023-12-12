@@ -18,13 +18,13 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "purchase")
+@Table(name = "purchases")
 public class Purchase {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "purchase_id")
     private UUID id;
-
+    
     @Column(name = "ppn")
     private Double ppn;
 
@@ -48,12 +48,6 @@ public class Purchase {
     @Column(name = "slug_purchase", nullable = false, unique = true)
     private String slugPurchase;
 
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
-
     @OneToOne(mappedBy = "purchase", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private CreditCardDetail creditCardDetail;
 
@@ -67,4 +61,10 @@ public class Purchase {
     @ManyToOne
     @JoinColumn(name = "course_id", referencedColumnName = "course_id", nullable = false)
     private Course course;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 }

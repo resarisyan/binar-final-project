@@ -20,7 +20,7 @@ public class PaymentProof {
     @Column(name = "payment_proof_id")
     private UUID id;
 
-    @Column(name = "path_payment_proof_image", nullable = false)
+    @Column(name = "path_payment_proof_image")
     private String pathPaymentProofImage;
 
     @OneToOne(fetch = FetchType.EAGER)

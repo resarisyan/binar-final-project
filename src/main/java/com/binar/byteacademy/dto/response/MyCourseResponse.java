@@ -22,6 +22,5 @@ public class MyCourseResponse {
     private EnumCourseLevel courseLevel;
     private String pathCourseImage;
     private CategoryResponse category;
-    private Integer coursePercentage;
     private UserProgressResponse userProgressResponse;
 }

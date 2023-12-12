@@ -33,8 +33,11 @@ public class Chapter {
     @Column(name = "chapter_duration")
     private Integer chapterDuration;
 
-    @OneToMany(mappedBy = "chapter", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne
+    @JoinColumn(name = "course_id", referencedColumnName = "course_id", nullable = false)
+    private Course course;
 
+    @OneToMany(mappedBy = "chapter", cascade = {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.EAGER)
     private List<Material> materials;
 
     @CreationTimestamp
@@ -42,8 +45,4 @@ public class Chapter {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-
-    @ManyToOne
-    @JoinColumn(name = "course_id", referencedColumnName = "course_id", nullable = false)
-    private Course course;
 }

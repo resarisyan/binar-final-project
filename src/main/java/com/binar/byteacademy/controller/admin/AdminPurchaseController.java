@@ -1,5 +1,7 @@
 package com.binar.byteacademy.controller.admin;
 
+import com.binar.byteacademy.dto.request.UpdatePurchaseStatusRequest;
+import com.binar.byteacademy.dto.response.base.APIResponse;
 import com.binar.byteacademy.dto.response.base.APIResultResponse;
 import com.binar.byteacademy.dto.response.AdminPurchaseDetailResponse;
 import com.binar.byteacademy.service.PurchaseService;
@@ -12,10 +14,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.concurrent.CompletableFuture;
 
 import static com.binar.byteacademy.common.util.Constants.PurchasePats.ADMIN_PURCHASE_PATS;
 
@@ -38,5 +39,19 @@ public class AdminPurchaseController {
                 purchaseDetailResponses
         );
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
+    @PutMapping("/status/{slugPurchase}")
+    @Schema(name = "UpdatePurchaseStatusRequest", description = "Update purchase status request body")
+    @Operation(summary = "Endpoint to handle update purchase status (User Role : Admin)")
+    public CompletableFuture<ResponseEntity<APIResponse>> updatePurchaseStatus(@PathVariable String slugPurchase, @RequestBody UpdatePurchaseStatusRequest request) {
+        return purchaseService.updatePurchaseStatus(request, slugPurchase)
+                .thenApplyAsync(purchaseResponse -> {
+                    APIResponse responseDTO = new APIResponse(
+                            HttpStatus.OK,
+                            "Purchase status successfully updated"
+                    );
+                    return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+                });
     }
 }

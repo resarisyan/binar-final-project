@@ -31,7 +31,10 @@ public class Category {
     @Column(name = "path_category_image")
     private String pathCategoryImage;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Column(name = "slug_category", unique = true, nullable = false)
+    private String slugCategory;
+
+    @OneToMany(mappedBy = "category", cascade = {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.EAGER)
     private List<Course> courses;
 
     @CreationTimestamp
