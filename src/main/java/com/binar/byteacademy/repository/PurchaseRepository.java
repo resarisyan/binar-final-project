@@ -18,6 +18,8 @@ import java.util.UUID;
 public interface PurchaseRepository extends JpaRepository<Purchase, UUID> {
     Optional<Purchase> findFirstBySlugPurchase(String slugPurchase);
 
+    Optional<Purchase> findByUserAndCourse(User user, Course course);
+
     @Query(value = """
             SELECT CASE WHEN COUNT(p) > 0 THEN true ELSE false END FROM Purchase p
             WHERE p.user = :user

@@ -26,5 +26,4 @@ public class PurchaseDetailResponse {
     private LocalDateTime createdAt;
     private CourseResponse course;
     private PaymentProofResponse paymentProofResponse;
-    private String slugPurchase;
 }

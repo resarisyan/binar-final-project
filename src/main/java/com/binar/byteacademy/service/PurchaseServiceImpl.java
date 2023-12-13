@@ -27,7 +27,6 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -113,7 +112,6 @@ public class PurchaseServiceImpl implements PurchaseService {
                                     .pathCategoryImage(purchase.getCourse().getCategory().getPathCategoryImage())
                                     .build())
                             .build())
-                    .slugPurchase(purchase.getSlugPurchase())
                     .build();
         } catch (DataNotFoundException | IllegalArgumentException e) {
             throw e;
@@ -198,12 +196,10 @@ public class PurchaseServiceImpl implements PurchaseService {
                                     .pathCategoryImage(purchase.getCourse().getCategory().getPathCategoryImage())
                                     .build())
                             .build())
-                    .slugPurchase(purchase.getSlugPurchase())
                     .build();
         } catch (DataNotFoundException | DataConflictException e) {
             throw e;
         } catch (Exception e) {
-            log.error(e.getMessage());
             log.error("Failed to make purchase using credit card");
             throw new ServiceBusinessException("Failed to make purchase using credit card");
         }
@@ -248,7 +244,6 @@ public class PurchaseServiceImpl implements PurchaseService {
                                     .pathPaymentProofImage(paymentProof.getPathPaymentProofImage())
                                     .build())
                             .orElse(null))
-                    .slugPurchase(purchase.getSlugPurchase())
                     .build());
         } catch (DataNotFoundException e) {
             throw e;

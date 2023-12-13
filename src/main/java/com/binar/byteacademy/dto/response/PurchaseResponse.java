@@ -23,5 +23,4 @@ public class PurchaseResponse {
     private EnumPaymentMethod paymentMethod;
     private LocalDateTime createdAt;
     private CourseResponse course;
-    private String slugPurchase;
 }
