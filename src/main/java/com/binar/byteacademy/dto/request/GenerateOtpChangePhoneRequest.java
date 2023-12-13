@@ -1,0 +1,18 @@
+package com.binar.byteacademy.dto.request;
+
+import com.binar.byteacademy.validation.FieldExistence;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class GenerateOtpChangePhoneRequest {
+    @NotBlank
+    @Size(min = 10, max = 14)
+    @FieldExistence(tableName = "users", fieldName = "phone_number", shouldExist = false, message = "Phone number already exists")
+    private String phoneNumber;
+}

@@ -7,14 +7,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MaterialResponse {
+    private String materialName;
     private Integer serialNumber;
     private String videoLink;
     private Integer materialDuration;
