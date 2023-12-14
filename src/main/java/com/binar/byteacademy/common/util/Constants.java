@@ -56,6 +56,11 @@ public class Constants {
         public static final String BANK_TRANSFER_DETAIL_PATS_ALL = BASE_URL + "/bank-transfer-detail/**";
     }
 
+    public static final class PaymentProofPats {
+        public static final String PAYMENT_PROOF_PATS = BASE_URL + "/payment_proof";
+        public static final String PAYMENT_PROOF_PATS_ALL = BASE_URL + "/payment_proof/**";
+    }
+
     public static final class CommonPats {
         public static final String[] WHITE_LIST_PATS = {
                 "/api/v1/auth/login",
@@ -92,6 +97,7 @@ public class Constants {
         public static final String COURSE_PROMO_NOT_FOUND = "Course promo not found";
         public static final String PURCHASE_NOT_FOUND = "Purchase not found";
         public static final String PURCHASE_DETAILS_NOT_FOUND = "Purchase details not found";
+        public static final String PAYMENT_PROOF_NOT_FOUND = "Payment proof not found";
     }
 
     public static final class TableName {

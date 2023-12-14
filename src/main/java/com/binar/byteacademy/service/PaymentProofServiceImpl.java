@@ -7,6 +7,7 @@ import com.binar.byteacademy.entity.Course;
 import com.binar.byteacademy.entity.PaymentProof;
 import com.binar.byteacademy.entity.Purchase;
 import com.binar.byteacademy.entity.User;
+import com.binar.byteacademy.enumeration.EnumPurchaseStatus;
 import com.binar.byteacademy.exception.DataNotFoundException;
 import com.binar.byteacademy.exception.ServiceBusinessException;
 import com.binar.byteacademy.repository.CourseRepository;
@@ -34,7 +35,7 @@ public class PaymentProofServiceImpl implements PaymentProofService {
             User user = jwtUtil.getUser();
             Course course = courseRepository.findFirstBySlugCourse(slugCourse)
                     .orElseThrow(() -> new DataNotFoundException(COURSE_NOT_FOUND));
-            Purchase purchase = purchaseRepository.findByUserAndCourse(user, course)
+            Purchase purchase = purchaseRepository.findByUserAndCourseAndPurchaseStatus(user, course, EnumPurchaseStatus.WAITING_FOR_PAYMENT)
                     .orElseThrow(() -> new DataNotFoundException(PURCHASE_NOT_FOUND));
             PaymentProof paymentProof = purchase.getPaymentProof();
             String pathPaymentProofImage = imageUtil.base64UploadImage(request.getPathPaymentProofImage()).join();
