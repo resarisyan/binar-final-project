@@ -1,7 +1,5 @@
 package com.binar.byteacademy.dto.response;
 
-import com.binar.byteacademy.dto.response.CourseResponse;
-import com.binar.byteacademy.dto.response.PaymentProofResponse;
 import com.binar.byteacademy.enumeration.EnumPaymentMethod;
 import com.binar.byteacademy.enumeration.EnumPurchaseStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -24,7 +22,8 @@ public class AdminPurchaseDetailResponse {
     private LocalDateTime endPaymentDate;
     private EnumPurchaseStatus purchaseStatus;
     private EnumPaymentMethod paymentMethod;
-    private LocalDateTime createdAt;
+    private LocalDateTime purchaseDate;
+    private LocalDateTime paymentDate;
     private CourseResponse course;
     private PaymentProofResponse paymentProofResponse;
     private String slugPurchase;
