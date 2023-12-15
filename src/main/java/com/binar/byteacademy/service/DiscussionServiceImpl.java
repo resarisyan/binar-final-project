@@ -1,6 +1,7 @@
 package com.binar.byteacademy.service;
 
 import com.binar.byteacademy.dto.request.DiscussionRequest;
+import com.binar.byteacademy.dto.request.UpdateDiscussionRequest;
 import com.binar.byteacademy.dto.response.DiscussionResponse;
 import com.binar.byteacademy.entity.Course;
 import com.binar.byteacademy.entity.Discussion;
@@ -20,7 +21,6 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.binar.byteacademy.common.util.Constants.ControllerMessage.COURSE_NOT_FOUND;
 
 @Service
 @Slf4j
@@ -40,12 +40,13 @@ public class DiscussionServiceImpl implements DiscussionService {
                             .discussionTopic(discussion.get().getDiscussionTopic())
                             .discussionContent(discussion.get().getDiscussionContent())
                             .discussionDate(discussion.get().getDiscussionDate())
+                            .slugDiscussion(discussion.get().getSlugDiscussion())
                             .isComplete(discussion.get().isComplete())
                             .username(discussion.get().getUser().getUsername())
                             .build())
                     .orElseThrow(() -> new DataNotFoundException("Discussion Not Found"));
         } catch (DataNotFoundException e) {
-            throw e;
+            throw new ServiceBusinessException(e.getMessage());
         }
     }
 
@@ -58,6 +59,7 @@ public class DiscussionServiceImpl implements DiscussionService {
                     .map(course1 -> {
                         Discussion discussion = Discussion.builder()
                                 .course(course1)
+                                .slugDiscussion(discussionRequest.getSlugDiscussion())
                                 .discussionContent(discussionRequest.getDiscussionContent())
                                 .discussionTopic(discussionRequest.getDiscussionTopic())
                                 .discussionDate(LocalDateTime.now())
@@ -70,6 +72,7 @@ public class DiscussionServiceImpl implements DiscussionService {
                                 .discussionTopic(discussion.getDiscussionTopic())
                                 .discussionContent(discussion.getDiscussionContent())
                                 .discussionDate(discussion.getDiscussionDate())
+                                .slugDiscussion(discussion.getSlugDiscussion())
                                 .isComplete(discussion.isComplete())
                                 .username(discussion.getUser().getUsername())
                                 .build();
@@ -84,12 +87,13 @@ public class DiscussionServiceImpl implements DiscussionService {
     public Page<DiscussionResponse> getListDiscussion(Pageable pageable) {
         try {
            return Optional.of(discussionRepository.findAll(pageable))
-                    .filter(Page::hasContent)
+                   .filter(Page::hasContent)
                     .map(discussionPage -> discussionPage
                             .map(discussion -> DiscussionResponse.builder()
                                     .courseName(discussion.getCourse().getCourseName())
                                     .discussionTopic(discussion.getDiscussionTopic())
                                     .discussionContent(discussion.getDiscussionContent())
+                                    .slugDiscussion(discussion.getSlugDiscussion())
                                     .discussionDate(LocalDateTime.now())
                                     .username(discussion.getUser().getUsername())
                                     .isComplete(false)
@@ -104,21 +108,22 @@ public class DiscussionServiceImpl implements DiscussionService {
     }
 
     @Override
-    public DiscussionResponse updateDiscussion(DiscussionRequest discussionRequest, UUID id) {
+    public DiscussionResponse updateDiscussion(UpdateDiscussionRequest request, UUID id) {
         try {
             User user = jwtUtil.getUser();
             Optional<Discussion> discussionOptional = Optional.of(discussionRepository.findById(id))
                     .orElseThrow(() -> new DataNotFoundException("Discussion Not Found"));
             if (discussionOptional.isPresent()) {
                 Discussion discussion = discussionOptional.get();
-                discussion.setDiscussionContent(discussionRequest.getDiscussionContent());
-                discussion.setDiscussionTopic(discussionRequest.getDiscussionTopic());
+                discussion.setDiscussionContent(request.getDiscussionContent());
+                discussion.setUpdatedAt(LocalDateTime.now());
                 discussionRepository.save(discussion);
                 return DiscussionResponse.builder()
                         .courseName(discussion.getCourse().getCourseName())
                         .discussionTopic(discussion.getDiscussionTopic())
                         .discussionContent(discussion.getDiscussionContent())
                         .discussionDate(discussion.getDiscussionDate())
+                        .slugDiscussion(discussion.getSlugDiscussion())
                         .isComplete(discussion.isComplete())
                         .username(user.getUsername())
                         .build();

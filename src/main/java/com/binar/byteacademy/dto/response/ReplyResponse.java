@@ -15,8 +15,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ReplyResponse {
-    private UUID id;
-    private String discussionTopic;
+    private String commentContent;
     private String replyContent;
     private String username;
     private LocalDateTime replyDate;

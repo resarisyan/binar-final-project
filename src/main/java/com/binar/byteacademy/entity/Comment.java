@@ -1,5 +1,6 @@
 package com.binar.byteacademy.entity;
 
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,41 +17,28 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "discussions")
-public class Discussion {
+@Table(name = "comments")
+public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "discussion_id")
+    @Column(name = "comment_id")
     private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "course_id", nullable = false)
-    private Course course;
-
-    @Column(name = "slug_discussion", nullable = false)
-    private String slugDiscussion;
-
-    @Column(name = "discussion_topic")
-    private String discussionTopic;
-
-    @Column(name = "discussion_content")
-    private String discussionContent;
-
-    @Column(name = "discussion_date")
-    private LocalDateTime discussionDate;
-
-    @Column(name = "is_complete")
-    private boolean isComplete;
+    @Column(name = "comment_content")
+    private String commentContent;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "discussion_id", nullable = false)
+    private Discussion discussion;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-
 }

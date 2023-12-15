@@ -2,11 +2,14 @@ package com.binar.byteacademy.service;
 
 import com.binar.byteacademy.common.util.JwtUtil;
 import com.binar.byteacademy.dto.request.ReplyRequest;
+import com.binar.byteacademy.dto.request.UpdateReplyRequest;
 import com.binar.byteacademy.dto.response.ReplyResponse;
+import com.binar.byteacademy.entity.Comment;
 import com.binar.byteacademy.entity.Reply;
 import com.binar.byteacademy.entity.User;
 import com.binar.byteacademy.exception.DataNotFoundException;
 import com.binar.byteacademy.exception.ServiceBusinessException;
+import com.binar.byteacademy.repository.CommentRepository;
 import com.binar.byteacademy.repository.DiscussionRepository;
 import com.binar.byteacademy.repository.ReplyRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +27,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ReplyServiceImpl implements ReplyService {
     private final ReplyRepository replyRepository;
-    private final DiscussionRepository discussionRepository;
     private final JwtUtil jwtUtil;
+    private final CommentRepository commentRepository;
 
     @Override
     public Page<ReplyResponse> getReplyList(Pageable pageable) {
@@ -34,9 +37,9 @@ public class ReplyServiceImpl implements ReplyService {
                     .filter(Page::hasContent)
                     .map(replyPage -> replyPage
                             .map(reply -> ReplyResponse.builder()
-                                    .discussionTopic(reply.getDiscussion().getDiscussionTopic())
+                                    .commentContent(reply.getComment().getCommentContent())
                                     .replyContent(reply.getReplyContent())
-                                    .replyDate(reply.getReplyDate())
+                                    .replyDate(reply.getCreatedAt())
                                     .username(reply.getUser().getUsername())
                                     .build()))
             .orElseThrow(() -> new DataNotFoundException("Reply Not Found"));
@@ -50,25 +53,22 @@ public class ReplyServiceImpl implements ReplyService {
     }
 
     @Override
-    public ReplyResponse saveReply(ReplyRequest request, String discussionTopic) {
+    public ReplyResponse saveReply(ReplyRequest request) {
         try {
             User user = jwtUtil.getUser();
-            return Optional.of(discussionRepository.findByDiscussionTopic(discussionTopic))
-                    .map(discussion -> {
-                        Reply reply = Reply.builder()
-                                .discussion(discussion)
-                                .replyContent(request.getReplyContent())
-                                .replyDate(LocalDateTime.now())
-                                .user(user)
-                                .build();
-                        replyRepository.save(reply);
-                        return ReplyResponse.builder()
-                                .discussionTopic(reply.getDiscussion().getDiscussionTopic())
-                                .replyContent(reply.getReplyContent())
-                                .replyDate(reply.getReplyDate())
-                                .username(reply.getUser().getUsername())
-                                .build();
-                    }).orElseThrow(() -> new DataNotFoundException("Discussion Not Found"));
+            Comment comment = commentRepository.findById(request.getCommentId())
+                    .orElseThrow(() -> new DataNotFoundException("Comment Not Found"));
+            Reply reply = replyRepository.save(Reply.builder()
+                    .replyContent(request.getReplyContent())
+                    .comment(comment)
+                    .user(user)
+                    .build());
+            return ReplyResponse.builder()
+                    .commentContent(comment.getCommentContent())
+                    .replyContent(reply.getReplyContent())
+                    .replyDate(reply.getCreatedAt())
+                    .username(reply.getUser().getUsername())
+                    .build();
         } catch (Exception e) {
             log.error("Failed to create reply", e);
             throw new ServiceBusinessException(e.getMessage());
@@ -80,9 +80,9 @@ public class ReplyServiceImpl implements ReplyService {
         try {
             return Optional.of(replyRepository.findById(replyId))
                     .map(reply -> ReplyResponse.builder()
-                            .discussionTopic(reply.get().getDiscussion().getDiscussionTopic())
+                            .commentContent(reply.get().getComment().getCommentContent())
                             .replyContent(reply.get().getReplyContent())
-                            .replyDate(reply.get().getReplyDate())
+                            .replyDate(reply.get().getCreatedAt())
                             .username(reply.get().getUser().getUsername())
                             .build())
                     .orElseThrow(() -> new DataNotFoundException("Reply Not Found"));
@@ -95,7 +95,8 @@ public class ReplyServiceImpl implements ReplyService {
     @Override
     public void deleteReplyById(UUID replyId) {
         try {
-            Optional<Reply> replyOptional = Optional.of(replyRepository.findById(replyId)).orElseThrow(() -> new DataNotFoundException("Reply Not Found"));
+            Optional<Reply> replyOptional = Optional.of(replyRepository.findById(replyId))
+                    .orElseThrow(() -> new DataNotFoundException("Reply Not Found"));
             if (replyOptional.isPresent()) {
                 replyRepository.deleteById(replyId);
             } else {
@@ -107,7 +108,7 @@ public class ReplyServiceImpl implements ReplyService {
     }
 
     @Override
-    public ReplyResponse updateReply(ReplyRequest replyRequest, UUID replyId) {
+    public ReplyResponse updateReply(UpdateReplyRequest request, UUID replyId) {
         try {
             User user = jwtUtil.getUser();
             Optional<Reply> replyOptional = Optional.of(replyRepository.findById(replyId))
@@ -115,13 +116,14 @@ public class ReplyServiceImpl implements ReplyService {
 
             if (replyOptional.isPresent()) {
                 Reply reply = replyOptional.get();
-                reply.setReplyContent(replyRequest.getReplyContent());
+                reply.setReplyContent(request.getReplyContent());
+                reply.setUpdatedAt(LocalDateTime.now());
+                reply.setUser(user);
                 replyRepository.save(reply);
                 return ReplyResponse.builder()
-                        .discussionTopic(reply.getDiscussion().getDiscussionTopic())
                         .replyContent(reply.getReplyContent())
-                        .replyDate(reply.getReplyDate())
-                        .username(user.getUsername())
+                        .replyDate(reply.getCreatedAt())
+                        .username(reply.getUser().getUsername())
                         .build();
             }
         } catch (Exception e) {

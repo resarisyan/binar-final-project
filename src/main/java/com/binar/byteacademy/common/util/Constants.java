@@ -51,8 +51,12 @@ public class Constants {
         public static final String DISCUSSION_PATS_ALL = BASE_URL + "/discussion/**";
     }
     public static final class ReplyPats {
-        public static final String REPLY_PATS = BASE_URL + "/reply";
-        public static final String REPLY_PATS_ALL = BASE_URL + "/reply/**";
+        public static final String REPLY_PATS = BASE_URL + "/replies";
+        public static final String REPLY_PATS_ALL = BASE_URL + "/replies/**";
+    }
+    public static final class CommentPats {
+        public static final String COMMENT_PATS = BASE_URL + "/comment";
+        public static final String COMMENT_PATS_ALL = BASE_URL + "/comment/**";
     }
 
     public static final class CommonPats {
@@ -60,7 +64,7 @@ public class Constants {
                 "/api/v1/auth/login",
                 "/api/v1/auth/register",
                 "/api/v1/discussion/**",
-                "/api/v1/reply/**",
+                "/api/v1/replies/**",
                 "/api/v1/auth/verify-register-phone",
                 "/api/v1/auth/regenerate-otp-register",
                 "/api/v1/auth/verify-email-register",

@@ -1,6 +1,7 @@
 package com.binar.byteacademy.controller;
 
 import com.binar.byteacademy.dto.request.ReplyRequest;
+import com.binar.byteacademy.dto.request.UpdateReplyRequest;
 import com.binar.byteacademy.dto.response.DiscussionResponse;
 import com.binar.byteacademy.dto.response.ReplyResponse;
 import com.binar.byteacademy.dto.response.base.APIResultResponse;
@@ -59,8 +60,9 @@ public class ReplyController {
     @PostMapping("/create-reply")
     @Schema(name = "SaveReply", description = "Save reply")
     @Operation(summary = "Endpoint to handle save reply")
-    public ResponseEntity<APIResultResponse<ReplyResponse>> saveReply(@RequestBody ReplyRequest replyRequest,@RequestParam("discussionTopic") String discussionTopic) {
-        ReplyResponse replyResponse = replyService.saveReply(replyRequest, discussionTopic );
+    public ResponseEntity<APIResultResponse<ReplyResponse>> saveReply(
+            @RequestBody ReplyRequest replyRequest) {
+        ReplyResponse replyResponse = replyService.saveReply(replyRequest);
         APIResultResponse<ReplyResponse> responseDTO = new APIResultResponse<>(
                 HttpStatus.CREATED,
                 "Success Create Reply",
@@ -72,8 +74,8 @@ public class ReplyController {
     @PutMapping("/update-reply/{id}")
     @Schema(name = "UpdateReply", description = "Update reply")
     @Operation(summary = "Endpoint to handle update reply")
-    public ResponseEntity<APIResultResponse<ReplyResponse>> updateReply(@RequestBody ReplyRequest replyRequest, @PathVariable UUID id) {
-        ReplyResponse replyResponse = replyService.updateReply(replyRequest, id);
+    public ResponseEntity<APIResultResponse<ReplyResponse>> updateReply(@RequestBody UpdateReplyRequest request, @PathVariable UUID id) {
+        ReplyResponse replyResponse = replyService.updateReply(request, id);
         APIResultResponse<ReplyResponse> responseDTO = new APIResultResponse<>(
                 HttpStatus.OK,
                 "Success update reply",

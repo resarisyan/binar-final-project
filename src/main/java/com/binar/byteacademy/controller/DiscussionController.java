@@ -1,6 +1,7 @@
 package com.binar.byteacademy.controller;
 
 import com.binar.byteacademy.dto.request.DiscussionRequest;
+import com.binar.byteacademy.dto.request.UpdateDiscussionRequest;
 import com.binar.byteacademy.dto.response.DiscussionResponse;
 import com.binar.byteacademy.dto.response.base.APIResultResponse;
 import com.binar.byteacademy.entity.Discussion;
@@ -71,8 +72,8 @@ public class DiscussionController {
     @PutMapping("/update-discussion/{id}")
     @Schema(name = "UpdateDiscussion", description = "Update discussion")
     @Operation(summary = "Endpoint to handle update discussion")
-    public ResponseEntity<APIResultResponse<DiscussionResponse>> updateDiscussion(@RequestBody DiscussionRequest discussionRequest, @PathVariable UUID id) {
-        DiscussionResponse discussionResponse = discussionService.updateDiscussion(discussionRequest, id);
+    public ResponseEntity<APIResultResponse<DiscussionResponse>> updateDiscussion(@RequestBody UpdateDiscussionRequest request, @PathVariable UUID id) {
+        DiscussionResponse discussionResponse = discussionService.updateDiscussion(request, id);
         APIResultResponse<DiscussionResponse> responseDTO = new APIResultResponse<>(
                 HttpStatus.OK,
                 "Success update discussion",

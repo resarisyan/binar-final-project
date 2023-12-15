@@ -28,15 +28,12 @@ public class Reply {
     private String replyContent;
 
     @ManyToOne
-    @JoinColumn(name = "discussion_id", nullable = false)
-    private Discussion discussion;
-
-    @Column(name = "reply_date")
-    private LocalDateTime replyDate;
-
-    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "comment_id", nullable = false)
+    private Comment comment;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

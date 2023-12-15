@@ -8,17 +8,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DiscussionRequest {
-    @NotBlank
-    private String discussionTopic;
+public class UpdateDiscussionRequest {
 
     @NotBlank
     private String discussionContent;
-
-    @NotBlank
-    private String slugDiscussion;
-
-    @NotBlank
-    private String slugCourse;
-
 }

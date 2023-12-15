@@ -8,17 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DiscussionRequest {
+public class UpdateReplyRequest {
     @NotBlank
-    private String discussionTopic;
-
-    @NotBlank
-    private String discussionContent;
-
-    @NotBlank
-    private String slugDiscussion;
-
-    @NotBlank
-    private String slugCourse;
-
+    private String replyContent;
 }

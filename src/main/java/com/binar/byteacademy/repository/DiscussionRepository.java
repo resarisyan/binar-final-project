@@ -8,4 +8,5 @@ import java.util.UUID;
 
 public interface DiscussionRepository extends JpaRepository<Discussion, UUID> {
     Discussion findByDiscussionTopic(String discussionTopic);
+    Discussion findBySlugDiscussion(String slugDiscussion);
 }

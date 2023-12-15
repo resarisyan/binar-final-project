@@ -7,19 +7,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DiscussionResponse {
-    private String courseName;
-    private String discussionTopic;
-    private String discussionContent;
-    private String slugDiscussion;
-    private LocalDateTime discussionDate;
-    private boolean isComplete;
+public class CommentResponse {
+    private String commentContent;
     private String username;
+    private LocalDateTime commentDate;
 }
