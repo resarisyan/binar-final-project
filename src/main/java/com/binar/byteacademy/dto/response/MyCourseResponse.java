@@ -14,12 +14,13 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MyCourseResponse {
     private String courseName;
-    private String categoryName;
     private String instructorName;
-    private String pathImage;
-    private EnumCourseLevel courseLevel;
     private Double totalCourseRate;
     private Integer totalModules;
     private Integer courseDuration;
-    private Integer coursePercentage;
+    private String slugCourse;
+    private EnumCourseLevel courseLevel;
+    private String pathCourseImage;
+    private CategoryResponse category;
+    private UserProgressResponse userProgressResponse;
 }

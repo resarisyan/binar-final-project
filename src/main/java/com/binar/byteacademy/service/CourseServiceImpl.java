@@ -29,7 +29,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 import static com.binar.byteacademy.common.util.Constants.ControllerMessage.CATEGORY_NOT_FOUND;
 import static com.binar.byteacademy.common.util.Constants.ControllerMessage.COURSE_NOT_FOUND;
@@ -168,22 +167,22 @@ public class CourseServiceImpl implements CourseService {
         }
     }
 
-    @Transactional(readOnly = true)
     @Override
     public Page<Course> getAllCourseByCriteria(List<String> categoryNames, List<EnumCourseLevel> courseLevels, List<EnumCourseType> courseTypes, List<EnumStatus> courseStatuses, List<EnumFilterCoursesBy> filterCoursesBy, String keyword, String username, Pageable pageable) throws DataNotFoundException {
-        categoryNames = Optional.ofNullable(categoryNames).map(val -> val.stream().map(String::toLowerCase).collect(Collectors.toList())).orElse(Collections.emptyList());
+        categoryNames = Optional.ofNullable(categoryNames).map(val -> val.stream().map(String::toLowerCase).toList()).orElse(Collections.emptyList());
         courseLevels = Optional.ofNullable(courseLevels).orElse(Collections.emptyList());
         courseTypes = Optional.ofNullable(courseTypes).orElse(Collections.emptyList());
         courseStatuses = Optional.ofNullable(courseStatuses).orElse(Collections.emptyList());
         filterCoursesBy = Optional.ofNullable(filterCoursesBy).orElse(Collections.emptyList());
+        keyword = Optional.ofNullable(keyword).map(String::toLowerCase).orElse(null);
         return Optional.of(courseRepository.findAll(CourseFilterSpecification.filterCourses(categoryNames, courseLevels, courseTypes, courseStatuses, filterCoursesBy, keyword, username), pageable)).filter(Page::hasContent).orElseThrow(() -> new DataNotFoundException("Course Not  Found"));
     }
 
     @Override
-    public Page<SearchCourseResponse> getCourseListForWeb(List<String> categoryNames, List<EnumCourseLevel> courseLevels, List<EnumCourseType> courseTypes, List<EnumStatus> courseStatuses, List<EnumFilterCoursesBy> filterCoursesBy, String keyword, Pageable pageable) {
+    public Page<CourseResponse> getCourseListForWeb(List<String> categoryNames, List<EnumCourseLevel> courseLevels, List<EnumCourseType> courseTypes, List<EnumStatus> courseStatuses, List<EnumFilterCoursesBy> filterCoursesBy, String keyword, Pageable pageable) {
         try {
             Page<Course> coursePage = getAllCourseByCriteria(categoryNames, courseLevels, courseTypes, courseStatuses, filterCoursesBy, keyword, null, pageable);
-            return coursePage.map(course -> SearchCourseResponse.builder().courseName(course.getCourseName()).categoryName(course.getCategory().getCategoryName()).instructorName(course.getInstructorName()).pathImage(course.getPathCourseImage()).price(course.getPrice()).courseType(course.getCourseType()).courseLevel(course.getCourseLevel()).totalCourseRate(course.getTotalCourseRate()).totalModules(course.getTotalModules()).courseDuration(course.getCourseDuration()).build());
+            return coursePage.map(course -> CourseResponse.builder().courseName(course.getCourseName()).instructorName(course.getInstructorName()).price(course.getPrice()).totalCourseRate(course.getTotalCourseRate()).totalModules(course.getTotalModules()).courseDuration(course.getCourseDuration()).slugCourse(course.getSlugCourse()).pathCourseImage(course.getPathCourseImage()).courseType(course.getCourseType()).courseLevel(course.getCourseLevel()).category(CategoryResponse.builder().categoryName(course.getCategory().getCategoryName()).pathCategoryImage(course.getCategory().getPathCategoryImage()).build()).build());
         } catch (DataNotFoundException e) {
             throw e;
         } catch (Exception e) {
@@ -195,7 +194,7 @@ public class CourseServiceImpl implements CourseService {
     public Page<AdminCourseResponse> getCourseListForAdmin(List<String> categoryNames, List<EnumCourseLevel> courseLevels, List<EnumCourseType> courseTypes, List<EnumStatus> courseStatuses, List<EnumFilterCoursesBy> filterCoursesBy, String keyword, Pageable pageable) {
         try {
             Page<Course> coursePage = getAllCourseByCriteria(categoryNames, courseLevels, courseTypes, courseStatuses, filterCoursesBy, keyword, null, pageable);
-            return coursePage.map(course -> AdminCourseResponse.builder().slugCourse(course.getSlugCourse()).courseName(course.getCourseName()).categoryName(course.getCategory().getCategoryName()).price(course.getPrice()).courseType(course.getCourseType()).courseLevel(course.getCourseLevel()).courseStatus(course.getCourseStatus()).build());
+            return coursePage.map(course -> AdminCourseResponse.builder().slugCourse(course.getSlugCourse()).courseName(course.getCourseName()).price(course.getPrice()).courseType(course.getCourseType()).courseLevel(course.getCourseLevel()).courseStatus(course.getCourseStatus()).category(CategoryResponse.builder().categoryName(course.getCategory().getCategoryName()).pathCategoryImage(course.getCategory().getPathCategoryImage()).build()).build());
         } catch (DataNotFoundException e) {
             throw e;
         } catch (Exception e) {
@@ -208,7 +207,7 @@ public class CourseServiceImpl implements CourseService {
         try {
             User user = jwtUtil.getUser();
             Page<Course> coursePage = getAllCourseByCriteria(categoryNames, courseLevels, courseTypes, courseStatuses, filterCoursesBy, keyword, user.getUsername(), pageable);
-            return coursePage.map(course -> MyCourseResponse.builder().courseName(course.getCourseName()).categoryName(course.getCategory().getCategoryName()).courseLevel(course.getCourseLevel()).instructorName(course.getInstructorName()).pathImage(course.getPathCourseImage()).courseLevel(course.getCourseLevel()).totalCourseRate(course.getTotalCourseRate()).totalModules(course.getTotalModules()).courseDuration(course.getCourseDuration()).coursePercentage(course.getUserProgresses().get(0).getCoursePercentage()).build());
+            return coursePage.map(course -> MyCourseResponse.builder().courseName(course.getCourseName()).instructorName(course.getInstructorName()).totalCourseRate(course.getTotalCourseRate()).totalModules(course.getTotalModules()).courseDuration(course.getCourseDuration()).slugCourse(course.getSlugCourse()).courseLevel(course.getCourseLevel()).pathCourseImage(course.getPathCourseImage()).category(CategoryResponse.builder().categoryName(course.getCategory().getCategoryName()).pathCategoryImage(course.getCategory().getPathCategoryImage()).build()).userProgressResponse(UserProgressResponse.builder().completionDate(course.getUserProgresses().get(0).getCompletionDate()).coursePercentage(course.getUserProgresses().get(0).getCoursePercentage()).isCompleted(course.getUserProgresses().get(0).getIsCompleted()).build()).build());
         } catch (DataNotFoundException e) {
             throw e;
         } catch (Exception e) {
@@ -220,7 +219,7 @@ public class CourseServiceImpl implements CourseService {
     public CourseDetailResponse getCourseDetail(String courseSlug) {
         try {
             Course course = courseRepository.findFirstBySlugCourse(courseSlug).orElseThrow(() -> new DataNotFoundException("Course not found"));
-            return CourseDetailResponse.builder().courseName(course.getCourseName()).instructorName(course.getInstructorName()).totalCourseRate(course.getTotalCourseRate()).totalModules(course.getTotalModules()).courseDuration(course.getCourseDuration()).groupLink(course.getGroupLink()).slugCourse(course.getSlugCourse()).courseType(course.getCourseType()).pathCourseImage(course.getPathCourseImage()).courseLevel(course.getCourseLevel()).category(CategoryResponse.builder().categoryName(course.getCategory().getCategoryName()).pathCategoryImage(course.getCategory().getPathCategoryImage()).build()).chapters(course.getChapters().stream().map(chapter -> ChapterCourseDetailResponse.builder().title(chapter.getTitle()).chapterDuration(chapter.getChapterDuration()).noChapter(chapter.getNoChapter()).materials(chapter.getMaterials().stream().map(material -> MaterialCourseDetailResponse.builder().materialType(material.getMaterialType()).materialDuration(material.getMaterialDuration()).slugMaterial(material.getSlugMaterial()).build()).collect(Collectors.toList())).build()).collect(Collectors.toList())).build();
+            return CourseDetailResponse.builder().courseName(course.getCourseName()).instructorName(course.getInstructorName()).totalCourseRate(course.getTotalCourseRate()).totalModules(course.getTotalModules()).courseDuration(course.getCourseDuration()).groupLink(course.getGroupLink()).slugCourse(course.getSlugCourse()).courseType(course.getCourseType()).pathCourseImage(course.getPathCourseImage()).courseLevel(course.getCourseLevel()).category(CategoryResponse.builder().categoryName(course.getCategory().getCategoryName()).pathCategoryImage(course.getCategory().getPathCategoryImage()).build()).chapters(course.getChapters().stream().map(chapter -> ChapterCourseDetailResponse.builder().title(chapter.getTitle()).chapterDuration(chapter.getChapterDuration()).noChapter(chapter.getNoChapter()).materials(chapter.getMaterials().stream().map(material -> MaterialCourseDetailResponse.builder().materialType(material.getMaterialType()).materialDuration(material.getMaterialDuration()).slugMaterial(material.getSlugMaterial()).build()).toList()).build()).toList()).build();
         } catch (DataNotFoundException e) {
             throw e;
         } catch (Exception e) {

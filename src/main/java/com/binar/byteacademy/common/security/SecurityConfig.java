@@ -12,7 +12,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static com.binar.byteacademy.common.util.Constants.BankTransferDetailPats.BANK_TRANSFER_DETAIL_PATS_ALL;
 import static com.binar.byteacademy.common.util.Constants.CoursePats.*;
+import static com.binar.byteacademy.common.util.Constants.PaymentProofPats.PAYMENT_PROOF_PATS_ALL;
+import static com.binar.byteacademy.common.util.Constants.PurchasePats.*;
 import static com.binar.byteacademy.enumeration.EnumPermission.*;
 import static org.springframework.http.HttpMethod.*;
 
@@ -49,6 +52,15 @@ public class SecurityConfig {
                                 .requestMatchers(PUT, ADMIN_COURSE_PATS).hasAnyAuthority(ADMIN_UPDATE.getPermission())
                                 .requestMatchers(DELETE, ADMIN_COURSE_PATS).hasAnyAuthority(ADMIN_DELETE.getPermission())
                                 .requestMatchers(GET, CUSTOMER_COURSE_PATS).hasAnyAuthority(CUSTOMER_READ.getPermission())
+                                .requestMatchers(POST, PURCHASE_PATS_ALL).hasAnyAuthority(CUSTOMER_CREATE.getPermission())
+                                .requestMatchers(GET, PURCHASE_PATS_ALL).hasAnyAuthority(CUSTOMER_READ.getPermission())
+                                .requestMatchers(GET, ADMIN_PURCHASE_PATS).hasAnyAuthority(ADMIN_READ.getPermission())
+                                .requestMatchers(PUT, ADMIN_PURCHASE_PATS_ALL).hasAnyAuthority(ADMIN_UPDATE.getPermission())
+                                .requestMatchers(POST, BANK_TRANSFER_DETAIL_PATS_ALL).hasAnyAuthority(ADMIN_CREATE.getPermission())
+                                .requestMatchers(PUT, BANK_TRANSFER_DETAIL_PATS_ALL).hasAnyAuthority(ADMIN_UPDATE.getPermission())
+                                .requestMatchers(DELETE, BANK_TRANSFER_DETAIL_PATS_ALL).hasAnyAuthority(ADMIN_DELETE.getPermission())
+                                .requestMatchers(GET, BANK_TRANSFER_DETAIL_PATS_ALL).hasAnyAuthority(ADMIN_READ.getPermission())
+                                .requestMatchers(PUT, PAYMENT_PROOF_PATS_ALL).hasAnyAuthority(CUSTOMER_UPDATE.getPermission())
                                 .requestMatchers("/api/v1/**")
                                 .authenticated()
                 )

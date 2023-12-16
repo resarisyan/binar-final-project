@@ -18,24 +18,21 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "purchase")
+@Table(name = "purchases")
 public class Purchase {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "purchase_id")
     private UUID id;
-
-    @Column(name = "path_proof_payment")
-    private String pathProofPayment;
-
+    
     @Column(name = "ppn")
     private Double ppn;
 
     @Column(name = "amount_paid", nullable = false)
     private Double amountPaid;
 
-    @Column(name = "purchase_date")
-    private LocalDateTime purchaseDate;
+    @Column(name = "payment_date")
+    private LocalDateTime paymentDate;
 
     @Column(name = "end_payment_time", nullable = false)
     private LocalDateTime endPaymentDate;
@@ -47,6 +44,15 @@ public class Purchase {
     @Column(name = "payment_method", nullable = false)
     @Enumerated(EnumType.STRING)
     private EnumPaymentMethod paymentMethod;
+
+    @Column(name = "slug_purchase", nullable = false, unique = true)
+    private String slugPurchase;
+
+    @OneToOne(mappedBy = "purchase", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private CreditCardDetail creditCardDetail;
+
+    @OneToOne(mappedBy = "purchase", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private PaymentProof paymentProof;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
