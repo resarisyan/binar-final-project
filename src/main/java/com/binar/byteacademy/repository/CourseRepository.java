@@ -17,4 +17,5 @@ public interface CourseRepository extends JpaRepository<Course, UUID> {
     Optional<Course> findFirstBySlugCourse(String slugCourse);
     Page<Course> findAll(Specification<Course> specification, Pageable pageable);
     Optional<Course> findFirstBySlugCourseAndCourseStatus(String slugCourse, EnumStatus courseStatus);
+    boolean existsBySlugCourse(String slugCourse);
 }
