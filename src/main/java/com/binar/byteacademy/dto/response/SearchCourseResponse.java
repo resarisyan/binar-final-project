@@ -18,7 +18,7 @@ public class SearchCourseResponse {
     private String categoryName;
     private String instructorName;
     private String pathImage;
-    private Double price;
+    private Integer price;
     private EnumCourseType courseType;
     private EnumCourseLevel courseLevel;
     private Double totalCourseRate;

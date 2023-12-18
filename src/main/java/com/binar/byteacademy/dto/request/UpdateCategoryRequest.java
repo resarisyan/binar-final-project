@@ -1,7 +1,6 @@
 package com.binar.byteacademy.dto.request;
 
 import com.binar.byteacademy.validation.Base64Image;
-import com.binar.byteacademy.validation.FieldExistence;
 import com.binar.byteacademy.validation.ValidSlug;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -18,7 +17,7 @@ public class UpdateCategoryRequest {
     @Base64Image
     private String pathCategoryImage;
 
+    @NotBlank
     @ValidSlug
-    @FieldExistence(tableName = "categories", fieldName = "slug_category", shouldExist = false, message = "Slug category already exists")
     private String slugCategory;
 }

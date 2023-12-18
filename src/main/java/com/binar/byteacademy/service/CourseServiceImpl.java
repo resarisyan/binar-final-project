@@ -7,13 +7,13 @@ import com.binar.byteacademy.common.util.SlugUtil;
 import com.binar.byteacademy.dto.request.CreateCourseRequest;
 import com.binar.byteacademy.dto.request.UpdateCourseRequest;
 import com.binar.byteacademy.dto.response.*;
-import com.binar.byteacademy.entity.Category;
 import com.binar.byteacademy.entity.Course;
 import com.binar.byteacademy.entity.User;
 import com.binar.byteacademy.enumeration.EnumCourseLevel;
 import com.binar.byteacademy.enumeration.EnumCourseType;
 import com.binar.byteacademy.enumeration.EnumFilterCoursesBy;
 import com.binar.byteacademy.enumeration.EnumStatus;
+import com.binar.byteacademy.exception.DataConflictException;
 import com.binar.byteacademy.exception.DataNotFoundException;
 import com.binar.byteacademy.exception.ServiceBusinessException;
 import com.binar.byteacademy.repository.CategoryRepository;
@@ -22,6 +22,7 @@ import com.binar.byteacademy.repository.specification.CourseFilterSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,13 +47,13 @@ public class CourseServiceImpl implements CourseService {
     private final SlugUtil slugUtil;
 
     @Override
+    @Async("asyncExecutor")
     public CompletableFuture<CourseResponse> addCourse(CreateCourseRequest request) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                String pathCourseImage = imageUtil.base64UploadImage(request.getPathCourseImage()).join();
                 String slug = Optional.ofNullable(request.getSlugCourse()).orElseGet(() -> slugUtil.toSlug(COURSE_TABLE, "slug_course", request.getCourseName()));
-
                 return categoryRepository.findBySlugCategory(request.getSlugCategory()).map(category -> {
+                    String pathCourseImage = imageUtil.base64UploadImage(request.getPathCourseImage()).join();
                     Course course = Course.builder()
                             .courseName(request.getCourseName()).
                             instructorName(request.getInstructorName())
@@ -92,9 +93,11 @@ public class CourseServiceImpl implements CourseService {
                                             .pathCategoryImage(category.getPathCategoryImage())
                                             .build())
                             .build();
-                }).orElseThrow(() -> new DataNotFoundException("Category not found"));
+                }).orElseThrow(() -> new DataNotFoundException(CATEGORY_NOT_FOUND));
+            } catch (DataNotFoundException | DataConflictException e) {
+                throw e;
             } catch (Exception e) {
-                throw new ServiceBusinessException(e.getMessage());
+                throw new ServiceBusinessException("Failed to create course");
             }
         });
     }
@@ -104,39 +107,39 @@ public class CourseServiceImpl implements CourseService {
     public CompletableFuture<Void> updateCourse(String slugCourse, UpdateCourseRequest request) {
         return CompletableFuture.runAsync(() -> {
             try {
-                courseRepository.findFirstBySlugCourse(slugCourse).map(course -> {
-                    checkDataUtil.checkDataField(COURSE_TABLE, "course_name", request.getCourseName(), "course_id", course.getId());
-                    course.setCourseName(request.getCourseName());
-                    course.setInstructorName(request.getInstructorName());
-                    course.setCourseLevel(request.getCourseLevel());
-                    course.setCourseType(request.getCourseType());
-                    course.setPrice(request.getPrice());
-                    course.setCourseDuration(request.getCourseDuration());
-                    course.setTargetMarket(request.getTargetMarket());
-                    course.setGroupLink(request.getGroupLink());
-                    course.setCourseStatus(request.getCourseStatus());
-                    course.setCourseDescription(request.getCourseDescription());
-
-                    Optional.ofNullable(request.getSlugCourse()).ifPresent(slug -> {
-                        checkDataUtil.checkDataField(COURSE_TABLE, "slug_course", slug, "course_id", course.getId());
-                        course.setSlugCourse(slug);
-                    });
-
-                    Optional.ofNullable(request.getPathCourseImage()).ifPresent(image -> {
-                        imageUtil.deleteImage(course.getPathCourseImage());
-                        String pathCourseImage = imageUtil.base64UploadImage(image).join();
-                        course.setPathCourseImage(pathCourseImage);
-                    });
-
-                    Optional.ofNullable(request.getSlugCategory()).ifPresent(slugCategory -> {
-                        Category category = categoryRepository.findBySlugCategory(slugCategory).orElseThrow(() -> new DataNotFoundException(CATEGORY_NOT_FOUND));
-                        course.setCategory(category);
-                    });
-
-                    return course;
-                }).ifPresentOrElse(courseRepository::save, () -> {
-                    throw new DataNotFoundException(COURSE_NOT_FOUND);
-                });
+                categoryRepository.findBySlugCategory(request.getSlugCategory())
+                        .ifPresentOrElse(category -> {
+                            courseRepository.findFirstBySlugCourse(slugCourse)
+                                    .ifPresentOrElse(course -> {
+                                        checkDataUtil.checkDataField(COURSE_TABLE, "course_name", request.getCourseName(), "course_id", course.getId());
+                                        checkDataUtil.checkDataField(COURSE_TABLE, "slug_course", request.getSlugCourse(), "course_id", course.getId());
+                                        course.setCourseName(request.getCourseName());
+                                        course.setInstructorName(request.getInstructorName());
+                                        course.setCourseLevel(request.getCourseLevel());
+                                        course.setCourseType(request.getCourseType());
+                                        course.setCourseStatus(request.getCourseStatus());
+                                        course.setPrice(request.getPrice());
+                                        course.setCourseDuration(request.getCourseDuration());
+                                        course.setSlugCourse(request.getSlugCourse());
+                                        course.setGroupLink(request.getGroupLink());
+                                        course.setTargetMarket(request.getTargetMarket());
+                                        course.setCourseDescription(request.getCourseDescription());
+                                        Optional.ofNullable(request.getPathCourseImage())
+                                                .ifPresent(image -> {
+                                                    imageUtil.deleteImage(course.getPathCourseImage());
+                                                    String pathCourseImage = imageUtil.base64UploadImage(request.getPathCourseImage()).join();
+                                                    course.setPathCourseImage(pathCourseImage);
+                                                });
+                                        course.setCategory(category);
+                                        courseRepository.save(course);
+                                    }, () -> {
+                                        throw new DataNotFoundException(COURSE_NOT_FOUND);
+                                    });
+                        }, () -> {
+                            throw new DataNotFoundException(CATEGORY_NOT_FOUND);
+                        });
+            } catch (DataNotFoundException | DataConflictException e) {
+                throw e;
             } catch (Exception e) {
                 throw new ServiceBusinessException("Failed to update course");
             }
@@ -154,12 +157,11 @@ public class CourseServiceImpl implements CourseService {
         }
     }
 
-    @Transactional
     @Override
     public void deleteCourse(String slugCourse) {
         try {
             courseRepository.findFirstBySlugCourse(slugCourse).ifPresentOrElse(courseRepository::delete, () -> {
-                throw new DataNotFoundException(COURSE_NOT_FOUND);
+                throw new DataNotFoundException("Course not found for slug " + slugCourse);
             });
         } catch (DataNotFoundException e) {
             throw e;

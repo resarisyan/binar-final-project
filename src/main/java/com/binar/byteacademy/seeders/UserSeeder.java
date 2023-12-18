@@ -11,13 +11,14 @@ import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
-public class AdminSeeder implements CommandLineRunner {
+public class UserSeeder implements CommandLineRunner {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) throws Exception {
         seedAdmin();
+        seedCustomer();
     }
 
     private void seedAdmin() {
@@ -41,6 +42,30 @@ public class AdminSeeder implements CommandLineRunner {
                             .isVerifiedPhoneNumber(true)
                             .build();
                     userRepository.save(admin);
+                });
+    }
+
+    private void seedCustomer(){
+        String customerUsername = "customer";
+        String customerPassword = "password";
+
+        userRepository.findFirstByUsername(customerUsername).ifPresentOrElse(
+                user -> {
+                    user.setPassword(passwordEncoder.encode(customerPassword));
+                    userRepository.save(user);
+                },
+                () -> {
+                    User customer = User.builder()
+                            .username(customerUsername)
+                            .email("resarisyan@gmail.com")
+                            .phoneNumber("081234567899")
+                            .password(passwordEncoder.encode(customerPassword))
+                            .role(EnumRole.ADMIN)
+                            .status(EnumStatus.ACTIVE)
+                            .isVerifiedEmail(true)
+                            .isVerifiedPhoneNumber(true)
+                            .build();
+                    userRepository.save(customer);
                 });
     }
 }

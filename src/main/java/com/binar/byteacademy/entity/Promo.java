@@ -31,7 +31,7 @@ public class Promo {
     private String promoCode;
 
     @Column(nullable = false)
-    private Double discount;
+    private Integer discount;
 
     @Column(columnDefinition = "text")
     private String promoDescription;

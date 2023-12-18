@@ -1,5 +1,6 @@
 package com.binar.byteacademy.dto.response;
 
+import com.binar.byteacademy.enumeration.EnumPurchaseStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,11 +14,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class PromoResponse {
-    private String promoName;
-    private String promoDescription;
-    private String promoCode;
-    private Integer discount;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+public class PurchaseResponse {
+    private String courseName;
+    private String tokenPurchase;
+    private Integer amountPaid;
+    private Double ppn;
+    private LocalDateTime purchaseDate;
+    private EnumPurchaseStatus purchaseStatus;
 }

@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 public class CourseResponse {
     private String courseName;
     private String instructorName;
-    private Double price;
+    private Integer price;
     private Double totalCourseRate;
     private Integer totalModules;
     private Integer courseDuration;

@@ -18,7 +18,7 @@ public class AdminCourseResponse {
     private String slugCourse;
     private String courseName;
     private String categoryName;
-    private Double price;
+    private Integer price;
     private EnumCourseType courseType;
     private EnumCourseLevel courseLevel;
     private EnumStatus courseStatus;

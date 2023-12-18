@@ -34,7 +34,7 @@ public class Course {
     private String instructorName;
 
     @Column(nullable = false)
-    private Double price;
+    private Integer price;
 
     @Column(name = "total_course_rate")
     private Double totalCourseRate;

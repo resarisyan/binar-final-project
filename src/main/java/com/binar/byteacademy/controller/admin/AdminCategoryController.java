@@ -26,29 +26,29 @@ public class AdminCategoryController {
     private final CategoryService categoryService;
 
     @PostMapping
-    public CompletableFuture<ResponseEntity<APIResultResponse<CategoryResponse>>> createNewCategoryAsync(
+    public ResponseEntity<APIResultResponse<CategoryResponse>> createNewCategoryAsync(
             @RequestBody @Valid CreateCategoryRequest request) {
-        return categoryService.addCategory(request)
-                .thenApplyAsync(categoryResponse -> {
-                    APIResultResponse<CategoryResponse> responseDTO = new APIResultResponse<>(
-                            HttpStatus.CREATED,
-                            "Category successfully created",
-                            categoryResponse
-                    );
-                    return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
-                });
+        CompletableFuture<CategoryResponse> futureResult = categoryService.addCategory(request);
+        return futureResult.thenApplyAsync(categoryResponse -> {
+            APIResultResponse<CategoryResponse> responseDTO = new APIResultResponse<>(
+                    HttpStatus.CREATED,
+                    "Category successfully created",
+                    categoryResponse
+            );
+            return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+        }).join();
     }
 
     @PutMapping("/{slugCategory}")
-    public CompletableFuture<ResponseEntity<APIResponse>> updateCategory(@PathVariable String slugCategory, @RequestBody @Valid UpdateCategoryRequest request) {
-        return categoryService.updateCategory(slugCategory, request)
-                .thenApplyAsync(aVoid -> {
-                    APIResponse responseDTO =  new APIResponse(
-                            HttpStatus.OK,
-                            "Category successfully updated"
-                    );
-                    return new ResponseEntity<>(responseDTO, HttpStatus.OK);
-                });
+    public ResponseEntity<APIResponse> updateCategory(@PathVariable String slugCategory, @RequestBody @Valid UpdateCategoryRequest request) {
+        CompletableFuture<Void> futureResult = categoryService.updateCategory(slugCategory, request);
+        return futureResult.thenApplyAsync(aVoid -> {
+            APIResponse responseDTO =  new APIResponse(
+                    HttpStatus.OK,
+                    "Category successfully updated"
+            );
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+        }).join();
     }
 
     @DeleteMapping("/{slugCategory}")

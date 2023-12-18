@@ -53,17 +53,17 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
                 String text;
 
                 if (EnumEmailVerificationType.REGISTER.equals(type)) {
-                    verifyEmailLink = generateEmailToken(null, user, "http://localhost:8080/api/v1/email/verify/register/", type);
+                    verifyEmailLink = generateEmailToken(null, user, "http://localhost:4200/email-verify-register?token=", type);
                     subject = "Verify your email";
                     text = "Please verify your email by clicking this link: " + verifyEmailLink;
                     mailUtil.sendEmailVerificationAsync(finalEmail, subject, text);
                 } else if (EnumEmailVerificationType.FORGOT_PASSWORD.equals(type)) {
-                    verifyEmailLink = generateEmailToken(null, user, "http://localhost:8080/api/v1/email/verify/forgot-password/", type);
+                    verifyEmailLink = generateEmailToken(null, user, "http://localhost:4200/email-verify-forgot-password?token=", type);
                     subject = "Reset your password";
                     text = "Please reset your password by clicking this link: " + verifyEmailLink;
                     mailUtil.sendEmailVerificationAsync(finalEmail, subject, text);
                 } else {
-                    verifyEmailLink = generateEmailToken(email, user, "http://localhost:8080/api/v1/email/verify/change-email/", type);
+                    verifyEmailLink = generateEmailToken(email, user, "http://localhost:4200/email-verify-change?token=", type);
                     subject = "Change your email";
                     text = "Please change your email by clicking this link: " + verifyEmailLink;
                     mailUtil.sendEmailVerificationAsync(email, subject, text);

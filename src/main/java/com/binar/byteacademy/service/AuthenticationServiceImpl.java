@@ -43,6 +43,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final OtpService otpService;
     private final EmailVerificationService emailVerificationService;
+
+    @Transactional
     public LoginResponse login(LoginRequest request) {
         try {
             boolean isEmail = request.getCredential().contains("@");
@@ -64,7 +66,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     )
             );
 
-            if (!user.isVerifiedEmail() || !user.isVerifiedPhoneNumber()) {
+            if (!user.isVerifiedPhoneNumber()) {
                 throw new UserNotActiveException("User is not verified");
             }
             if (user.getStatus() == EnumStatus.INACTIVE) {
@@ -86,10 +88,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
     }
 
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional
     public RegisterResponse register(RegisterRequest request) {
-        RegisterResponse registerResponse;
-
         try {
             User user = User.builder()
                     .username(request.getUsername())
@@ -107,22 +107,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .build();
             customerDetailRepository.save(customerDetail);
 
-            registerResponse = RegisterResponse.builder()
+            emailVerificationService.sendEmail(user.getEmail(), EnumEmailVerificationType.REGISTER);
+            otpService.sendOtp(user.getPhoneNumber(), EnumOtpType.REGISTER);
+
+            return RegisterResponse.builder()
                     .username(user.getUsername())
                     .email(user.getEmail())
                     .name(customerDetail.getName())
                     .phoneNumber(user.getPhoneNumber())
                     .build();
-
-            emailVerificationService.sendEmail(user.getEmail(), EnumEmailVerificationType.REGISTER);
-            otpService.sendOtp(user.getPhoneNumber(), EnumOtpType.REGISTER);
         } catch (DataConflictException e) {
             throw e;
         } catch (Exception e) {
             throw new ServiceBusinessException(e.getMessage());
         }
-
-        return registerResponse;
     }
 
     public void changePassword(ChangePasswordRequest request, Principal connectedUser) {
@@ -154,12 +152,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 throw new DataNotFoundException("Access token is missing");
             }
             accessToken = authHeader.substring(7);
-            Token storedToken = tokenRepository.findByToken(accessToken)
-                    .orElseThrow(() -> new DataNotFoundException("Access token is invalid"));
-            storedToken.setExpired(true);
-            storedToken.setRevoked(true);
-            tokenRepository.save(storedToken);
-            SecurityContextHolder.clearContext();
+            tokenRepository.findByToken(accessToken).ifPresentOrElse(
+                    token -> {
+                        token.setExpired(true);
+                        token.setRevoked(true);
+                        tokenRepository.save(token);
+                        SecurityContextHolder.clearContext();
+                    },
+                    () -> {
+                        throw new DataNotFoundException("Access token is invalid");
+                    }
+            );
         } catch (DataNotFoundException e) {
             throw e;
         } catch (Exception e) {

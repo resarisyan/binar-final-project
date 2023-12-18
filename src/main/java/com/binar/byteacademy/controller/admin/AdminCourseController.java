@@ -39,30 +39,31 @@ public class  AdminCourseController {
     @PostMapping
     @Schema(name = "CreateCourseRequest", description = "Create course request body")
     @Operation(summary = "Endpoint to handle create new course (User Role : Admin)")
-    public CompletableFuture<ResponseEntity<APIResultResponse<CourseResponse>>> createNewCourse(@RequestBody @Valid CreateCourseRequest request) {
-        return courseService.addCourse(request)
-                .thenApplyAsync(courseResponse -> {
-                    APIResultResponse<CourseResponse> responseDTO = new APIResultResponse<>(
-                            HttpStatus.CREATED,
-                            "Course successfully created",
-                            courseResponse
-                    );
-                    return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
-                });
+    public ResponseEntity<APIResultResponse<CourseResponse>> createNewCourse(@RequestBody @Valid CreateCourseRequest request) {
+        CompletableFuture<CourseResponse> futureResult = courseService.addCourse(request);
+        return futureResult.thenApplyAsync(courseResponse -> {
+            APIResultResponse<CourseResponse> responseDTO = new APIResultResponse<>(
+                    HttpStatus.CREATED,
+                    "Course successfully created",
+                    courseResponse
+            );
+            return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+        }).join();
     }
+
 
     @PutMapping("/{courseSlug}")
     @Schema(name = "UpdateCourseRequest", description = "Update course request body")
     @Operation(summary = "Endpoint to handle update course (User Role : Admin)")
-    public CompletableFuture<ResponseEntity<APIResponse>> updateCourse(@PathVariable String courseSlug, @RequestBody @Valid UpdateCourseRequest request) {
-        return courseService.updateCourse(courseSlug, request)
-                .thenApplyAsync(courseResponse -> {
-                    APIResponse responseDTO = new APIResponse(
-                            HttpStatus.OK,
-                            "Course successfully updated"
-                    );
-                    return new ResponseEntity<>(responseDTO, HttpStatus.OK);
-                });
+    public ResponseEntity<APIResponse> updateCourse(@PathVariable String courseSlug, @RequestBody @Valid UpdateCourseRequest request) {
+        CompletableFuture<Void> futureResult = courseService.updateCourse(courseSlug, request);
+        return futureResult.thenApplyAsync(aVoid -> {
+            APIResponse responseDTO =  new APIResponse(
+                    HttpStatus.OK,
+                    "Course successfully updated"
+            );
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+        }).join();
     }
 
     @DeleteMapping("/{slugCourse}")

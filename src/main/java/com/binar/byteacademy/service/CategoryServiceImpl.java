@@ -13,12 +13,15 @@ import com.binar.byteacademy.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+
 import static com.binar.byteacademy.common.util.Constants.ControllerMessage.CATEGORY_NOT_FOUND;
 import static com.binar.byteacademy.common.util.Constants.TableName.CATEGORY_TABLE;
+
 @Service
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
@@ -28,13 +31,14 @@ public class CategoryServiceImpl implements CategoryService {
     private final CheckDataUtil checkDataUtil;
 
     @Override
+    @Async("asyncExecutor")
     public CompletableFuture<CategoryResponse> addCategory(CreateCategoryRequest request) {
         return CompletableFuture.supplyAsync(() -> {
             try {
+                String slug = Optional.ofNullable(request.getSlugCategory())
+                        .orElse(slugUtil.toSlug(CATEGORY_TABLE, "slug_category", request.getCategoryName()));
                 String pathCategoryImage = imageUtil.base64UploadImage(request.getPathCategoryImage())
                         .join();
-                String slug = request.getSlugCategory() != null ? request.getSlugCategory() :
-                        slugUtil.toSlug(CATEGORY_TABLE, "slug_category", request.getCategoryName());
 
                 Category category = Category.builder()
                         .categoryName(request.getCategoryName())
@@ -52,10 +56,13 @@ public class CategoryServiceImpl implements CategoryService {
             } catch (Exception e) {
                 throw new ServiceBusinessException("Failed to create category");
             }
+        }).exceptionally(throwable -> {
+            throw new ServiceBusinessException(throwable.getMessage());
         });
     }
 
     @Override
+    @Async("asyncExecutor")
     public CompletableFuture<Void> updateCategory(String slugCategory, UpdateCategoryRequest request) {
         return CompletableFuture.runAsync(() -> {
             try {
@@ -63,12 +70,8 @@ public class CategoryServiceImpl implements CategoryService {
                         .map(category -> {
                             checkDataUtil.checkDataField(CATEGORY_TABLE, "category_name", request.getCategoryName(), "category_id", category.getId());
                             category.setCategoryName(request.getCategoryName());
-
-                            Optional.ofNullable(request.getSlugCategory())
-                                    .ifPresent(newSlug -> {
-                                        checkDataUtil.checkDataField(CATEGORY_TABLE, "slug_category", newSlug, "category_id", category.getId());
-                                        category.setSlugCategory(newSlug);
-                                    });
+                            checkDataUtil.checkDataField(CATEGORY_TABLE, "slug_category", request.getSlugCategory(), "category_id", category.getId());
+                            category.setSlugCategory(request.getSlugCategory());
 
                             Optional.ofNullable(request.getPathCategoryImage())
                                     .ifPresent(image -> {
@@ -82,8 +85,7 @@ public class CategoryServiceImpl implements CategoryService {
                         });
             } catch (DataNotFoundException e) {
                 throw e;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 throw new ServiceBusinessException(e.getMessage());
             }
         });
@@ -92,19 +94,19 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void deleteCategory(String slugCategory) {
-       try{
-           categoryRepository.findBySlugCategory(slugCategory)
-                   .ifPresentOrElse(category -> {
-                       imageUtil.deleteImage(category.getPathCategoryImage());
-                       categoryRepository.delete(category);
-                   }, () -> {
-                       throw new DataNotFoundException(CATEGORY_NOT_FOUND);
-                   });
-       } catch (DataNotFoundException e){
-           throw e;
-       } catch (Exception e){
-           throw new ServiceBusinessException("Failed to delete category");
-       }
+        try {
+            categoryRepository.findBySlugCategory(slugCategory)
+                    .ifPresentOrElse(category -> {
+                        imageUtil.deleteImage(category.getPathCategoryImage());
+                        categoryRepository.delete(category);
+                    }, () -> {
+                        throw new DataNotFoundException(CATEGORY_NOT_FOUND);
+                    });
+        } catch (DataNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ServiceBusinessException("Failed to delete category");
+        }
     }
 
 

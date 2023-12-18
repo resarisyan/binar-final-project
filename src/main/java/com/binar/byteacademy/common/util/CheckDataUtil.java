@@ -18,14 +18,13 @@ public class CheckDataUtil {
         try {
             String sqlCheckUniqueValue = "SELECT COUNT(*) FROM " + tableName + " WHERE " + fieldName + " = ?";
             Integer countSqlCheckUniqueValue = jdbcTemplate.queryForObject(sqlCheckUniqueValue, Integer.class, fieldValue);
-            log.info("Count sql check unique value {}", countSqlCheckUniqueValue);
             if (countSqlCheckUniqueValue != null && countSqlCheckUniqueValue > 0) {
                 String sqlExceptCurrentId = new StringBuilder(sqlCheckUniqueValue)
                         .append(" AND ").append(fieldId).append(" != ?").toString();
                 Integer countExceptCurrentId = jdbcTemplate.queryForObject(sqlExceptCurrentId, Integer.class, fieldValue, fieldValueId);
 
                 if (countExceptCurrentId != null && countExceptCurrentId > 0) {
-                    throw new DataConflictException(fieldValue + " Data already exists in field " + fieldName);
+                    throw new DataConflictException("Data "+ fieldValue +"already exists in field " + fieldName);
                 }
             }
         } catch (DataConflictException e) {

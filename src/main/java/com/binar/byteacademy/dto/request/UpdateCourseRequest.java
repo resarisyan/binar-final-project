@@ -4,7 +4,6 @@ import com.binar.byteacademy.enumeration.EnumCourseLevel;
 import com.binar.byteacademy.enumeration.EnumStatus;
 import com.binar.byteacademy.enumeration.EnumCourseType;
 import com.binar.byteacademy.validation.Base64Image;
-import com.binar.byteacademy.validation.FieldExistence;
 import com.binar.byteacademy.validation.ValidSlug;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
@@ -22,8 +21,8 @@ public class UpdateCourseRequest {
     @NotBlank
     private String instructorName;
     @NotNull
-    @Digits(integer = 10, fraction = 2)
-    private Double price;
+    @Digits(integer = 10, fraction = 0)
+    private Integer price;
     @NotNull
     @Digits(integer = 10, fraction = 0)
     private Integer courseDuration;
@@ -31,8 +30,8 @@ public class UpdateCourseRequest {
     private String courseDescription;
     @NotBlank
     private String targetMarket;
+    @NotBlank
     @ValidSlug
-    @FieldExistence(tableName = "courses", fieldName = "slug_course", shouldExist = false, message = "Course slug already exists")
     private String slugCourse;
     @Base64Image
     private String pathCourseImage;
