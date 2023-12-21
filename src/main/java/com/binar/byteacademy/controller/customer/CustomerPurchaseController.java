@@ -4,10 +4,12 @@ import com.binar.byteacademy.dto.response.PurchaseResponse;
 import com.binar.byteacademy.dto.response.base.APIResponse;
 import com.binar.byteacademy.dto.response.base.APIResultResponse;
 import com.binar.byteacademy.service.PurchaseService;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,12 +18,11 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.Map;
 
-import static com.binar.byteacademy.common.util.Constants.CustomerPurchasePats.CUSTOMER_PURCHASE_PATS;
+import static com.binar.byteacademy.common.util.Constants.PurchasePats.CUSTOMER_PURCHASE_PATS;
 
 @RestController
 @RequestMapping(value = CUSTOMER_PURCHASE_PATS, produces = "application/json")
 @RequiredArgsConstructor
-@Slf4j
 @Tag(name = "Customer Purchase", description = "Customer Purchase API")
 public class CustomerPurchaseController {
     private final PurchaseService purchaseService;
@@ -37,7 +38,20 @@ public class CustomerPurchaseController {
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
+    @GetMapping
+    public ResponseEntity<APIResultResponse<Page<PurchaseResponse>>> getAllPurchase(@RequestParam("page") int page, Principal connectedUser) {
+        Pageable pageable = PageRequest.of(page, 10);
+        Page<PurchaseResponse> purchaseResponses = purchaseService.getAllPurchaseDetailsForCustomer(pageable, connectedUser);
+        APIResultResponse<Page<PurchaseResponse>> responseDTO = new APIResultResponse<>(
+                HttpStatus.OK,
+                "Purchase successfully retrieved",
+                purchaseResponses
+        );
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
     @PostMapping(value = "/notification", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Hidden
     public ResponseEntity<APIResponse> paymentCallback(@RequestBody Map<String, Object> request) {
         purchaseService.paymentCallback(request);
         APIResponse responseDTO = new APIResponse(

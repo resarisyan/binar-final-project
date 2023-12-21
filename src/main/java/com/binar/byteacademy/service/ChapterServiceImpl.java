@@ -1,6 +1,9 @@
 package com.binar.byteacademy.service;
 
-import com.binar.byteacademy.dto.request.ChapterRequest;
+import com.binar.byteacademy.common.util.CheckDataUtil;
+import com.binar.byteacademy.common.util.SlugUtil;
+import com.binar.byteacademy.dto.request.CreateChapterRequest;
+import com.binar.byteacademy.dto.request.UpdateChapterRequest;
 import com.binar.byteacademy.dto.response.ChapterResponse;
 import com.binar.byteacademy.entity.Chapter;
 import com.binar.byteacademy.exception.DataNotFoundException;
@@ -13,10 +16,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import static com.binar.byteacademy.common.util.Constants.ControllerMessage.CHAPTER_NOT_FOUND;
 import static com.binar.byteacademy.common.util.Constants.ControllerMessage.COURSE_NOT_FOUND;
+import static com.binar.byteacademy.common.util.Constants.TableName.CHAPTER_TABLE;
 
 
 @Service
@@ -24,10 +27,14 @@ import static com.binar.byteacademy.common.util.Constants.ControllerMessage.COUR
 public class ChapterServiceImpl implements ChapterService {
     private final ChapterRepository chapterRepository;
     private final CourseRepository courseRepository;
+    private final SlugUtil slugUtil;
+    private final CheckDataUtil checkDataUtil;
 
     @Override
-    public ChapterResponse addChapter(ChapterRequest request) {
+    public ChapterResponse addChapter(CreateChapterRequest request) {
         try{
+            String slug = Optional.ofNullable(request.getSlugChapter())
+                    .orElse(slugUtil.toSlug(CHAPTER_TABLE, "slug_chapter", request.getTitle()+"-"+request.getSlugCourse()));
             return courseRepository.findFirstBySlugCourse(request.getSlugCourse())
                     .map(course -> {
                         Chapter chapter = Chapter.builder()
@@ -35,26 +42,31 @@ public class ChapterServiceImpl implements ChapterService {
                                 .title(request.getTitle())
                                 .chapterDuration(request.getChapterDuration())
                                 .course(course)
+                                .slugChapter(slug)
                                 .build();
                         Chapter savedChapter = chapterRepository.save(chapter);
+                        course.setTotalChapter(course.getTotalChapter()+1);
+                        courseRepository.save(course);
                         return ChapterResponse.builder()
-                                .id(savedChapter.getId())
+                                .slugChapter(savedChapter.getSlugChapter())
                                 .noChapter(savedChapter.getNoChapter())
                                 .title(savedChapter.getTitle())
                                 .chapterDuration(savedChapter.getChapterDuration())
                                 .build();
                     }).orElseThrow(() -> new DataNotFoundException(COURSE_NOT_FOUND));
         } catch (Exception e){
-            throw new ServiceBusinessException("Failed to create chapter");
+            throw new ServiceBusinessException(e.getMessage());
         }
     }
 
     @Override
-        public void updateChapter(UUID id, ChapterRequest request) {
+        public void updateChapter(String slugChapter, UpdateChapterRequest request) {
         try{
-            chapterRepository.findById(id)
+            chapterRepository.findFirstBySlugChapter(slugChapter)
                     .ifPresentOrElse(chapter -> courseRepository.findFirstBySlugCourse(request.getSlugCourse())
                             .ifPresentOrElse(course -> {
+                                checkDataUtil.checkDataField(CHAPTER_TABLE, "slug_chapter", request.getSlugChapter(), "chapter_id", chapter.getId());
+                                chapter.setSlugChapter(request.getSlugChapter());
                                 chapter.setNoChapter(request.getNoChapter());
                                 chapter.setTitle(request.getTitle());
                                 chapter.setChapterDuration(request.getChapterDuration());
@@ -73,10 +85,17 @@ public class ChapterServiceImpl implements ChapterService {
     }
 
     @Override
-    public void deleteChapter(UUID id) {
+    public void deleteChapter(String slugChapter) {
         try{
-            chapterRepository.findById(id)
-                    .ifPresentOrElse(chapterRepository::delete, () -> {
+            chapterRepository.findFirstBySlugChapter(slugChapter)
+                    .ifPresentOrElse(chapter -> courseRepository.findFirstBySlugCourse(chapter.getCourse().getSlugCourse())
+                            .ifPresentOrElse(course -> {
+                                course.setTotalChapter(course.getTotalChapter()-1);
+                                courseRepository.save(course);
+                                chapterRepository.delete(chapter);
+                            }, () -> {
+                                throw new DataNotFoundException(COURSE_NOT_FOUND);
+                            }), () -> {
                         throw new DataNotFoundException(CHAPTER_NOT_FOUND);
                     });
         } catch (DataNotFoundException e){
@@ -93,7 +112,7 @@ public class ChapterServiceImpl implements ChapterService {
                     .filter(Page::hasContent)
                     .orElseThrow(() -> new DataNotFoundException(CHAPTER_NOT_FOUND));
             return chapterPage.map(chapter -> ChapterResponse.builder()
-                    .id(chapter.getId())
+                    .slugChapter(chapter.getSlugChapter())
                     .noChapter(chapter.getNoChapter())
                     .title(chapter.getTitle())
                     .chapterDuration(chapter.getChapterDuration())
@@ -106,12 +125,12 @@ public class ChapterServiceImpl implements ChapterService {
     }
 
     @Override
-    public ChapterResponse getChapterDetail(UUID id) {
+    public ChapterResponse getChapterDetail(String slugChapter) {
         try{
-            Chapter chapter = chapterRepository.findById(id)
+            Chapter chapter = chapterRepository.findFirstBySlugChapter(slugChapter)
                     .orElseThrow(() -> new DataNotFoundException(CHAPTER_NOT_FOUND));
             return ChapterResponse.builder()
-                    .id(chapter.getId())
+                    .slugChapter(chapter.getSlugChapter())
                     .noChapter(chapter.getNoChapter())
                     .title(chapter.getTitle())
                     .chapterDuration(chapter.getChapterDuration())

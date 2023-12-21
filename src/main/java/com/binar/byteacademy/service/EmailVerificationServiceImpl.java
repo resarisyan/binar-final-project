@@ -20,6 +20,10 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Base64;
 
+import static com.binar.byteacademy.common.util.Constants.ControllerMessage.TOKEN_EXPIRED;
+import static com.binar.byteacademy.common.util.Constants.ControllerMessage.TOKEN_NOT_FOUND;
+
+
 @RequiredArgsConstructor
 @Service
 public class EmailVerificationServiceImpl implements EmailVerificationService {
@@ -87,7 +91,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
         try {
             emailVerificationRepository.findFirstByTokenAndEmailVerificationType(token, EnumEmailVerificationType.REGISTER).ifPresentOrElse(emailVerification -> {
                 if (emailVerification.getExpTime().isBefore(LocalDateTime.now())) {
-                    throw new ForbiddenException("Token expired");
+                    throw new ForbiddenException(TOKEN_EXPIRED);
                 }
                 User user = emailVerification.getUser();
                 user.setVerifiedEmail(true);
@@ -95,7 +99,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
                 emailVerification.setUser(null);
                 emailVerificationRepository.delete(emailVerification);
             }, () -> {
-                throw new DataNotFoundException("Token not found");
+                throw new DataNotFoundException(TOKEN_NOT_FOUND);
             });
         } catch (DataNotFoundException | ForbiddenException e) {
             throw e;
@@ -109,7 +113,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
         try {
             emailVerificationRepository.findFirstByTokenAndEmailVerificationType(request.getToken(), EnumEmailVerificationType.FORGOT_PASSWORD).ifPresentOrElse(emailVerification -> {
                 if (emailVerification.getExpTime().isBefore(LocalDateTime.now())) {
-                    throw new ForbiddenException("Token expired");
+                    throw new ForbiddenException(TOKEN_EXPIRED);
                 }
                 if (!request.getPassword().equals(request.getConfirmPassword())) {
                         throw new ValidationException("Password and confirm password not match");
@@ -120,7 +124,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
                 emailVerification.setUser(null);
                 emailVerificationRepository.delete(emailVerification);
             }, () -> {
-                throw new DataNotFoundException("Token not found");
+                throw new DataNotFoundException(TOKEN_NOT_FOUND);
             });
         } catch (DataNotFoundException | ForbiddenException | ValidationException e) {
             throw e;
@@ -135,14 +139,14 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
             User user = jwtUtil.getUser();
             emailVerificationRepository.findFirstByTokenAndUserAndEmailVerificationType(token, user, EnumEmailVerificationType.CHANGE_EMAIL).ifPresentOrElse(emailVerification -> {
                 if (emailVerification.getExpTime().isBefore(LocalDateTime.now())) {
-                    throw new ForbiddenException("Token expired");
+                    throw new ForbiddenException(TOKEN_EXPIRED);
                 }
                 user.setEmail(emailVerification.getEmail());
                 userRepository.save(user);
                 emailVerification.setUser(null);
                 emailVerificationRepository.delete(emailVerification);
             }, () -> {
-                throw new DataNotFoundException("Token not found");
+                throw new DataNotFoundException(TOKEN_NOT_FOUND);
             });
         } catch (DataNotFoundException | ForbiddenException e) {
             throw e;

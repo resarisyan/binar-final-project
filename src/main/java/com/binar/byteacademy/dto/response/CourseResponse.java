@@ -18,7 +18,7 @@ public class CourseResponse {
     private String instructorName;
     private Integer price;
     private Double totalCourseRate;
-    private Integer totalModules;
+    private Integer totalChapters;
     private Integer courseDuration;
     private String slugCourse;
     private EnumCourseType courseType;

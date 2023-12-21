@@ -33,6 +33,9 @@ public class Chapter {
     @Column(name = "chapter_duration")
     private Integer chapterDuration;
 
+    @Column(name = "slug_chapter", nullable = false, unique = true)
+    private String slugChapter;
+
     @ManyToOne
     @JoinColumn(name = "course_id", referencedColumnName = "course_id", nullable = false)
     private Course course;

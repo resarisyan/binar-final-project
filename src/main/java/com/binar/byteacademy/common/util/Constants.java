@@ -23,13 +23,35 @@ public class Constants {
     public static final class CoursePats {
         public static final String COURSE_PATS = BASE_URL + "/course";
         public static final String CUSTOMER_COURSE_PATS = COURSE_PATS + "/my-course";
-        public static final String CUSTOMER_USER_PATS = BASE_URL + "/customer/user";
         public static final String ADMIN_COURSE_PATS = BASE_URL + "/admin/course";
         public static final String ADMIN_COURSE_PATS_ALL = ADMIN_COURSE_PATS + "/**";
     }
 
-    public static final class CustomerPurchasePats {
+    public static final class UserPats {
+        public static final String CUSTOMER_USER_PATS = BASE_URL + "/customer/user";
+        public static final String ADMIN_USER_PATS = BASE_URL + "/admin/user";
+    }
+
+    public static final class ReplyPats {
+        public static final String CUSTOMER_REPLY_PATS = BASE_URL + "/customer/reply";
+        public static final String CUSTOMER_REPLY_PATS_ALL = CUSTOMER_REPLY_PATS + "/**";
+    }
+
+    public static final class DiscussionPats {
+        public static final String CUSTOMER_DISCUSSION_PATS = BASE_URL + "/customer/discussion";
+        public static final String CUSTOMER_DISCUSSION_PATS_ALL = CUSTOMER_DISCUSSION_PATS + "/**";
+    }
+
+    public static final class CommentPats {
+        public static final String CUSTOMER_COMMENT_PATS = BASE_URL + "/customer/comment";
+        public static final String CUSTOMER_COMMENT_PATS_ALL = CUSTOMER_COMMENT_PATS + "/**";
+    }
+
+    public static final class PurchasePats {
         public static final String CUSTOMER_PURCHASE_PATS = BASE_URL + "/customer/purchase";
+        public static final String CUSTOMER_PURCHASE_PATS_ALL = CUSTOMER_PURCHASE_PATS + "/**";
+        public static final String ADMIN_PURCHASE_PATS = BASE_URL + "/admin/purchase";
+        public static final String ADMIN_PURCHASE_PATS_ALL = ADMIN_PURCHASE_PATS + "/**";
     }
 
     public static final class ChapterPats {
@@ -52,6 +74,10 @@ public class Constants {
         public static final String ADMIN_COURSE_PROMO_PATS_ALL = ADMIN_COURSE_PROMO_PATS + "/**";
     }
 
+    public static final class DashboardPats {
+        public static final String ADMIN_DASHBOARD_PATS = BASE_URL + "/admin/dashboard";
+    }
+
     public static final class CommonPats {
         public static final String[] SECURE_LIST_PATS = {
                 CoursePats.ADMIN_COURSE_PATS_ALL,
@@ -61,6 +87,11 @@ public class Constants {
                 PromoPats.ADMIN_PROMO_PATS_ALL,
                 CoursePromoPats.ADMIN_COURSE_PROMO_PATS_ALL,
                 SettingPats.SETTING_PATS_ALL,
+                PurchasePats.CUSTOMER_PURCHASE_PATS_ALL,
+                DiscussionPats.CUSTOMER_DISCUSSION_PATS_ALL,
+                CommentPats.CUSTOMER_COMMENT_PATS_ALL,
+                ReplyPats.CUSTOMER_REPLY_PATS_ALL,
+                PurchasePats.ADMIN_PURCHASE_PATS_ALL
         };
     }
 
@@ -73,10 +104,17 @@ public class Constants {
         public static final String PROMO_NOT_FOUND = "Promo not found";
         public static final String COURSE_PROMO_NOT_FOUND = "Course promo not found";
         public static final String PURCHASE_NOT_FOUND = "Purchase not found";
+        public static final String DISCUSSION_NOT_FOUND = "Discussion not found";
+        public static final String COMMENT_NOT_FOUND = "Comment not found";
+        public static final String REPLY_NOT_FOUND = "Reply not found";
+        public static final String TOKEN_NOT_FOUND = "Token not found";
+        public static final String TOKEN_EXPIRED = "Token expired";
     }
 
     public static final class TableName {
         public static final String CATEGORY_TABLE = "categories";
+        public static final String DISCUSSION_TABLE = "discussions";
+        public static final String CHAPTER_TABLE = "chapters";
         public static final String COURSE_TABLE = "courses";
         public static final String MATERIAL_TABLE = "materials";
         public static final String PROMO_TABLE = "promos";

@@ -23,8 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -140,33 +138,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw e;
         } catch (Exception e) {
             throw new ServiceBusinessException(e.getMessage());
-        }
-    }
-
-    @Override
-    public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-        try {
-            final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-            final String accessToken;
-            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                throw new DataNotFoundException("Access token is missing");
-            }
-            accessToken = authHeader.substring(7);
-            tokenRepository.findByToken(accessToken).ifPresentOrElse(
-                    token -> {
-                        token.setExpired(true);
-                        token.setRevoked(true);
-                        tokenRepository.save(token);
-                        SecurityContextHolder.clearContext();
-                    },
-                    () -> {
-                        throw new DataNotFoundException("Access token is invalid");
-                    }
-            );
-        } catch (DataNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new ServiceBusinessException("Failed to logout");
         }
     }
 

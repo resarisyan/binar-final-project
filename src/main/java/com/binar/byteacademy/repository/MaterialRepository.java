@@ -10,4 +10,6 @@ import java.util.UUID;
 @Repository
 public interface MaterialRepository extends JpaRepository<Material, UUID> {
     Optional<Material> findBySlugMaterial(String slugMaterial);
+    Integer countBySlugMaterialAndSerialNumberLessThanEqual(String slugMaterial, Integer serialNumber);
+    boolean existsBySlugMaterial(String slugMaterial);
 }

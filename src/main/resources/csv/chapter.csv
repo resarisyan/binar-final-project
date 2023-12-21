@@ -1,0 +1,38 @@
+slug_chapter,slug_course,no_chapter,title,chapter_duration
+slug-chapter-1,mastering-user-interface-design,1,Pendahuluan,20
+slug-chapter-2,mastering-user-interface-design,2,Prinsip Desain UI,20
+slug-chapter-3,mastering-user-interface-design,3,Prototyping dan Testing,20
+slug-chapter-4,metode-dan-basic-skill-product-manager,1,Pendahuluan,54
+slug-chapter-5,metode-dan-basic-skill-product-manager,2,Strategi Pengembangan Produk,54
+slug-chapter-6,metode-dan-basic-skill-product-manager,3,Pengambilan Keputusan Berbasis Data,54
+slug-chapter-7,metode-dan-basic-skill-product-manager,4,Studi Kasus dan Praktek Terbaik,54
+slug-chapter-8,full-stack-web-development-bootcamp,1,Pendahuluan,48
+slug-chapter-9,full-stack-web-development-bootcamp,2,Frontend Development,48
+slug-chapter-10,full-stack-web-development-bootcamp,3,Backend Development,48
+slug-chapter-11,full-stack-web-development-bootcamp,4,Pengembangan Aplikasi Full Stack,48
+slug-chapter-12,full-stack-web-development-bootcamp,5,Keamanan Web,48
+slug-chapter-13,ios-app-development-for-beginners,1,Pendahuluan,54
+slug-chapter-14,ios-app-development-for-beginners,2,Bahasa Pemrograman Swift,54
+slug-chapter-15,ios-app-development-for-beginners,3,Pengembangan Aplikasi Sederhana,54
+slug-chapter-16,ios-app-development-for-beginners,4,Pengujian dan Debugging,54
+slug-chapter-17,ios-app-development-for-beginners,5,Pengujian dan Debugging,54
+slug-chapter-18,data-science-and-machine-learning-fundamentals,1,Pendahuluan,50
+slug-chapter-19,data-science-and-machine-learning-fundamentals,2,Penggunaan Python untuk Analisis Data,50
+slug-chapter-20,data-science-and-machine-learning-fundamentals,3,Preprocessing Data,50
+slug-chapter-21,data-science-and-machine-learning-fundamentals,4,Pemodelan Prediktif,50
+slug-chapter-22,android-app-development-from-basics-to-advanced,1,Pendahuluan,52
+slug-chapter-23,android-app-development-from-basics-to-advanced,2,Basics of Kotlin/Java for Android,52
+slug-chapter-24,android-app-development-from-basics-to-advanced,3,User Interface (UI) Development,52
+slug-chapter-25,android-app-development-from-basics-to-advanced,4,Data Handling and Storage,52
+slug-chapter-26,android-app-development-from-basics-to-advanced,5,Testing and Deployment,52
+slug-chapter-27,ux-fundamentals-creating-user-centric-designs,1,Pendahuluan,54
+slug-chapter-28,ux-fundamentals-creating-user-centric-designs,2,Pemahaman Pengguna,54
+slug-chapter-29,ux-fundamentals-creating-user-centric-designs,3,Alat dan Teknik Desain,54
+slug-chapter-30,ux-fundamentals-creating-user-centric-designs,4,Prinsip Desain UX yang Penting,54
+slug-chapter-31,ux-fundamentals-creating-user-centric-designs,5,Penerapan Prinsip UX dalam Proyek,54
+slug-chapter-32,strategic-product-leadership,1,Pendahuluan,20
+slug-chapter-33,strategic-product-leadership,2,Analisis Pasar dan Pesaing,20
+slug-chapter-34,strategic-product-leadership,3,Kepemimpinan Tim dan Kolaborasi,20
+slug-chapter-35,html5-dasar,1,Pendahuluan,20
+slug-chapter-36,html5-dasar,2,Struktur Dasar HTML,20
+slug-chapter-37,html5-dasar,3,Formulir dan Input,20

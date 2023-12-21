@@ -2,13 +2,15 @@ package com.binar.byteacademy.service;
 
 import com.binar.byteacademy.common.util.MidtransUtil;
 import com.binar.byteacademy.dto.response.PurchaseResponse;
+import com.binar.byteacademy.entity.MaterialActivity;
 import com.binar.byteacademy.entity.Purchase;
 import com.binar.byteacademy.entity.User;
+import com.binar.byteacademy.entity.UserProgress;
+import com.binar.byteacademy.entity.compositekey.UserProgressKey;
 import com.binar.byteacademy.enumeration.EnumPurchaseStatus;
 import com.binar.byteacademy.exception.DataNotFoundException;
 import com.binar.byteacademy.exception.ServiceBusinessException;
-import com.binar.byteacademy.repository.CourseRepository;
-import com.binar.byteacademy.repository.PurchaseRepository;
+import com.binar.byteacademy.repository.*;
 import com.midtrans.httpclient.error.MidtransError;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +38,9 @@ public class PurchaseServiceImpl implements PurchaseService {
     private final PurchaseRepository purchaseRepository;
     private final CourseRepository courseRepository;
     private final MidtransUtil midtransUtil;
+    private final UserProgressRepository userProgressRepository;
+    private final MaterialActivityRepository materialActivityRepository;
+    private final MaterialRepository materialRepository;
 
     @Override
     @Transactional
@@ -107,6 +112,16 @@ public class PurchaseServiceImpl implements PurchaseService {
                                         if (fraudStatus.equals("challenge")) {
                                             purchase.setPurchaseStatus(EnumPurchaseStatus.CHALLENGE);
                                         } else if (fraudStatus.equals("accept")) {
+                                            userProgressRepository.save(UserProgress.builder()
+                                                    .id(UserProgressKey.builder()
+                                                            .userId(purchase.getUser().getId())
+                                                            .courseId(purchase.getCourse().getId())
+                                                            .build())
+                                                    .user(purchase.getUser())
+                                                    .course(purchase.getCourse())
+                                                    .isCompleted(false)
+                                                    .coursePercentage(0)
+                                                    .build());
                                             purchase.setPurchaseStatus(EnumPurchaseStatus.PAID);
                                         }
                                     }
@@ -125,7 +140,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         } catch (DataNotFoundException e) {
             throw e;
         } catch (Exception e) {
-            throw new ServiceBusinessException("Failed to update purchase status");
+            throw new ServiceBusinessException(e.getMessage());
         }
     }
 

@@ -1,6 +1,7 @@
 package com.binar.byteacademy.repository;
 
 import com.binar.byteacademy.entity.User;
+import com.binar.byteacademy.enumeration.EnumStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,5 +13,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findFirstByUsername(String username);
     Optional<User> findFirstByPhoneNumber(String phoneNumber);
     Optional<User> findFirstByEmail(String email);
+    int countByStatus(EnumStatus status);
 }
 

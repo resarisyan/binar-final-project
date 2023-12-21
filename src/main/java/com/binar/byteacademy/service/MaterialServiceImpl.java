@@ -5,15 +5,22 @@ import com.binar.byteacademy.common.util.SlugUtil;
 import com.binar.byteacademy.dto.request.MaterialRequest;
 import com.binar.byteacademy.dto.response.MaterialResponse;
 import com.binar.byteacademy.entity.Material;
+import com.binar.byteacademy.entity.User;
+import com.binar.byteacademy.enumeration.EnumPurchaseStatus;
 import com.binar.byteacademy.exception.DataNotFoundException;
+import com.binar.byteacademy.exception.ForbiddenException;
 import com.binar.byteacademy.exception.ServiceBusinessException;
 import com.binar.byteacademy.repository.ChapterRepository;
+import com.binar.byteacademy.repository.MaterialActivityRepository;
 import com.binar.byteacademy.repository.MaterialRepository;
+import com.binar.byteacademy.repository.PurchaseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.util.Optional;
 
 import static com.binar.byteacademy.common.util.Constants.ControllerMessage.CHAPTER_NOT_FOUND;
@@ -27,11 +34,13 @@ public class MaterialServiceImpl implements MaterialService {
     private final ChapterRepository chapterRepository;
     private final CheckDataUtil checkDataUtil;
     private final SlugUtil slugUtil;
+    private final PurchaseRepository purchaseRepository;
+    private final MaterialActivityRepository materialActivityRepository;
 
     @Override
     public MaterialResponse addMaterial(MaterialRequest request) {
         try {
-            return chapterRepository.findById(request.getChapterId()).map(chapter -> {
+            return chapterRepository.findFirstBySlugChapter(request.getSlugChapter()).map(chapter -> {
                 String slug = request.getSlugMaterial() != null ? request.getSlugMaterial() :
                         slugUtil.toSlug(MATERIAL_TABLE, "slug_material", request.getMaterialName());
                 Material material = Material.builder().
@@ -56,7 +65,7 @@ public class MaterialServiceImpl implements MaterialService {
     public void updateMaterial(String slugMaterial, MaterialRequest request) {
         try {
             materialRepository.findBySlugMaterial(slugMaterial).ifPresentOrElse(
-                    material -> chapterRepository.findById(request.getChapterId()).ifPresentOrElse(
+                    material -> chapterRepository.findFirstBySlugChapter(request.getSlugChapter()).ifPresentOrElse(
                             chapter -> {
                                 material.setMaterialName(request.getMaterialName());
                                 material.setSerialNumber(request.getSerialNumber());
@@ -123,7 +132,7 @@ public class MaterialServiceImpl implements MaterialService {
     }
 
     @Override
-    public MaterialResponse getMaterialDetail(String slugMaterial) {
+    public MaterialResponse getMaterialDetailAdmin(String slugMaterial) {
         try {
             return materialRepository.findBySlugMaterial(slugMaterial).map(material -> MaterialResponse.builder()
                     .materialName(material.getMaterialName())
@@ -135,6 +144,36 @@ public class MaterialServiceImpl implements MaterialService {
         } catch (DataNotFoundException e) {
             throw e;
         } catch (Exception e) {
+            throw new ServiceBusinessException("Failed to get material");
+        }
+    }
+
+    @Override
+    public MaterialResponse getMaterialDetailCustomer(String slugMaterial, Principal principal) {
+        try {
+            User user = (User) ((UsernamePasswordAuthenticationToken) principal).getPrincipal();
+            return materialRepository.findBySlugMaterial(slugMaterial)
+                    .map(material -> purchaseRepository.findByUserAndCourseAndPurchaseStatus(user, material.getChapter().getCourse(), EnumPurchaseStatus.PAID)
+                            .map(purchase -> {
+                                if(!material.getSerialNumber().equals(1)){
+
+                                }
+
+                                return MaterialResponse.builder()
+                                        .materialName(material.getMaterialName())
+                                        .serialNumber(material.getSerialNumber())
+                                        .videoLink(material.getVideoLink())
+                                        .materialDuration(material.getMaterialDuration())
+                                        .materialType(material.getMaterialType())
+                                        .build();
+                            })
+                            .orElseThrow(() -> new ForbiddenException("You don't have access to this material")))
+                    .orElseThrow(() -> new DataNotFoundException(MATERIAL_NOT_FOUND));
+
+        } catch (DataNotFoundException | ForbiddenException e) {
+            throw e;
+        }
+        catch (Exception e) {
             throw new ServiceBusinessException("Failed to get material");
         }
     }

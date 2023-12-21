@@ -28,7 +28,7 @@ public interface CourseService {
                                         String keyword,
                                         String username,
                                         Pageable pageable);
-    Page<SearchCourseResponse> getCourseListForWeb(List<String> categoryNames,
+    Page<CourseResponse> getCourseListForWeb(List<String> categoryNames,
                                                    List<EnumCourseLevel> courseLevels,
                                                    List<EnumCourseType> courseTypes,
                                                    List<EnumStatus> courseStatuses,

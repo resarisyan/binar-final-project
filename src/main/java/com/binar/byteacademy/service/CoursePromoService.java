@@ -2,9 +2,7 @@ package com.binar.byteacademy.service;
 
 
 import com.binar.byteacademy.dto.request.CoursePromoRequest;
-import com.binar.byteacademy.dto.request.PromoRequest;
 import com.binar.byteacademy.dto.response.CoursePromoResponse;
-import com.binar.byteacademy.dto.response.PromoResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

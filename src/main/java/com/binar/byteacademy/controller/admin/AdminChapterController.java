@@ -1,10 +1,12 @@
 package com.binar.byteacademy.controller.admin;
 
-import com.binar.byteacademy.dto.request.ChapterRequest;
+import com.binar.byteacademy.dto.request.CreateChapterRequest;
+import com.binar.byteacademy.dto.request.UpdateChapterRequest;
 import com.binar.byteacademy.dto.response.ChapterResponse;
 import com.binar.byteacademy.dto.response.base.APIResponse;
 import com.binar.byteacademy.dto.response.base.APIResultResponse;
 import com.binar.byteacademy.service.ChapterService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,19 +16,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
-
 import static com.binar.byteacademy.common.util.Constants.ChapterPats.ADMIN_CHAPTER_PATS;
 
 @RestController
 @RequestMapping(value = ADMIN_CHAPTER_PATS, produces = "application/json")
 @RequiredArgsConstructor
+@Tag(name = "Admin Chapter", description = "Admin Chapter API")
 public class AdminChapterController {
     private final ChapterService chapterService;
 
     @PostMapping
     public ResponseEntity<APIResultResponse<ChapterResponse>> createNewChapter(
-            @RequestBody @Valid ChapterRequest request) {
+            @RequestBody @Valid CreateChapterRequest request) {
         ChapterResponse chapterResponse = chapterService.addChapter(request);
         APIResultResponse<ChapterResponse> responseDTO = new APIResultResponse<>(
                 HttpStatus.CREATED,
@@ -36,9 +37,9 @@ public class AdminChapterController {
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<APIResponse> updateChapter(@PathVariable UUID id, @RequestBody @Valid ChapterRequest request) {
-        chapterService.updateChapter(id, request);
+    @PutMapping("/{slug}")
+    public ResponseEntity<APIResponse> updateChapter(@PathVariable String slug, @RequestBody @Valid UpdateChapterRequest request) {
+        chapterService.updateChapter(slug, request);
         APIResponse responseDTO = new APIResponse(
                 HttpStatus.OK,
                 "Chapter successfully updated"
@@ -46,9 +47,9 @@ public class AdminChapterController {
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<APIResponse> deleteChapter(@PathVariable UUID id) {
-        chapterService.deleteChapter(id);
+    @DeleteMapping("/{slug}")
+    public ResponseEntity<APIResponse> deleteChapter(@PathVariable String slug) {
+        chapterService.deleteChapter(slug);
         APIResponse responseDTO = new APIResponse(
                 HttpStatus.OK,
                 "Chapter successfully deleted"
@@ -68,9 +69,9 @@ public class AdminChapterController {
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<APIResultResponse<ChapterResponse>> getChapterDetail(@PathVariable UUID id) {
-        ChapterResponse chapterResponse = chapterService.getChapterDetail(id);
+    @GetMapping("/{slug}")
+    public ResponseEntity<APIResultResponse<ChapterResponse>> getChapterDetail(@PathVariable String slug) {
+        ChapterResponse chapterResponse = chapterService.getChapterDetail(slug);
         APIResultResponse<ChapterResponse> responseDTO =  new APIResultResponse<>(
                 HttpStatus.OK,
                 "Chapter successfully retrieved",

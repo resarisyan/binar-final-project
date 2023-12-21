@@ -26,7 +26,7 @@ import static com.binar.byteacademy.common.util.Constants.ControllerMessage.COUR
 
 @Service
 @RequiredArgsConstructor
-public class CoursePromoImpl implements CoursePromoService {
+public class CoursePromoServiceImpl implements CoursePromoService {
     private final CoursePromoRepository coursePromoRepository;
     private final CourseRepository courseRepository;
     private final PromoRepository promoRepository;
@@ -58,7 +58,7 @@ public class CoursePromoImpl implements CoursePromoService {
                                     .price(course.getPrice())
                                     .totalCourseRate(course.getTotalCourseRate())
                                     .courseDuration(course.getCourseDuration())
-                                    .totalModules(course.getTotalModules())
+                                    .totalChapters(course.getTotalChapter())
                                     .slugCourse(course.getSlugCourse())
                                     .pathCourseImage(course.getPathCourseImage())
                                     .targetMarket(course.getTargetMarket())
@@ -144,7 +144,7 @@ public class CoursePromoImpl implements CoursePromoService {
                                             .price(coursePromo.getCourse().getPrice())
                                             .totalCourseRate(coursePromo.getCourse().getTotalCourseRate())
                                             .courseDuration(coursePromo.getCourse().getCourseDuration())
-                                            .totalModules(coursePromo.getCourse().getTotalModules())
+                                            .totalChapters(coursePromo.getCourse().getTotalChapter())
                                             .slugCourse(coursePromo.getCourse().getSlugCourse())
                                             .pathCourseImage(coursePromo.getCourse().getPathCourseImage())
                                             .targetMarket(coursePromo.getCourse().getTargetMarket())
@@ -192,7 +192,7 @@ public class CoursePromoImpl implements CoursePromoService {
                                     .price(coursePromo.getCourse().getPrice())
                                     .totalCourseRate(coursePromo.getCourse().getTotalCourseRate())
                                     .courseDuration(coursePromo.getCourse().getCourseDuration())
-                                    .totalModules(coursePromo.getCourse().getTotalModules())
+                                    .totalChapters(coursePromo.getCourse().getTotalChapter())
                                     .slugCourse(coursePromo.getCourse().getSlugCourse())
                                     .pathCourseImage(coursePromo.getCourse().getPathCourseImage())
                                     .targetMarket(coursePromo.getCourse().getTargetMarket())

@@ -20,7 +20,7 @@ public class CourseDetailResponse {
     private String courseName;
     private String instructorName;
     private Double totalCourseRate;
-    private Integer totalModules;
+    private Integer totalChapter;
     private Integer courseDuration;
     private String slugCourse;
     private String pathCourseImage;
@@ -29,5 +29,5 @@ public class CourseDetailResponse {
     private EnumCourseLevel courseLevel;
     private List<ChapterCourseDetailResponse> chapters;
     private CategoryResponse category;
-//    private isOrdere;
+//    private isOrder
 }

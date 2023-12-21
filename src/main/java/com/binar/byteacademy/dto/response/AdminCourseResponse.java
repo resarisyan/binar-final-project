@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 public class AdminCourseResponse {
     private String slugCourse;
     private String courseName;
-    private String categoryName;
+    private CategoryResponse category;
     private Integer price;
     private EnumCourseType courseType;
     private EnumCourseLevel courseLevel;

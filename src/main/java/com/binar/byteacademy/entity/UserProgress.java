@@ -21,12 +21,12 @@ public class UserProgress {
     @EmbeddedId
     private UserProgressKey id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @MapsId("userId")
     @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @MapsId("courseId")
     @JoinColumn(name = "course_id", referencedColumnName = "course_id", nullable = false)
     private Course course;

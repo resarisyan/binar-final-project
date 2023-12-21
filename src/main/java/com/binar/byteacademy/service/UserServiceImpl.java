@@ -1,7 +1,9 @@
 package com.binar.byteacademy.service;
 
-import com.binar.byteacademy.common.util.JwtUtil;
 import com.binar.byteacademy.dto.request.UpdateCustomerDetailRequest;
+import com.binar.byteacademy.dto.response.CustomerDetailResponse;
+import com.binar.byteacademy.dto.response.UserAdminResponse;
+import com.binar.byteacademy.dto.response.UserCustomerResponse;
 import com.binar.byteacademy.entity.User;
 import com.binar.byteacademy.exception.DataNotFoundException;
 import com.binar.byteacademy.exception.ServiceBusinessException;
@@ -16,7 +18,6 @@ import java.security.Principal;
 @Service
 public class UserServiceImpl implements UserService {
     private final CustomerDetailRepository customerDetailRepository;
-    private final JwtUtil jwtUtil;
 
     @Override
     public void updateCustomerDetail(UpdateCustomerDetailRequest request, Principal connectedUser) {
@@ -35,6 +36,40 @@ public class UserServiceImpl implements UserService {
             throw e;
         } catch (Exception e) {
             throw new ServiceBusinessException("Failed to update user");
+        }
+    }
+
+    @Override
+    public UserAdminResponse getAdminDetail(Principal connectedUser) {
+        try {
+            User user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
+            return UserAdminResponse.builder()
+                    .username(user.getUsername())
+                    .email(user.getEmail())
+                    .phoneNumber(user.getPhoneNumber())
+                    .build();
+        } catch (Exception e) {
+            throw new ServiceBusinessException("Failed to get user");
+        }
+    }
+
+    @Override
+    public UserCustomerResponse getCustomerDetail(Principal connectedUser) {
+        try {
+            User user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
+            return UserCustomerResponse.builder()
+                    .username(user.getUsername())
+                    .email(user.getEmail())
+                    .phoneNumber(user.getPhoneNumber())
+                    .customerDetail(
+                            CustomerDetailResponse.builder()
+                                    .name(user.getCustomerDetail().getName())
+                                    .city(user.getCustomerDetail().getCity())
+                                    .country(user.getCustomerDetail().getCountry())
+                                    .build()
+                    ).build();
+        } catch (Exception e) {
+            throw new ServiceBusinessException("Failed to get user");
         }
     }
 }
