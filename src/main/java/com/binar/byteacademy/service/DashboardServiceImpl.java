@@ -6,15 +6,19 @@ import com.binar.byteacademy.enumeration.EnumStatus;
 import com.binar.byteacademy.repository.CourseRepository;
 import com.binar.byteacademy.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@CacheConfig(cacheNames = "dashboard")
 public class DashboardServiceImpl implements DashboardService{
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
 
     @Override
+    @Cacheable(key = "#root.method.name")
     public DashboardResponse getAdminDashboard() {
         int activeUser = userRepository.countByStatus(EnumStatus.ACTIVE);
         int nonActiveUser = userRepository.countByStatus(EnumStatus.INACTIVE);

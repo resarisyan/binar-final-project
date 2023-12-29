@@ -6,4 +6,5 @@ public enum EnumPurchaseStatus {
     PENDING,
     CHALLENGE,
     SETTLEMENT,
+    REFUND,
 }

@@ -51,9 +51,6 @@ public class Material {
     @OneToMany(mappedBy = "material", cascade = {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private List<MaterialActivity> materialActivities;
 
-    @OneToMany(mappedBy = "material", cascade = {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
-    private List<MaterialOrder> materialOrders;
-
     @CreationTimestamp
     private LocalDateTime createdAt;
 

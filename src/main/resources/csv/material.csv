@@ -1,75 +1,75 @@
 slug_chapter,material_name,serial_number,video_link,material_duration,slug_material,material_type
-slug-chapter-1,Konsep dasar tentang UI/UX,1,https://youtu.be/ixOd42SEUF0,10,slug-material-1,FREE
-slug-chapter-1,Peran penting desain UI dalam pengalaman pengguna,2,https://youtu.be/DwTkyMJi890,10,slug-material-2,FREE
-slug-chapter-2,Tata letak (layout) dan hierarki visual,1,https://youtu.be/rd-590n3H6w,10,slug-material-3,PAID
-slug-chapter-2,"Penggunaan warna, tipografi, dan ikon",2,https://youtu.be/HYfG_uCOlhc,10,slug-material-4,PAID
-slug-chapter-3,Pembuatan prototipe UI,1,https://youtu.be/DmxXl1k0X5g,10,slug-material-5,PAID
-slug-chapter-3,Pengujian prototipe untuk pengalaman pengguna yang lebih baik,2,https://youtu.be/1eJzLj9OE0Q,10,slug-material-6,PAID
-slug-chapter-4,Definisi Peran Product Manager,1,https://youtu.be/6hIUgd6WuFw,13,slug-material-7,FREE
-slug-chapter-4,Perbedaan antara Produk dan Proyek,2,https://youtu.be/6hXoBeIQd-o,13,slug-material-8,FREE
-slug-chapter-5,Riset Pasar dan Analisis Kebutuhan Pengguna,1,https://youtu.be/HVmmrTBdiFY,13,slug-material-9,PAID
-slug-chapter-5,Pembuatan Persona Pengguna,2,https://youtu.be/eSrXU5vrgaI,13,slug-material-10,PAID
-slug-chapter-6,Pengumpulan dan Interpretasi Data Produk,1,https://youtu.be/JVJc4k6xjTM,13,slug-material-11,PAID
-slug-chapter-6,Menggunakan Analytics untuk Pengembangan Produk,2,https://youtu.be/Sl0YBFJuvSU,13,slug-material-12,PAID
-slug-chapter-7,Analisis Studi Kasus Produk Sukses dan Gagal,1,https://youtu.be/t2s863UWF2I,13,slug-material-13,PAID
-slug-chapter-7,Pelajaran dari Industri tentang Manajemen Produk,2,https://youtu.be/yk_p1bi6Oyw,13,slug-material-14,PAID
-slug-chapter-8,Overview tentang konsep-konsep dasar pengembangan web,1,https://youtu.be/BruzjxVsneM,9,slug-material-15,FREE
-slug-chapter-8,Sejarah dan perkembangan teknologi web,2,https://youtu.be/CQDcJ07sMNg,9,slug-material-16,FREE
-slug-chapter-9,"Frameworks Frontend seperti React, Angular, atau Vue.js",1,https://youtu.be/ChdiLQ1iy5o,9,slug-material-17,PAID
-slug-chapter-9,Responsive Web Design,2,https://youtu.be/iQwND8dlCdM,9,slug-material-18,PAID
-slug-chapter-10,"Server-side programming menggunakan Node.js, Django, atau Flask",1,https://youtu.be/CjzwkDddlFM,9,slug-material-19,PAID
-slug-chapter-10,Database Management: SQL (atau NoSQL) dan CRUD operations,2,https://youtu.be/g0vyvImYaWE,9,slug-material-20,PAID
-slug-chapter-11,Integrasi frontend dan backend untuk membangun aplikasi web lengkap,1,https://youtu.be/SKoGGSF4fDc,9,slug-material-21,PAID
-slug-chapter-11,Penggunaan tools seperti Git untuk pengembangan kolaboratif,2,https://youtu.be/j7hZe2ZwWPo,9,slug-material-22,PAID
-slug-chapter-12,Konsep keamanan dasar dalam pengembangan web,1,https://youtu.be/8YKbodsF7kQ,9,slug-material-23,PAID
-slug-chapter-12,Manajemen risiko keamanan dan praktik terbaik untuk mengamankan aplikasi,2,https://youtu.be/BRarEh3NdSc,9,slug-material-24,PAID
-slug-chapter-13,Pengenalan kepada lingkungan pengembangan iOS (Xcode),1,https://youtu.be/zf9kXjW5DqQ,10,slug-material-25,FREE
-slug-chapter-13,Pemahaman tentang proses pengembangan aplikasi untuk platform iOS,2,https://youtu.be/HOPtedXdrCY,10,slug-material-26,FREE
-slug-chapter-14,"Dasar-dasar bahasa Swift seperti variabel, tipe data, operasi dasar, dan struktur kontrol",1,https://youtu.be/td64VaAeSTY,10,slug-material-27,PAID
-slug-chapter-14,"Konsep-konsep penting dalam Swift seperti fungsi, kelas, dan pewarisan",2,https://youtu.be/Cv6vvcAGuD0,10,slug-material-28,PAID
-slug-chapter-15,Langkah-langkah dalam membuat aplikasi sederhana dari konsep hingga implementasi,1,https://youtu.be/N3kSpkJ8D3s,10,slug-material-29,PAID
-slug-chapter-15,Pembelajaran tentang struktur dasar aplikasi iOS dan siklus hidup aplikasi,2,https://youtu.be/vlaBGlCOSg0,10,slug-material-30,PAID
-slug-chapter-16,Metode pengujian aplikasi pada simulator iOS,1,https://youtu.be/ixOd42SEUF0,10,slug-material-31,PAID
-slug-chapter-16,Pemahaman tentang alat-alat debugging untuk mengatasi masalah umum dalam pengembangan aplikasi,2,https://youtu.be/DwTkyMJi890,10,slug-material-32,PAID
-slug-chapter-17,Metode pengujian aplikasi pada simulator iOS,1,https://youtu.be/rd-590n3H6w,10,slug-material-33,PAID
-slug-chapter-17,Pemahaman tentang alat-alat debugging,2,https://youtu.be/HYfG_uCOlhc,10,slug-material-34,PAID
-slug-chapter-18,Definisi dan lingkup data science,1,https://youtu.be/DmxXl1k0X5g,12,slug-material-35,FREE
-slug-chapter-18,Konsep-konsep dasar dalam machine learning,2,https://youtu.be/1eJzLj9OE0Q,12,slug-material-36,FREE
-slug-chapter-19,Pengantar bahasa pemrograman Python untuk manipulasi data,1,https://youtu.be/6hIUgd6WuFw,12,slug-material-37,PAID
-slug-chapter-19,Penggunaan library seperti Pandas dan NumPy untuk eksplorasi data,2,https://youtu.be/6hXoBeIQd-o,12,slug-material-38,PAID
-slug-chapter-20,Membersihkan data dan penanganan nilai-nilai yang hilang,1,https://youtu.be/HVmmrTBdiFY,12,slug-material-39,PAID
-slug-chapter-20,Transformasi data untuk persiapan pemodelan,2,https://youtu.be/eSrXU5vrgaI,12,slug-material-40,PAID
-slug-chapter-21,Pengenalan pada jenis-jenis model prediktif seperti Regresi dan Klasifikasi,1,https://youtu.be/JVJc4k6xjTM,12,slug-material-41,PAID
-slug-chapter-21,Implementasi model menggunakan library Scikit-Learn,2,https://youtu.be/Sl0YBFJuvSU,12,slug-material-42,PAID
-slug-chapter-22,Pengantar tentang platform Android dan sejarahnya,1,https://youtu.be/t2s863UWF2I,10,slug-material-43,FREE
-slug-chapter-22,"Instalasi lingkungan pengembangan (IDE, SDK, emulator)",2,https://youtu.be/yk_p1bi6Oyw,10,slug-material-44,FREE
-slug-chapter-23,Pengenalan bahasa pemrograman Kotlin/Java,1,https://youtu.be/BruzjxVsneM,10,slug-material-45,PAID
-slug-chapter-23,"Konsep dasar pemrograman seperti variabel, tipe data, pengkondisian, dan pengulangan",2,https://youtu.be/CQDcJ07sMNg,10,slug-material-46,PAID
-slug-chapter-24,Desain antarmuka pengguna yang responsif dan menarik,1,https://youtu.be/ChdiLQ1iy5o,10,slug-material-47,PAID
-slug-chapter-24,Penggunaan XML atau Layout Editor untuk membuat tata letak antarmuka pengguna,2,https://youtu.be/iQwND8dlCdM,10,slug-material-48,PAID
-slug-chapter-25,Penggunaan SQLite atau Room Database untuk menyimpan data lokal,1,https://youtu.be/CjzwkDddlFM,10,slug-material-49,PAID
-slug-chapter-25,"Koneksi dan pengelolaan data dari sumber eksternal (API, internet)",2,https://youtu.be/g0vyvImYaWE,10,slug-material-50,PAID
-slug-chapter-26,Pengujian aplikasi menggunakan Android Debug Bridge (ADB),1,https://youtu.be/SKoGGSF4fDc,10,slug-material-51,PAID
-slug-chapter-26,Persiapan aplikasi untuk peluncuran dan distribusi (Google Play Store),2,https://youtu.be/j7hZe2ZwWPo,10,slug-material-52,PAID
-slug-chapter-27,Definisi dan pentingnya UX dalam pengembangan produk,1,https://youtu.be/8YKbodsF7kQ,10,slug-material-53,FREE
-slug-chapter-27,Peran pengalaman pengguna dalam kesuksesan produk,2,https://youtu.be/BRarEh3NdSc,10,slug-material-54,FREE
-slug-chapter-28,Analisis kebutuhan pengguna: pengumpulan data dan riset,1,https://youtu.be/zf9kXjW5DqQ,10,slug-material-55,PAID
-slug-chapter-28,Membuat persona pengguna untuk memahami target audiens,2,https://youtu.be/HOPtedXdrCY,10,slug-material-56,PAID
-slug-chapter-29,"Penggunaan perangkat lunak desain seperti Adobe XD, Sketch, atau Figma",1,https://youtu.be/td64VaAeSTY,10,slug-material-57,PAID
-slug-chapter-29,"Pembuatan wireframe, prototipe, dan desain interaktif",2,https://youtu.be/Cv6vvcAGuD0,10,slug-material-58,PAID
-slug-chapter-30,Konsistensi antarmuka pengguna,1,https://youtu.be/N3kSpkJ8D3s,10,slug-material-59,PAID
-slug-chapter-30,Responsif terhadap kebutuhan pengguna,2,https://youtu.be/vlaBGlCOSg0,10,slug-material-60,PAID
-slug-chapter-31,Studi kasus: menerapkan prinsip-prinsip UX pada proyek nyata,1,https://youtu.be/ixOd42SEUF0,10,slug-material-61,PAID
-slug-chapter-31,Penilaian dan pengembangan desain yang telah ada,2,https://youtu.be/DwTkyMJi890,10,slug-material-62,PAID
-slug-chapter-32,Memahami Peran Strategis Manajemen Produk,1,https://youtu.be/rd-590n3H6w,6,slug-material-63,FREE
-slug-chapter-32,Mengidentifikasi Tantangan Utama dalam Mengarahkan Produk,2,https://youtu.be/HYfG_uCOlhc,6,slug-material-64,FREE
-slug-chapter-33,Menganalisis Peluang Pasar yang Relevan,1,https://youtu.be/DmxXl1k0X5g,6,slug-material-65,PAID
-slug-chapter-33,Memahami Strategi Pes konkuren dalam Industri yang Tepat,2,https://youtu.be/1eJzLj9OE0Q,6,slug-material-66,PAID
-slug-chapter-34,Membangun Tim yang Kuat dan Efisien,1,https://youtu.be/6hIUgd6WuFw,6,slug-material-67,PAID
-slug-chapter-34,Meningkatkan Kolaborasi antar Tim dan Departemen,2,https://youtu.be/6hXoBeIQd-o,6,slug-material-68,PAID
-slug-chapter-35,Penjelasan singkat tentang HTML5,1,https://youtu.be/HVmmrTBdiFY,6,slug-material-69,FREE
-slug-chapter-35,Fitur-fitur utama HTML5,2,https://youtu.be/eSrXU5vrgaI,6,slug-material-70,FREE
-slug-chapter-36,"Tag-tag dasar seperti <html>, <head>, dan <body>",1,https://youtu.be/JVJc4k6xjTM,6,slug-material-71,PAID
-slug-chapter-36,"Penggunaan tag <header>, <footer>, <nav>, <section>, <article>, dan <aside>",2,https://youtu.be/Sl0YBFJuvSU,6,slug-material-72,PAID
-slug-chapter-37,"Tag-tag untuk membuat formulir seperti <form>, <input>, <textarea>, dan <button>",1,https://youtu.be/t2s863UWF2I,6,slug-material-73,PAID
-slug-chapter-37,Validasi sederhana menggunakan atribut HTML,2,https://youtu.be/yk_p1bi6Oyw,6,slug-material-74,PAID
+slug-chapter-1,Konsep dasar tentang UI/UX,1,https://www.youtube.com/embed/ixOd42SEUF0,10,slug-material-1,FREE
+slug-chapter-1,Peran penting desain UI dalam pengalaman pengguna,2,https://www.youtube.com/embed/DwTkyMJi890,10,slug-material-2,FREE
+slug-chapter-2,Tata letak (layout) dan hierarki visual,1,https://www.youtube.com/embed/rd-590n3H6w,10,slug-material-3,PAID
+"slug-chapter-2,""Penggunaan warna, tipografi, dan ikon"",2,https://www.youtube.com/embed/HYfG_uCOlhc,10,slug-material-4,PAID"
+slug-chapter-3,Pembuatan prototipe UI,1,https://www.youtube.com/embed/DmxXl1k0X5g,10,slug-material-5,PAID
+slug-chapter-3,Pengujian prototipe untuk pengalaman pengguna yang lebih baik,2,https://www.youtube.com/embed/1eJzLj9OE0Q,10,slug-material-6,PAID
+slug-chapter-4,Definisi Peran Product Manager,1,https://www.youtube.com/embed/6hIUgd6WuFw,13,slug-material-7,FREE
+slug-chapter-4,Perbedaan antara Produk dan Proyek,2,https://www.youtube.com/embed/6hXoBeIQd-o,13,slug-material-8,FREE
+slug-chapter-5,Riset Pasar dan Analisis Kebutuhan Pengguna,1,https://www.youtube.com/embed/HVmmrTBdiFY,13,slug-material-9,PAID
+slug-chapter-5,Pembuatan Persona Pengguna,2,https://www.youtube.com/embed/eSrXU5vrgaI,13,slug-material-10,PAID
+slug-chapter-6,Pengumpulan dan Interpretasi Data Produk,1,https://www.youtube.com/embed/JVJc4k6xjTM,13,slug-material-11,PAID
+slug-chapter-6,Menggunakan Analytics untuk Pengembangan Produk,2,https://www.youtube.com/embed/Sl0YBFJuvSU,13,slug-material-12,PAID
+slug-chapter-7,Analisis Studi Kasus Produk Sukses dan Gagal,1,https://www.youtube.com/embed/t2s863UWF2I,13,slug-material-13,PAID
+slug-chapter-7,Pelajaran dari Industri tentang Manajemen Produk,2,https://www.youtube.com/embed/yk_p1bi6Oyw,13,slug-material-14,PAID
+slug-chapter-8,Overview tentang konsep-konsep dasar pengembangan web,1,https://www.youtube.com/embed/BruzjxVsneM,9,slug-material-15,FREE
+slug-chapter-8,Sejarah dan perkembangan teknologi web,2,https://www.youtube.com/embed/CQDcJ07sMNg,9,slug-material-16,FREE
+"slug-chapter-9,""Frameworks Frontend seperti React, Angular, atau Vue.js"",1,https://www.youtube.com/embed/ChdiLQ1iy5o,9,slug-material-17,PAID"
+slug-chapter-9,Responsive Web Design,2,https://www.youtube.com/embed/iQwND8dlCdM,9,slug-material-18,PAID
+"slug-chapter-10,""Server-side programming menggunakan Node.js, Django, atau Flask"",1,https://www.youtube.com/embed/CjzwkDddlFM,9,slug-material-19,PAID"
+slug-chapter-10,Database Management: SQL (atau NoSQL) dan CRUD operations,2,https://www.youtube.com/embed/g0vyvImYaWE,9,slug-material-20,PAID
+slug-chapter-11,Integrasi frontend dan backend untuk membangun aplikasi web lengkap,1,https://www.youtube.com/embed/SKoGGSF4fDc,9,slug-material-21,PAID
+slug-chapter-11,Penggunaan tools seperti Git untuk pengembangan kolaboratif,2,https://www.youtube.com/embed/j7hZe2ZwWPo,9,slug-material-22,PAID
+slug-chapter-12,Konsep keamanan dasar dalam pengembangan web,1,https://www.youtube.com/embed/8YKbodsF7kQ,9,slug-material-23,PAID
+slug-chapter-12,Manajemen risiko keamanan dan praktik terbaik untuk mengamankan aplikasi,2,https://www.youtube.com/embed/BRarEh3NdSc,9,slug-material-24,PAID
+slug-chapter-13,Pengenalan kepada lingkungan pengembangan iOS (Xcode),1,https://www.youtube.com/embed/zf9kXjW5DqQ,10,slug-material-25,FREE
+slug-chapter-13,Pemahaman tentang proses pengembangan aplikasi untuk platform iOS,2,https://www.youtube.com/embed/HOPtedXdrCY,10,slug-material-26,FREE
+"slug-chapter-14,""Dasar-dasar bahasa Swift seperti variabel, tipe data, operasi dasar, dan struktur kontrol"",1,https://www.youtube.com/embed/td64VaAeSTY,10,slug-material-27,PAID"
+"slug-chapter-14,""Konsep-konsep penting dalam Swift seperti fungsi, kelas, dan pewarisan"",2,https://www.youtube.com/embed/Cv6vvcAGuD0,10,slug-material-28,PAID"
+slug-chapter-15,Langkah-langkah dalam membuat aplikasi sederhana dari konsep hingga implementasi,1,https://www.youtube.com/embed/N3kSpkJ8D3s,10,slug-material-29,PAID
+slug-chapter-15,Pembelajaran tentang struktur dasar aplikasi iOS dan siklus hidup aplikasi,2,https://www.youtube.com/embed/vlaBGlCOSg0,10,slug-material-30,PAID
+slug-chapter-16,Metode pengujian aplikasi pada simulator iOS,1,https://www.youtube.com/embed/ixOd42SEUF0,10,slug-material-31,PAID
+slug-chapter-16,Pemahaman tentang alat-alat debugging untuk mengatasi masalah umum dalam pengembangan aplikasi,2,https://www.youtube.com/embed/DwTkyMJi890,10,slug-material-32,PAID
+slug-chapter-17,Metode pengujian aplikasi pada simulator iOS,1,https://www.youtube.com/embed/rd-590n3H6w,10,slug-material-33,PAID
+slug-chapter-17,Pemahaman tentang alat-alat debugging,2,https://www.youtube.com/embed/HYfG_uCOlhc,10,slug-material-34,PAID
+slug-chapter-18,Definisi dan lingkup data science,1,https://www.youtube.com/embed/DmxXl1k0X5g,12,slug-material-35,FREE
+slug-chapter-18,Konsep-konsep dasar dalam machine learning,2,https://www.youtube.com/embed/1eJzLj9OE0Q,12,slug-material-36,FREE
+slug-chapter-19,Pengantar bahasa pemrograman Python untuk manipulasi data,1,https://www.youtube.com/embed/6hIUgd6WuFw,12,slug-material-37,PAID
+slug-chapter-19,Penggunaan library seperti Pandas dan NumPy untuk eksplorasi data,2,https://www.youtube.com/embed/6hXoBeIQd-o,12,slug-material-38,PAID
+slug-chapter-20,Membersihkan data dan penanganan nilai-nilai yang hilang,1,https://www.youtube.com/embed/HVmmrTBdiFY,12,slug-material-39,PAID
+slug-chapter-20,Transformasi data untuk persiapan pemodelan,2,https://www.youtube.com/embed/eSrXU5vrgaI,12,slug-material-40,PAID
+slug-chapter-21,Pengenalan pada jenis-jenis model prediktif seperti Regresi dan Klasifikasi,1,https://www.youtube.com/embed/JVJc4k6xjTM,12,slug-material-41,PAID
+slug-chapter-21,Implementasi model menggunakan library Scikit-Learn,2,https://www.youtube.com/embed/Sl0YBFJuvSU,12,slug-material-42,PAID
+slug-chapter-22,Pengantar tentang platform Android dan sejarahnya,1,https://www.youtube.com/embed/t2s863UWF2I,10,slug-material-43,FREE
+"slug-chapter-22,""Instalasi lingkungan pengembangan (IDE, SDK, emulator)"",2,https://www.youtube.com/embed/yk_p1bi6Oyw,10,slug-material-44,FREE"
+slug-chapter-23,Pengenalan bahasa pemrograman Kotlin/Java,1,https://www.youtube.com/embed/BruzjxVsneM,10,slug-material-45,PAID
+"slug-chapter-23,""Konsep dasar pemrograman seperti variabel, tipe data, pengkondisian, dan pengulangan"",2,https://www.youtube.com/embed/CQDcJ07sMNg,10,slug-material-46,PAID"
+slug-chapter-24,Desain antarmuka pengguna yang responsif dan menarik,1,https://www.youtube.com/embed/ChdiLQ1iy5o,10,slug-material-47,PAID
+slug-chapter-24,Penggunaan XML atau Layout Editor untuk membuat tata letak antarmuka pengguna,2,https://www.youtube.com/embed/iQwND8dlCdM,10,slug-material-48,PAID
+slug-chapter-25,Penggunaan SQLite atau Room Database untuk menyimpan data lokal,1,https://www.youtube.com/embed/CjzwkDddlFM,10,slug-material-49,PAID
+"slug-chapter-25,""Koneksi dan pengelolaan data dari sumber eksternal (API, internet)"",2,https://www.youtube.com/embed/g0vyvImYaWE,10,slug-material-50,PAID"
+slug-chapter-26,Pengujian aplikasi menggunakan Android Debug Bridge (ADB),1,https://www.youtube.com/embed/SKoGGSF4fDc,10,slug-material-51,PAID
+slug-chapter-26,Persiapan aplikasi untuk peluncuran dan distribusi (Google Play Store),2,https://www.youtube.com/embed/j7hZe2ZwWPo,10,slug-material-52,PAID
+slug-chapter-27,Definisi dan pentingnya UX dalam pengembangan produk,1,https://www.youtube.com/embed/8YKbodsF7kQ,10,slug-material-53,FREE
+slug-chapter-27,Peran pengalaman pengguna dalam kesuksesan produk,2,https://www.youtube.com/embed/BRarEh3NdSc,10,slug-material-54,FREE
+slug-chapter-28,Analisis kebutuhan pengguna: pengumpulan data dan riset,1,https://www.youtube.com/embed/zf9kXjW5DqQ,10,slug-material-55,PAID
+slug-chapter-28,Membuat persona pengguna untuk memahami target audiens,2,https://www.youtube.com/embed/HOPtedXdrCY,10,slug-material-56,PAID
+"slug-chapter-29,""Penggunaan perangkat lunak desain seperti Adobe XD, Sketch, atau Figma"",1,https://www.youtube.com/embed/td64VaAeSTY,10,slug-material-57,PAID"
+"slug-chapter-29,""Pembuatan wireframe, prototipe, dan desain interaktif"",2,https://www.youtube.com/embed/Cv6vvcAGuD0,10,slug-material-58,PAID"
+slug-chapter-30,Konsistensi antarmuka pengguna,1,https://www.youtube.com/embed/N3kSpkJ8D3s,10,slug-material-59,PAID
+slug-chapter-30,Responsif terhadap kebutuhan pengguna,2,https://www.youtube.com/embed/vlaBGlCOSg0,10,slug-material-60,PAID
+slug-chapter-31,Studi kasus: menerapkan prinsip-prinsip UX pada proyek nyata,1,https://www.youtube.com/embed/ixOd42SEUF0,10,slug-material-61,PAID
+slug-chapter-31,Penilaian dan pengembangan desain yang telah ada,2,https://www.youtube.com/embed/DwTkyMJi890,10,slug-material-62,PAID
+slug-chapter-32,Memahami Peran Strategis Manajemen Produk,1,https://www.youtube.com/embed/rd-590n3H6w,6,slug-material-63,FREE
+slug-chapter-32,Mengidentifikasi Tantangan Utama dalam Mengarahkan Produk,2,https://www.youtube.com/embed/HYfG_uCOlhc,6,slug-material-64,FREE
+slug-chapter-33,Menganalisis Peluang Pasar yang Relevan,1,https://www.youtube.com/embed/DmxXl1k0X5g,6,slug-material-65,PAID
+slug-chapter-33,Memahami Strategi Pes konkuren dalam Industri yang Tepat,2,https://www.youtube.com/embed/1eJzLj9OE0Q,6,slug-material-66,PAID
+slug-chapter-34,Membangun Tim yang Kuat dan Efisien,1,https://www.youtube.com/embed/6hIUgd6WuFw,6,slug-material-67,PAID
+slug-chapter-34,Meningkatkan Kolaborasi antar Tim dan Departemen,2,https://www.youtube.com/embed/6hXoBeIQd-o,6,slug-material-68,PAID
+slug-chapter-35,Penjelasan singkat tentang HTML5,1,https://www.youtube.com/embed/HVmmrTBdiFY,6,slug-material-69,FREE
+slug-chapter-35,Fitur-fitur utama HTML5,2,https://www.youtube.com/embed/eSrXU5vrgaI,6,slug-material-70,FREE
+"slug-chapter-36,""Tag-tag dasar seperti <html>, <head>, dan <body>"",1,https://www.youtube.com/embed/JVJc4k6xjTM,6,slug-material-71,PAID"
+"slug-chapter-36,""Penggunaan tag <header>, <footer>, <nav>, <section>, <article>, dan <aside>"",2,https://www.youtube.com/embed/Sl0YBFJuvSU,6,slug-material-72,PAID"
+"slug-chapter-37,""Tag-tag untuk membuat formulir seperti <form>, <input>, <textarea>, dan <button>"",1,https://www.youtube.com/embed/t2s863UWF2I,6,slug-material-73,PAID"
+slug-chapter-37,Validasi sederhana menggunakan atribut HTML,2,https://www.youtube.com/embed/yk_p1bi6Oyw,6,slug-material-74,PAID

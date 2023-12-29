@@ -10,6 +10,7 @@ import com.binar.byteacademy.exception.ServiceBusinessException;
 import com.binar.byteacademy.repository.CourseRepository;
 import com.binar.byteacademy.repository.DiscussionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,6 +26,7 @@ import static com.binar.byteacademy.common.util.Constants.ControllerMessage.COUR
 
 @Service
 @RequiredArgsConstructor
+@CacheConfig(cacheNames = "discussions")
 public class DiscussionServiceImpl implements DiscussionService {
 
     private final DiscussionRepository discussionRepository;
@@ -32,6 +34,7 @@ public class DiscussionServiceImpl implements DiscussionService {
     private final SlugUtil slugUtil;
 
     @Override
+    @Cacheable(key = "'getDiscussionDetail-' + #slug")
     public DiscussionResponse getDiscussionDetail(String slug) {
         try {
             return discussionRepository.findBySlugDiscussion(slug)
@@ -49,6 +52,7 @@ public class DiscussionServiceImpl implements DiscussionService {
     }
 
     @Override
+    @CacheEvict(value = "allDiscussion", allEntries = true)
     public DiscussionResponse addDiscussion(DiscussionRequest request, Principal connectedUser) {
         try {
             User user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
@@ -86,6 +90,7 @@ public class DiscussionServiceImpl implements DiscussionService {
     }
 
     @Override
+    @Cacheable(value = "allDiscussion", key = "'getDiscussionByCourse-' + #pageable.pageNumber + '-' + #pageable.pageSize + '-' + #slugCourse")
     public Page<DiscussionResponse> getDiscussionByCourse(Pageable pageable, String slugCourse) {
         try {
             Page<Discussion> discussionPage = Optional.ofNullable(discussionRepository.findAllByCourse_SlugCourse(pageable, slugCourse))
@@ -109,6 +114,8 @@ public class DiscussionServiceImpl implements DiscussionService {
     }
 
     @Override
+    @CachePut(key = "'getDiscussionDetail-' + #slug")
+    @CacheEvict(value = "allDiscussion", allEntries = true)
     public void updateDiscussion(String slug, DiscussionRequest request, Principal connectedUser) {
         try {
             User user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
@@ -128,6 +135,8 @@ public class DiscussionServiceImpl implements DiscussionService {
     }
 
     @Override
+    @CachePut(key = "'getDiscussionDetail-' + #slug")
+    @CacheEvict(value = "allDiscussion", allEntries = true)
     public void updateStatusDiscussion(String slug) {
         try {
             discussionRepository.findBySlugDiscussion(slug)
@@ -145,6 +154,10 @@ public class DiscussionServiceImpl implements DiscussionService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(key = "'getDiscussionDetail-' + #slug"),
+            @CacheEvict(value = "allDiscussion", allEntries = true)
+    })
     public void deleteDiscussion(String slug) {
         try {
             discussionRepository.findBySlugDiscussion(slug)

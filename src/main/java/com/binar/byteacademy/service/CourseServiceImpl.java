@@ -7,28 +7,29 @@ import com.binar.byteacademy.common.util.SlugUtil;
 import com.binar.byteacademy.dto.request.CreateCourseRequest;
 import com.binar.byteacademy.dto.request.UpdateCourseRequest;
 import com.binar.byteacademy.dto.response.*;
-import com.binar.byteacademy.entity.Course;
-import com.binar.byteacademy.entity.User;
-import com.binar.byteacademy.enumeration.EnumCourseLevel;
-import com.binar.byteacademy.enumeration.EnumCourseType;
-import com.binar.byteacademy.enumeration.EnumFilterCoursesBy;
-import com.binar.byteacademy.enumeration.EnumStatus;
+import com.binar.byteacademy.entity.*;
+import com.binar.byteacademy.enumeration.*;
 import com.binar.byteacademy.exception.DataConflictException;
 import com.binar.byteacademy.exception.DataNotFoundException;
 import com.binar.byteacademy.exception.ServiceBusinessException;
 import com.binar.byteacademy.repository.CategoryRepository;
 import com.binar.byteacademy.repository.CourseRepository;
+import com.binar.byteacademy.repository.PurchaseRepository;
 import com.binar.byteacademy.repository.specification.CourseFilterSpecification;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.binar.byteacademy.common.util.Constants.ControllerMessage.CATEGORY_NOT_FOUND;
 import static com.binar.byteacademy.common.util.Constants.ControllerMessage.COURSE_NOT_FOUND;
@@ -36,9 +37,11 @@ import static com.binar.byteacademy.common.util.Constants.TableName.COURSE_TABLE
 
 @Service
 @RequiredArgsConstructor
+@CacheConfig(cacheNames = "courses")
 public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
     private final CategoryRepository categoryRepository;
+    private final PurchaseRepository purchaseRepository;
     private final JwtUtil jwtUtil;
     private final ImageUtil imageUtil;
     private final CheckDataUtil checkDataUtil;
@@ -46,6 +49,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     @Async("asyncExecutor")
+    @CacheEvict(value = "allCourses", allEntries = true)
     public CompletableFuture<CourseResponse> addCourse(CreateCourseRequest request) {
         return CompletableFuture.supplyAsync(() -> {
             try {
@@ -59,7 +63,7 @@ public class CourseServiceImpl implements CourseService {
                             .courseType(request.getCourseType())
                             .courseStatus(request.getCourseStatus())
                             .totalCourseRate(0.0)
-                            .price(request.getPrice())
+                            .price(request.getCourseType() == EnumCourseType.FREE ? 0 : request.getPrice())
                             .courseDuration(request.getCourseDuration())
                             .slugCourse(slug)
                             .pathCourseImage(pathCourseImage)
@@ -102,7 +106,16 @@ public class CourseServiceImpl implements CourseService {
 
 
     @Override
-    public CompletableFuture<Void> updateCourse(String slugCourse, UpdateCourseRequest request) {
+    @Caching(put = {
+            @CachePut(key = "'getCustomerCourseDetail-' + #slugCourse"),
+            @CachePut(key = "'getAdminCourseDetail-' + #slugCourse")
+    })
+    @CacheEvict(value = {
+            "allCourses", "chapters", "allChapters", "materials", "allMaterials",
+            "allPurchases", "discussions", "allDiscussion",
+            "allCoursePromos", "coursePromos",
+            "allPromos", "promos",
+    }, allEntries = true)    public CompletableFuture<Void> updateCourse(String slugCourse, UpdateCourseRequest request) {
         return CompletableFuture.runAsync(() -> {
             try {
                 categoryRepository.findBySlugCategory(request.getSlugCategory())
@@ -115,7 +128,7 @@ public class CourseServiceImpl implements CourseService {
                                     course.setCourseLevel(request.getCourseLevel());
                                     course.setCourseType(request.getCourseType());
                                     course.setCourseStatus(request.getCourseStatus());
-                                    course.setPrice(request.getPrice());
+                                    course.setPrice(request.getCourseType() == EnumCourseType.FREE ? 0 : request.getPrice());
                                     course.setCourseDuration(request.getCourseDuration());
                                     course.setSlugCourse(request.getSlugCourse());
                                     course.setGroupLink(request.getGroupLink());
@@ -143,9 +156,29 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Page<CourseResponse> getAllCourse(Pageable pageable) {
+    @Cacheable(value = "allCourses", key = "'getListCourse'")
+    public List<CourseResponse> getListCourse() {
         try {
-            return Optional.of(courseRepository.findAll(pageable)).filter(Page::hasContent).map(coursePage -> coursePage.map(course -> CourseResponse.builder().courseName(course.getCourseName()).instructorName(course.getInstructorName()).courseLevel(course.getCourseLevel()).courseType(course.getCourseType()).price(course.getPrice()).totalCourseRate(course.getTotalCourseRate()).courseDuration(course.getCourseDuration()).totalChapters(course.getTotalChapter()).slugCourse(course.getSlugCourse()).pathCourseImage(course.getPathCourseImage()).category(CategoryResponse.builder().categoryName(course.getCategory().getCategoryName()).slugCategory(course.getCategory().getSlugCategory()).pathCategoryImage(course.getCategory().getPathCategoryImage()).build()).build())).orElseThrow(() -> new DataNotFoundException(COURSE_NOT_FOUND));
+            List<Course> courseList = courseRepository.findAll();
+            return courseList.stream().map(course ->
+                            CourseResponse.builder()
+                            .courseName(course.getCourseName())
+                            .instructorName(course.getInstructorName())
+                            .courseLevel(course.getCourseLevel())
+                            .courseType(course.getCourseType())
+                            .price(course.getPrice())
+                            .totalCourseRate(course.getTotalCourseRate())
+                            .courseDuration(course.getCourseDuration())
+                            .totalChapters(course.getTotalChapter())
+                            .slugCourse(course.getSlugCourse())
+                            .pathCourseImage(course.getPathCourseImage())
+                            .category(CategoryResponse.builder()
+                                    .categoryName(course.getCategory().getCategoryName())
+                                    .slugCategory(course.getCategory().getSlugCategory())
+                                    .pathCategoryImage(course.getCategory().getPathCategoryImage())
+                                    .build())
+                            .build()
+            ).toList();
         } catch (DataNotFoundException e) {
             throw e;
         } catch (Exception e) {
@@ -154,6 +187,15 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(key = "'getAdminCourseDetail-' + #slugCourse"),
+            @CacheEvict(value = {
+                    "allCourses", "chapters", "allChapters", "materials", "allMaterials",
+                    "allPurchases", "discussions", "allDiscussion",
+                    "allCoursePromos", "coursePromos",
+                    "allPromos", "promos", "dashboard"
+            }, allEntries = true)
+    })
     public void deleteCourse(String slugCourse) {
         try {
             courseRepository.findFirstBySlugCourse(slugCourse).ifPresentOrElse(courseRepository::delete, () -> {
@@ -178,6 +220,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
+    @Cacheable(value = "allCourses", key = "'getCourseListForWeb-' + #pageable.pageNumber + '-' + #pageable.pageSize")
     public Page<CourseResponse> getCourseListForWeb(List<String> categoryNames, List<EnumCourseLevel> courseLevels, List<EnumCourseType> courseTypes, List<EnumStatus> courseStatuses, List<EnumFilterCoursesBy> filterCoursesBy, String keyword, Pageable pageable) {
         try {
             Page<Course> coursePage = getAllCourseByCriteria(categoryNames, courseLevels, courseTypes, courseStatuses, filterCoursesBy, keyword, null, pageable);
@@ -190,6 +233,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
+    @Cacheable(value = "allCourses", key = "'getCourseListForAdmin-' + #pageable.pageNumber + '-' + #pageable.pageSize")
     public Page<AdminCourseResponse> getCourseListForAdmin(List<String> categoryNames, List<EnumCourseLevel> courseLevels, List<EnumCourseType> courseTypes, List<EnumStatus> courseStatuses, List<EnumFilterCoursesBy> filterCoursesBy, String keyword, Pageable pageable) {
         try {
             Page<Course> coursePage = getAllCourseByCriteria(categoryNames, courseLevels, courseTypes, courseStatuses, filterCoursesBy, keyword, null, pageable);
@@ -202,6 +246,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
+    @Cacheable(value = "allCourses", key = "'getMyCourseList-' + #pageable.pageNumber + '-' + #pageable.pageSize")
     public Page<MyCourseResponse> getMyCourseList(List<String> categoryNames, List<EnumCourseLevel> courseLevels, List<EnumCourseType> courseTypes, List<EnumStatus> courseStatuses, List<EnumFilterCoursesBy> filterCoursesBy, String keyword, Pageable pageable) {
         try {
             User user = jwtUtil.getUser();
@@ -215,14 +260,121 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public CourseDetailResponse getCourseDetail(String courseSlug) {
+    @Cacheable(key = "'getAdminCourseDetail-' + #slugCourse")
+    public AdminCourseDetailResponse getAdminCourseDetail(String slugCourse) {
         try {
-            Course course = courseRepository.findFirstBySlugCourse(courseSlug).orElseThrow(() -> new DataNotFoundException("Course not found"));
-            return CourseDetailResponse.builder().courseName(course.getCourseName()).instructorName(course.getInstructorName()).totalCourseRate(course.getTotalCourseRate()).totalChapter(course.getTotalChapter()).courseDuration(course.getCourseDuration()).groupLink(course.getGroupLink()).slugCourse(course.getSlugCourse()).courseType(course.getCourseType()).pathCourseImage(course.getPathCourseImage()).courseLevel(course.getCourseLevel()).category(CategoryResponse.builder().categoryName(course.getCategory().getCategoryName()).pathCategoryImage(course.getCategory().getPathCategoryImage()).build()).chapters(course.getChapters().stream().map(chapter -> ChapterCourseDetailResponse.builder().title(chapter.getTitle()).chapterDuration(chapter.getChapterDuration()).noChapter(chapter.getNoChapter()).materials(chapter.getMaterials().stream().map(material -> MaterialCourseDetailResponse.builder().materialType(material.getMaterialType()).materialDuration(material.getMaterialDuration()).slugMaterial(material.getSlugMaterial()).build()).toList()).build()).toList()).build();
+            return courseRepository.findFirstBySlugCourse(slugCourse)
+                    .map(
+                            course -> AdminCourseDetailResponse.builder()
+                                    .courseName(course.getCourseName())
+                                    .instructorName(course.getInstructorName())
+                                    .totalCourseRate(course.getTotalCourseRate())
+                                    .totalChapter(course.getTotalChapter())
+                                    .courseDuration(course.getCourseDuration())
+                                    .slugCourse(course.getSlugCourse())
+                                    .courseType(course.getCourseType())
+                                    .pathCourseImage(course.getPathCourseImage())
+                                    .courseDescription(course.getCourseDescription())
+                                    .price(course.getPrice())
+                                    .targetMarket(course.getTargetMarket())
+                                    .courseLevel(course.getCourseLevel())
+                                    .groupLink(course.getGroupLink())
+                                    .slugCategory(course.getCategory().getSlugCategory())
+                                    .build()
+                    ).orElseThrow(() -> new DataNotFoundException(COURSE_NOT_FOUND));
         } catch (DataNotFoundException e) {
             throw e;
         } catch (Exception e) {
-            throw new ServiceBusinessException("Failed to get course detail");
+            throw new ServiceBusinessException(e.getMessage());
+        }
+    }
+
+    @Override
+    @Transactional
+    public CustomerCourseDetailResponse getCustomerCourseDetail(String slugCourse) {
+        try {
+            Course course = courseRepository.findFirstBySlugCourse(slugCourse)
+                    .orElseThrow(() -> new DataNotFoundException(COURSE_NOT_FOUND));
+            User user;
+            AtomicBoolean isMaterialLocked = new AtomicBoolean(true);
+            AtomicBoolean isMaterialCompleted = new AtomicBoolean(false);
+
+            if (jwtUtil.getTokenFromRequest() != null) {
+                user = jwtUtil.getUser();
+                purchaseRepository.findByUserAndCourseAndPurchaseStatus(user, course, EnumPurchaseStatus.PAID)
+                        .ifPresent(purchase -> {
+                            isMaterialLocked.set(false);
+                            isMaterialCompleted.set(true);
+                        });
+            } else {
+                user = null;
+            }
+
+            List<ChapterCourseDetailResponse> sortedChapters = course.getChapters().stream()
+                    .sorted(Comparator.comparing(Chapter::getNoChapter))
+                    .map(chapter -> {
+                        List<MaterialCourseDetailResponse> sortedMaterials = chapter.getMaterials().stream()
+                                .sorted(Comparator.comparing(Material::getSerialNumber))
+                                .map(material -> {
+                                    if (isMaterialCompleted.get()) {
+                                        return MaterialCourseDetailResponse.builder()
+                                                .materialName(material.getMaterialName())
+                                                .materialType(material.getMaterialType())
+                                                .materialDuration(material.getMaterialDuration())
+                                                .slugMaterial(material.getSlugMaterial())
+                                                .isLocked(isMaterialLocked.get())
+                                                .isCompleted(
+                                                        material.getMaterialActivities().stream()
+                                                                .anyMatch(materialActivities -> materialActivities.getUser().equals(user))
+                                                )
+                                                .build();
+                                    } else {
+                                        return MaterialCourseDetailResponse.builder()
+                                                .materialName(material.getMaterialName())
+                                                .materialType(material.getMaterialType())
+                                                .materialDuration(material.getMaterialDuration())
+                                                .slugMaterial(EnumMaterialType.FREE.equals(material.getMaterialType()) ? material.getSlugMaterial() : null)
+                                                .isLocked(!EnumMaterialType.FREE.equals(material.getMaterialType()))
+                                                .isCompleted(isMaterialCompleted.get())
+                                                .build();
+                                    }
+                                })
+                                .toList();
+
+                        return ChapterCourseDetailResponse.builder()
+                                .title(chapter.getTitle())
+                                .chapterDuration(chapter.getChapterDuration())
+                                .noChapter(chapter.getNoChapter())
+                                .materials(sortedMaterials)
+                                .build();
+                    })
+                    .toList();
+
+            return CustomerCourseDetailResponse.builder()
+                    .courseName(course.getCourseName())
+                    .instructorName(course.getInstructorName())
+                    .totalCourseRate(course.getTotalCourseRate())
+                    .totalChapter(course.getTotalChapter())
+                    .courseDuration(course.getCourseDuration())
+                    .groupLink(course.getGroupLink())
+                    .slugCourse(course.getSlugCourse())
+                    .courseType(course.getCourseType())
+                    .courseDescription(course.getCourseDescription())
+                    .targetMarket(course.getTargetMarket())
+                    .pathCourseImage(course.getPathCourseImage())
+                    .price(course.getPrice())
+                    .courseLevel(course.getCourseLevel())
+                    .category(CategoryResponse.builder()
+                            .categoryName(course.getCategory().getCategoryName())
+                            .pathCategoryImage(course.getCategory().getPathCategoryImage())
+                            .build())
+                    .chapters(sortedChapters)
+                    .build();
+
+        } catch (DataNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ServiceBusinessException(e.getMessage());
         }
     }
 }

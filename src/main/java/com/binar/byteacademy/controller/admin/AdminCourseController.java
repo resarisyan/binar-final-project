@@ -3,7 +3,7 @@ package com.binar.byteacademy.controller.admin;
 import com.binar.byteacademy.dto.request.CreateCourseRequest;
 import com.binar.byteacademy.dto.request.UpdateCourseRequest;
 import com.binar.byteacademy.dto.response.AdminCourseResponse;
-import com.binar.byteacademy.dto.response.CourseDetailResponse;
+import com.binar.byteacademy.dto.response.AdminCourseDetailResponse;
 import com.binar.byteacademy.dto.response.CourseResponse;
 import com.binar.byteacademy.dto.response.base.APIResponse;
 import com.binar.byteacademy.dto.response.base.APIResultResponse;
@@ -79,11 +79,11 @@ public class  AdminCourseController {
     }
 
     @GetMapping("/{slugCourse}")
-    @Schema(name = "GetCourseDetail", description = "Get course detail")
+    @Schema(name = "GetAdminCourseDetail", description = "Get course detail")
     @Operation(summary = "Endpoint to handle get course detail (User Role : Admin)")
-    public ResponseEntity<APIResultResponse<CourseDetailResponse>> getCourseDetail(@PathVariable String slugCourse) {
-        CourseDetailResponse courseResponse = courseService.getCourseDetail(slugCourse);
-        APIResultResponse<CourseDetailResponse> responseDTO = new APIResultResponse<>(
+    public ResponseEntity<APIResultResponse<AdminCourseDetailResponse>> getAdminCourseDetail(@PathVariable String slugCourse) {
+        AdminCourseDetailResponse courseResponse = courseService.getAdminCourseDetail(slugCourse);
+        APIResultResponse<AdminCourseDetailResponse> responseDTO = new APIResultResponse<>(
                 HttpStatus.OK,
                 "Course successfully retrieved",
                 courseResponse
@@ -115,6 +115,19 @@ public class  AdminCourseController {
                 HttpStatus.OK,
                 "Course successfully retrieved",
                 courseResponsePage
+        );
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
+    @GetMapping("/list")
+    @Schema(name = "GetAllCourseByCriteria", description = "Get all course by criteria")
+    @Operation(summary = "Endpoint to handle get all course by criteria (User Role : Admin)")
+    public ResponseEntity<APIResultResponse<List<CourseResponse>>> getListCourse() {
+        List<CourseResponse> courseResponseList = courseService.getListCourse();
+        APIResultResponse<List<CourseResponse>> responseDTO = new APIResultResponse<>(
+                HttpStatus.OK,
+                "Course successfully retrieved",
+                courseResponseList
         );
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }

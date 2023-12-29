@@ -9,6 +9,7 @@ import com.binar.byteacademy.exception.ServiceBusinessException;
 import com.binar.byteacademy.exception.ValidationException;
 import com.binar.byteacademy.repository.PromoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,10 +21,12 @@ import static com.binar.byteacademy.common.util.Constants.TableName.PROMO_TABLE;
 
 @Service
 @RequiredArgsConstructor
+@CacheConfig(cacheNames = "promos")
 public class PromoServiceImpl implements PromoService {
     private final PromoRepository promoRepository;
     private final CheckDataUtil checkDataUtil;
     @Override
+    @CacheEvict(value = "allPromos", allEntries = true)
     public PromoResponse addPromo(PromoRequest request) {
         try {
             promoRepository.findByPromoCode(request.getPromoCode())
@@ -57,6 +60,8 @@ public class PromoServiceImpl implements PromoService {
     }
 
     @Override
+    @CachePut(key = "'getPromoDetail-' + #promoCode")
+    @CacheEvict(value = {"allPromos", "allCoursePromos", "coursePromos"}, allEntries = true)
     public void updatePromo(String promoCode, PromoRequest request) {
         try {
             promoRepository.findByPromoCode(promoCode)
@@ -80,6 +85,10 @@ public class PromoServiceImpl implements PromoService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(key = "'getPromoDetail-' + #promoCode"),
+            @CacheEvict(value = "allPromos", allEntries = true)
+    })
     public void deletePromo(String promoCode) {
         try {
             promoRepository.findByPromoCode(promoCode)
@@ -92,6 +101,7 @@ public class PromoServiceImpl implements PromoService {
     }
 
     @Override
+    @Cacheable(value = "allPromos", key = "'getAllPromo-' + #pageable.pageNumber + '-' + #pageable.pageSize")
     public Page<PromoResponse> getAllPromo(Pageable pageable) {
         try {
             Page<Promo> promoPage = Optional.of(promoRepository.findAll(pageable))
@@ -113,6 +123,7 @@ public class PromoServiceImpl implements PromoService {
     }
 
     @Override
+    @Cacheable(key = "'getPromoDetail-' + #promoCode")
     public PromoResponse getPromoDetail(String promoCode) {
         try {
             return promoRepository.findByPromoCode(promoCode).map(promo -> PromoResponse.builder()

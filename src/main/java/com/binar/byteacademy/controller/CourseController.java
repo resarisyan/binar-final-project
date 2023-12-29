@@ -31,9 +31,9 @@ public class CourseController {
     @GetMapping("/{slugCourse}")
     @Schema(name = "GetCourseDetail", description = "Get course detail")
     @Operation(summary = "Endpoint to handle get course detail")
-    public ResponseEntity<APIResultResponse<CourseDetailResponse>> getCourseDetail(@PathVariable String slugCourse) {
-        CourseDetailResponse courseDetailResponse = courseService.getCourseDetail(slugCourse);
-        APIResultResponse<CourseDetailResponse> responseDTO = new APIResultResponse<>(
+    public ResponseEntity<APIResultResponse<CustomerCourseDetailResponse>> getCourseDetail(@PathVariable String slugCourse) {
+        CustomerCourseDetailResponse courseDetailResponse = courseService.getCustomerCourseDetail(slugCourse);
+        APIResultResponse<CustomerCourseDetailResponse> responseDTO = new APIResultResponse<>(
                 HttpStatus.OK,
                 SUCCESS_GET_COURSE,
                 courseDetailResponse

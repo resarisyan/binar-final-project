@@ -1,12 +1,14 @@
 package com.binar.byteacademy.service;
 
 import com.binar.byteacademy.common.util.MidtransUtil;
+import com.binar.byteacademy.dto.request.NotificationRequest;
+import com.binar.byteacademy.dto.response.AdminPurchaseResponse;
 import com.binar.byteacademy.dto.response.PurchaseResponse;
-import com.binar.byteacademy.entity.MaterialActivity;
 import com.binar.byteacademy.entity.Purchase;
 import com.binar.byteacademy.entity.User;
 import com.binar.byteacademy.entity.UserProgress;
 import com.binar.byteacademy.entity.compositekey.UserProgressKey;
+import com.binar.byteacademy.enumeration.EnumCourseType;
 import com.binar.byteacademy.enumeration.EnumPurchaseStatus;
 import com.binar.byteacademy.exception.DataNotFoundException;
 import com.binar.byteacademy.exception.ServiceBusinessException;
@@ -14,8 +16,10 @@ import com.binar.byteacademy.repository.*;
 import com.midtrans.httpclient.error.MidtransError;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,17 +37,17 @@ import static com.binar.byteacademy.common.util.Constants.ControllerMessage.PURC
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
+@CacheConfig(cacheNames = "purchases")
 public class PurchaseServiceImpl implements PurchaseService {
     private final PurchaseRepository purchaseRepository;
     private final CourseRepository courseRepository;
     private final MidtransUtil midtransUtil;
     private final UserProgressRepository userProgressRepository;
-    private final MaterialActivityRepository materialActivityRepository;
-    private final MaterialRepository materialRepository;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional
+    @CacheEvict(value = "allPurchases", allEntries = true)
     public PurchaseResponse createPurchase(String courseSlug, Principal connectedUser) {
         try {
             return courseRepository.findFirstBySlugCourse(courseSlug)
@@ -55,39 +59,61 @@ public class PurchaseServiceImpl implements PurchaseService {
                     )
                     .map(course -> {
                         User user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
-                        Integer promo = course.getCoursePromos().stream()
-                                .filter(coursePromo -> coursePromo.getPromo().getEndDate().isAfter(LocalDateTime.now()) && coursePromo.getPromo().getStartDate().isBefore(LocalDateTime.now()))
-                                .map(coursePromo -> coursePromo.getPromo().getDiscount())
-                                .findFirst()
-                                .orElse(0);
-                        Integer amount = (int) (course.getPrice() + (course.getPrice() * 0.1)) - (int) (course.getPrice() * promo * 0.01);
-                        Purchase purchase = Purchase.builder()
-                                .course(course)
-                                .purchaseStatus(EnumPurchaseStatus.PENDING)
-                                .ppn(0.1)
-                                .amountPaid(amount)
-                                .user(user)
-                                .build();
-                        Purchase savedPurchase = purchaseRepository.save(purchase);
-                        Map<String, Object> parameter = createParameter(savedPurchase);
-                        String transactionToken;
+                        double ppn = course.getCourseType() == EnumCourseType.FREE ? 0 : 0.1;
+                        if(course.getCourseType() == EnumCourseType.FREE){
+                            Purchase purchase = Purchase.builder()
+                                    .course(course)
+                                    .purchaseStatus(EnumPurchaseStatus.PAID)
+                                    .ppn(ppn)
+                                    .amountPaid(0)
+                                    .user(user)
+                                    .build();
+                            Purchase savedPurchase = purchaseRepository.save(purchase);
+                            purchaseSuccess(purchase);
+                            notificationPurchaseSuccess(user.getUsername(), course.getCourseName());
+                            return PurchaseResponse.builder()
+                                    .courseName(savedPurchase.getCourse().getCourseName())
+                                    .amountPaid(savedPurchase.getAmountPaid())
+                                    .ppn(savedPurchase.getPpn())
+                                    .purchaseDate(savedPurchase.getPurchaseDate())
+                                    .purchaseStatus(savedPurchase.getPurchaseStatus())
+                                    .tokenPurchase(savedPurchase.getTokenPurchase())
+                                    .build();
+                        } else {
+                            Integer promo = course.getCoursePromos().stream()
+                                    .filter(coursePromo -> coursePromo.getPromo().getEndDate().isAfter(LocalDateTime.now()) && coursePromo.getPromo().getStartDate().isBefore(LocalDateTime.now()))
+                                    .map(coursePromo -> coursePromo.getPromo().getDiscount())
+                                    .findFirst()
+                                    .orElse(0);
+                            Integer amount = (int) (course.getPrice() + (course.getPrice() * 0.1)) - (int) (course.getPrice() * promo * 0.01);
+                            Purchase purchase = Purchase.builder()
+                                    .course(course)
+                                    .purchaseStatus(EnumPurchaseStatus.PENDING)
+                                    .ppn(ppn)
+                                    .amountPaid(amount)
+                                    .user(user)
+                                    .build();
+                            Purchase savedPurchase = purchaseRepository.save(purchase);
+                            Map<String, Object> parameter = createParameter(savedPurchase);
+                            String transactionToken;
 
-                        try {
-                            transactionToken = midtransUtil.getSnapApi().createTransactionToken(parameter);
-                            purchase.setTokenPurchase(transactionToken);
-                            purchaseRepository.save(purchase);
-                        } catch (MidtransError e) {
-                            throw new ServiceBusinessException(e.getMessage());
+                            try {
+                                transactionToken = midtransUtil.getSnapApi().createTransactionToken(parameter);
+                                purchase.setTokenPurchase(transactionToken);
+                                purchaseRepository.save(purchase);
+                            } catch (MidtransError e) {
+                                throw new ServiceBusinessException(e.getMessage());
+                            }
+
+                            return PurchaseResponse.builder()
+                                    .courseName(savedPurchase.getCourse().getCourseName())
+                                    .amountPaid(savedPurchase.getAmountPaid())
+                                    .ppn(savedPurchase.getPpn())
+                                    .purchaseDate(savedPurchase.getPurchaseDate())
+                                    .purchaseStatus(savedPurchase.getPurchaseStatus())
+                                    .tokenPurchase(transactionToken)
+                                    .build();
                         }
-
-                        return PurchaseResponse.builder()
-                                .courseName(savedPurchase.getCourse().getCourseName())
-                                .amountPaid(savedPurchase.getAmountPaid())
-                                .ppn(savedPurchase.getPpn())
-                                .purchaseDate(savedPurchase.getPurchaseDate())
-                                .purchaseStatus(savedPurchase.getPurchaseStatus())
-                                .tokenPurchase(transactionToken)
-                                .build();
                     })
                     .orElseThrow(() -> new RuntimeException("Course not found or already purchased"));
         } catch (Exception e) {
@@ -96,9 +122,10 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
+    @Transactional
+    @CacheEvict(value = "allPurchases", allEntries = true)
     public void paymentCallback(Map<String, Object> request) {
         try {
-            log.info("Payment callback received");
             String orderId = (String) Optional.ofNullable(request.get("order_id"))
                     .orElseThrow(() -> new ServiceBusinessException("Order id is required"));
             JSONObject transactionResult = midtransUtil.getCoreApi().checkTransaction(orderId);
@@ -112,23 +139,20 @@ public class PurchaseServiceImpl implements PurchaseService {
                                         if (fraudStatus.equals("challenge")) {
                                             purchase.setPurchaseStatus(EnumPurchaseStatus.CHALLENGE);
                                         } else if (fraudStatus.equals("accept")) {
-                                            userProgressRepository.save(UserProgress.builder()
-                                                    .id(UserProgressKey.builder()
-                                                            .userId(purchase.getUser().getId())
-                                                            .courseId(purchase.getCourse().getId())
-                                                            .build())
-                                                    .user(purchase.getUser())
-                                                    .course(purchase.getCourse())
-                                                    .isCompleted(false)
-                                                    .coursePercentage(0)
-                                                    .build());
                                             purchase.setPurchaseStatus(EnumPurchaseStatus.PAID);
+                                            purchaseSuccess(purchase);
+                                            notificationPurchaseSuccess(purchase.getUser().getUsername(), purchase.getCourse().getCourseName());
                                         }
                                     }
                                     case "cancel", "deny", "expire", "failure" ->
                                             purchase.setPurchaseStatus(EnumPurchaseStatus.FAILURE);
                                     case "pending" -> purchase.setPurchaseStatus(EnumPurchaseStatus.PENDING);
-                                    case "settlement", "refund", "chargeback", "partial_refund", "partial_chargeback" -> purchase.setPurchaseStatus(EnumPurchaseStatus.SETTLEMENT);
+                                    case "settlement" -> {
+                                        purchase.setPurchaseStatus(EnumPurchaseStatus.PAID);
+                                        purchaseSuccess(purchase);
+                                        notificationPurchaseSuccess(purchase.getUser().getUsername(), purchase.getCourse().getCourseName());
+                                    }
+                                    case "refund", "chargeback", "partial_refund", "partial_chargeback" -> purchase.setPurchaseStatus(EnumPurchaseStatus.REFUND);
                                     default -> throw new ServiceBusinessException("Transaction status not found");
                                 }
                                 purchaseRepository.save(purchase);
@@ -145,6 +169,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
+    @Cacheable(value = "allPurchases", key = "'getAllPurchaseDetailsForCustomer-' + #pageable.pageNumber + '-' + #pageable.pageSize")
     public Page<PurchaseResponse> getAllPurchaseDetailsForCustomer(Pageable pageable, Principal connectedUser) {
         try {
             User user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
@@ -166,23 +191,45 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    public Page<PurchaseResponse> getAllPurchaseDetailsForAdmin(Pageable pageable) {
+    @Cacheable(value = "allPurchases", key = "'getAllPurchaseDetailsForAdmin-' + #pageable.pageNumber + '-' + #pageable.pageSize")
+    public Page<AdminPurchaseResponse> getAllPurchaseDetailsForAdmin(Pageable pageable) {
         try {
             Page<Purchase> purchasePage = Optional.of(purchaseRepository.findAll(pageable))
                     .filter(Page::hasContent)
                     .orElseThrow(() -> new DataNotFoundException(PURCHASE_NOT_FOUND));
-            return purchasePage.map(purchase -> PurchaseResponse.builder()
+            return purchasePage.map(purchase -> AdminPurchaseResponse.builder()
                     .courseName(purchase.getCourse().getCourseName())
                     .amountPaid(purchase.getAmountPaid())
                     .purchaseDate(purchase.getPurchaseDate())
                     .purchaseStatus(purchase.getPurchaseStatus())
                     .tokenPurchase(purchase.getTokenPurchase())
+                    .username(purchase.getUser().getUsername())
                     .build());
         } catch (DataNotFoundException e) {
             throw e;
         } catch (Exception e) {
             throw new ServiceBusinessException("Failed to get purchase details");
         }
+    }
+
+    private void purchaseSuccess(Purchase purchase){
+        userProgressRepository.save(UserProgress.builder()
+                .id(UserProgressKey.builder()
+                        .userId(purchase.getUser().getId())
+                        .courseId(purchase.getCourse().getId())
+                        .build())
+                .user(purchase.getUser())
+                .course(purchase.getCourse())
+                .isCompleted(false)
+                .coursePercentage(0)
+                .build());
+    }
+
+    private void notificationPurchaseSuccess(String username, String courseName){
+        notificationService.sendToUser(NotificationRequest.builder()
+                .title("Payment Success")
+                .body("Your payment for " + courseName + " is success")
+                .build(), username);
     }
 
 

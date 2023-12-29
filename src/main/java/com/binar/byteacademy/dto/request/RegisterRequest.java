@@ -30,5 +30,6 @@ public class RegisterRequest {
 
     @NotBlank
     @Size(min = 10, max = 14)
+    @FieldExistence(tableName = "users", fieldName = "phone_number", shouldExist = false, message = "Phone number already exists")
     private String phoneNumber;
 }

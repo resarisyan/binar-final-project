@@ -15,6 +15,7 @@ import com.binar.byteacademy.repository.CoursePromoRepository;
 import com.binar.byteacademy.repository.CourseRepository;
 import com.binar.byteacademy.repository.PromoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import static com.binar.byteacademy.common.util.Constants.ControllerMessage.COUR
 
 @Service
 @RequiredArgsConstructor
+@CacheConfig(cacheNames = "coursePromos")
 public class CoursePromoServiceImpl implements CoursePromoService {
     private final CoursePromoRepository coursePromoRepository;
     private final CourseRepository courseRepository;
@@ -89,6 +91,8 @@ public class CoursePromoServiceImpl implements CoursePromoService {
     }
 
     @Override
+    @CachePut(key = "'getCoursePromoDetail-' + #id")
+    @CacheEvict(value = "allCoursePromos", allEntries = true)
     public void updateCoursePromo(UUID id, CoursePromoRequest request) {
         try {
             coursePromoRepository.findById(id)
@@ -116,6 +120,10 @@ public class CoursePromoServiceImpl implements CoursePromoService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(key = "'getCoursePromoDetail-' + #id"),
+            @CacheEvict(value = "allCoursePromos", allEntries = true)
+    })
     public void deleteCoursePromo(UUID id) {
         try {
             coursePromoRepository.findById(id)
@@ -130,6 +138,7 @@ public class CoursePromoServiceImpl implements CoursePromoService {
     }
 
     @Override
+    @Cacheable(key = "'getCoursePromoDetail-' + #id")
     public CoursePromoResponse getCoursePromoDetail(UUID id) {
         try {
             return coursePromoRepository.findById(id)
@@ -176,6 +185,7 @@ public class CoursePromoServiceImpl implements CoursePromoService {
     }
 
     @Override
+    @Cacheable(value = "allCoursePromos", key = "'getAllCoursePromo-' + #pageable.pageNumber + '-' + #pageable.pageSize")
     public Page<CoursePromoResponse> getAllCoursePromo(Pageable pageable) {
         try {
             Page<CoursePromo> coursePromoPage = Optional.of(coursePromoRepository.findAll(pageable))

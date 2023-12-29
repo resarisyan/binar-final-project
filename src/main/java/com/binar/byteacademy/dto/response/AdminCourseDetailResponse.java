@@ -7,16 +7,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
-
+import java.io.Serializable;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class CourseDetailResponse {
+public class AdminCourseDetailResponse implements Serializable {
     private String courseName;
     private String instructorName;
     private Double totalCourseRate;
@@ -25,9 +23,10 @@ public class CourseDetailResponse {
     private String slugCourse;
     private String pathCourseImage;
     private String groupLink;
+    private String courseDescription;
+    private String targetMarket;
+    private Integer price;
     private EnumCourseType courseType;
     private EnumCourseLevel courseLevel;
-    private List<ChapterCourseDetailResponse> chapters;
-    private CategoryResponse category;
-//    private isOrder
+    private String slugCategory;
 }

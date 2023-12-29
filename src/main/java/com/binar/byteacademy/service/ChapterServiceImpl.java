@@ -11,10 +11,12 @@ import com.binar.byteacademy.exception.ServiceBusinessException;
 import com.binar.byteacademy.repository.ChapterRepository;
 import com.binar.byteacademy.repository.CourseRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.binar.byteacademy.common.util.Constants.ControllerMessage.CHAPTER_NOT_FOUND;
@@ -24,6 +26,7 @@ import static com.binar.byteacademy.common.util.Constants.TableName.CHAPTER_TABL
 
 @Service
 @RequiredArgsConstructor
+@CacheConfig(cacheNames = "chapters")
 public class ChapterServiceImpl implements ChapterService {
     private final ChapterRepository chapterRepository;
     private final CourseRepository courseRepository;
@@ -31,10 +34,11 @@ public class ChapterServiceImpl implements ChapterService {
     private final CheckDataUtil checkDataUtil;
 
     @Override
+    @CacheEvict(value = "allChapters", allEntries = true)
     public ChapterResponse addChapter(CreateChapterRequest request) {
-        try{
+        try {
             String slug = Optional.ofNullable(request.getSlugChapter())
-                    .orElse(slugUtil.toSlug(CHAPTER_TABLE, "slug_chapter", request.getTitle()+"-"+request.getSlugCourse()));
+                    .orElse(slugUtil.toSlug(CHAPTER_TABLE, "slug_chapter", request.getTitle() + "-" + request.getSlugCourse()));
             return courseRepository.findFirstBySlugCourse(request.getSlugCourse())
                     .map(course -> {
                         Chapter chapter = Chapter.builder()
@@ -45,7 +49,7 @@ public class ChapterServiceImpl implements ChapterService {
                                 .slugChapter(slug)
                                 .build();
                         Chapter savedChapter = chapterRepository.save(chapter);
-                        course.setTotalChapter(course.getTotalChapter()+1);
+                        course.setTotalChapter(course.getTotalChapter() + 1);
                         courseRepository.save(course);
                         return ChapterResponse.builder()
                                 .slugChapter(savedChapter.getSlugChapter())
@@ -54,14 +58,34 @@ public class ChapterServiceImpl implements ChapterService {
                                 .chapterDuration(savedChapter.getChapterDuration())
                                 .build();
                     }).orElseThrow(() -> new DataNotFoundException(COURSE_NOT_FOUND));
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new ServiceBusinessException(e.getMessage());
         }
     }
 
     @Override
-        public void updateChapter(String slugChapter, UpdateChapterRequest request) {
-        try{
+    @Cacheable(value = "allChapters", key = "'getListChapterBySlugCourse-' + #slugCourse")
+    public List<ChapterResponse> getListChapterBySlugCourse(String slugCourse) {
+        try {
+            List<Chapter> chapterList = chapterRepository.findAllByCourse_SlugCourse(slugCourse).orElseThrow(() -> new DataNotFoundException(CHAPTER_NOT_FOUND));
+            return chapterList.stream().map(chapter -> ChapterResponse.builder()
+                    .slugChapter(chapter.getSlugChapter())
+                    .noChapter(chapter.getNoChapter())
+                    .title(chapter.getTitle())
+                    .chapterDuration(chapter.getChapterDuration())
+                    .build()).toList();
+        } catch (DataNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ServiceBusinessException("Failed to get list chapter");
+        }
+    }
+
+    @Override
+    @CachePut(key = "'getChapterDetail-' + #slugChapter")
+    @CacheEvict(value = {"allChapters", "materials", "allMaterials"}, allEntries = true)
+    public void updateChapter(String slugChapter, UpdateChapterRequest request) {
+        try {
             chapterRepository.findFirstBySlugChapter(slugChapter)
                     .ifPresentOrElse(chapter -> courseRepository.findFirstBySlugCourse(request.getSlugCourse())
                             .ifPresentOrElse(course -> {
@@ -77,20 +101,24 @@ public class ChapterServiceImpl implements ChapterService {
                             }), () -> {
                         throw new DataNotFoundException(CHAPTER_NOT_FOUND);
                     });
-        } catch (DataNotFoundException e){
+        } catch (DataNotFoundException e) {
             throw e;
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new ServiceBusinessException("Failed to update chapter");
         }
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(key = "'getChapterDetail-' + #slugChapter"),
+            @CacheEvict(value = {"allChapters", "materials", "allMaterials"}, allEntries = true)
+    })
     public void deleteChapter(String slugChapter) {
-        try{
+        try {
             chapterRepository.findFirstBySlugChapter(slugChapter)
                     .ifPresentOrElse(chapter -> courseRepository.findFirstBySlugCourse(chapter.getCourse().getSlugCourse())
                             .ifPresentOrElse(course -> {
-                                course.setTotalChapter(course.getTotalChapter()-1);
+                                course.setTotalChapter(course.getTotalChapter() - 1);
                                 courseRepository.save(course);
                                 chapterRepository.delete(chapter);
                             }, () -> {
@@ -98,16 +126,17 @@ public class ChapterServiceImpl implements ChapterService {
                             }), () -> {
                         throw new DataNotFoundException(CHAPTER_NOT_FOUND);
                     });
-        } catch (DataNotFoundException e){
+        } catch (DataNotFoundException e) {
             throw e;
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new ServiceBusinessException("Failed to delete chapter");
         }
     }
 
     @Override
+    @Cacheable(value = "allChapters", key = "'getAllChapter-' + #pageable.pageNumber + '-' + #pageable.pageSize")
     public Page<ChapterResponse> getAllChapter(Pageable pageable) {
-        try{
+        try {
             Page<Chapter> chapterPage = Optional.of(chapterRepository.findAll(pageable))
                     .filter(Page::hasContent)
                     .orElseThrow(() -> new DataNotFoundException(CHAPTER_NOT_FOUND));
@@ -117,16 +146,17 @@ public class ChapterServiceImpl implements ChapterService {
                     .title(chapter.getTitle())
                     .chapterDuration(chapter.getChapterDuration())
                     .build());
-        } catch (DataNotFoundException e){
+        } catch (DataNotFoundException e) {
             throw e;
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new ServiceBusinessException("Failed to get all chapter");
         }
     }
 
     @Override
+    @Cacheable(key = "'getChapterDetail-' + #slugChapter")
     public ChapterResponse getChapterDetail(String slugChapter) {
-        try{
+        try {
             Chapter chapter = chapterRepository.findFirstBySlugChapter(slugChapter)
                     .orElseThrow(() -> new DataNotFoundException(CHAPTER_NOT_FOUND));
             return ChapterResponse.builder()
@@ -135,9 +165,9 @@ public class ChapterServiceImpl implements ChapterService {
                     .title(chapter.getTitle())
                     .chapterDuration(chapter.getChapterDuration())
                     .build();
-        } catch (DataNotFoundException e){
+        } catch (DataNotFoundException e) {
             throw e;
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new ServiceBusinessException("Failed to get chapter detail");
         }
     }

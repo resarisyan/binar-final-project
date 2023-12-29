@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static com.binar.byteacademy.common.util.Constants.CategoryPats.ADMIN_CATEGORY_PATS;
@@ -60,7 +61,7 @@ public class AdminCategoryController {
     }
 
     @DeleteMapping("/{slugCategory}")
-    @Schema(name = "UpdateCategoryRequest", description = "Update category request body")
+    @Schema(name = "GetCategoryDetailRequest", description = "Get category detail request body")
     @Operation(summary = "Endpoint to handle delete category (User Role : Admin)")
     public ResponseEntity<APIResponse> deleteCategory(@PathVariable String slugCategory) {
         categoryService.deleteCategory(slugCategory);
@@ -72,9 +73,9 @@ public class AdminCategoryController {
     }
 
     @GetMapping
-    @Schema(name = "UpdateCategoryRequest", description = "Update category request body")
+    @Schema(name = "GetAllCategoryRequest", description = "Get all category request body")
     @Operation(summary = "Endpoint to handle get all category (User Role : Admin)")
-    public ResponseEntity<APIResultResponse<Page<CategoryResponse>>> getCategory(@RequestParam("page") int page) {
+    public ResponseEntity<APIResultResponse<Page<CategoryResponse>>> getAllCategory(@RequestParam("page") int page) {
         Pageable pageable = PageRequest.of(page, 5);
         Page<CategoryResponse> categoryResponses = categoryService.getAllCategory(pageable);
         APIResultResponse<Page<CategoryResponse>> responseDTO =  new APIResultResponse<>(
@@ -85,8 +86,21 @@ public class AdminCategoryController {
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
+    @GetMapping("/list")
+    @Schema(name = "GetAllCategoryRequest", description = "Get all category request body")
+    @Operation(summary = "Endpoint to handle get all category (User Role : Admin)")
+    public ResponseEntity<APIResultResponse<List<CategoryResponse>>> getListCategory() {
+        List<CategoryResponse> categoryResponses = categoryService.getListCategory();
+        APIResultResponse<List<CategoryResponse>> responseDTO =  new APIResultResponse<>(
+                HttpStatus.OK,
+                "Category successfully retrieved",
+                categoryResponses
+        );
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
     @GetMapping("/{slugCategory}")
-    @Schema(name = "UpdateCategoryRequest", description = "Update category request body")
+    @Schema(name = "GetCategoryDetailRequest", description = "Get category detail request body")
     @Operation(summary = "Endpoint to handle get category detail (User Role : Admin)")
     public ResponseEntity<APIResultResponse<CategoryResponse>> getCategoryDetail(@PathVariable String slugCategory) {
         CategoryResponse categoryResponse = categoryService.getCategoryDetail(slugCategory);

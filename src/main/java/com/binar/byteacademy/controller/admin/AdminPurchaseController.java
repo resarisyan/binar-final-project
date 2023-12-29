@@ -1,6 +1,6 @@
 package com.binar.byteacademy.controller.admin;
 
-import com.binar.byteacademy.dto.response.PurchaseResponse;
+import com.binar.byteacademy.dto.response.AdminPurchaseResponse;
 import com.binar.byteacademy.dto.response.base.APIResultResponse;
 import com.binar.byteacademy.service.PurchaseService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,10 +29,10 @@ public class AdminPurchaseController {
     @GetMapping
     @Schema(name = "PurchaseResponse", description = "Get all purchase response body")
     @Operation(summary = "Endpoint to handle get all purchase (User Role : Admin)")
-    public ResponseEntity<APIResultResponse<Page<PurchaseResponse>>> getAllPurchase(@RequestParam("page") int page) {
+    public ResponseEntity<APIResultResponse<Page<AdminPurchaseResponse>>> getAllPurchase(@RequestParam("page") int page) {
         Pageable pageable = PageRequest.of(page, 10);
-        Page<PurchaseResponse> purchaseResponses = purchaseService.getAllPurchaseDetailsForAdmin(pageable);
-        APIResultResponse<Page<PurchaseResponse>> responseDTO = new APIResultResponse<>(
+        Page<AdminPurchaseResponse> purchaseResponses = purchaseService.getAllPurchaseDetailsForAdmin(pageable);
+        APIResultResponse<Page<AdminPurchaseResponse>> responseDTO = new APIResultResponse<>(
                 HttpStatus.OK,
                 "Purchase successfully retrieved",
                 purchaseResponses

@@ -9,12 +9,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AdminCourseResponse {
+public class AdminCourseResponse implements Serializable {
     private String slugCourse;
     private String courseName;
     private CategoryResponse category;

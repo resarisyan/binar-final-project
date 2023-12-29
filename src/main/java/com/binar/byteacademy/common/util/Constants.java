@@ -30,6 +30,8 @@ public class Constants {
     public static final class UserPats {
         public static final String CUSTOMER_USER_PATS = BASE_URL + "/customer/user";
         public static final String ADMIN_USER_PATS = BASE_URL + "/admin/user";
+        public static final String ADMIN_USER_PATS_ALL = ADMIN_USER_PATS + "/**";
+        public static final String CUSTOMER_USER_PATS_ALL = CUSTOMER_USER_PATS + "/**";
     }
 
     public static final class ReplyPats {
@@ -47,11 +49,22 @@ public class Constants {
         public static final String CUSTOMER_COMMENT_PATS_ALL = CUSTOMER_COMMENT_PATS + "/**";
     }
 
+    public static final class CallbackPats {
+        public static final String CALLBACK_PATS = BASE_URL + "/callback";
+    }
+
     public static final class PurchasePats {
         public static final String CUSTOMER_PURCHASE_PATS = BASE_URL + "/customer/purchase";
         public static final String CUSTOMER_PURCHASE_PATS_ALL = CUSTOMER_PURCHASE_PATS + "/**";
         public static final String ADMIN_PURCHASE_PATS = BASE_URL + "/admin/purchase";
         public static final String ADMIN_PURCHASE_PATS_ALL = ADMIN_PURCHASE_PATS + "/**";
+    }
+
+    public static final class NotificationPats {
+        public static final String CUSTOMER_NOTIFICATION_PATS = BASE_URL + "/customer/notification";
+        public static final String CUSTOMER_NOTIFICATION_PATS_ALL = CUSTOMER_NOTIFICATION_PATS + "/**";
+        public static final String ADMIN_NOTIFICATION_PATS = BASE_URL + "/admin/notification";
+        public static final String ADMIN_NOTIFICATION_PATS_ALL = ADMIN_NOTIFICATION_PATS + "/**";
     }
 
     public static final class ChapterPats {
@@ -62,6 +75,8 @@ public class Constants {
     public static final class MaterialPats {
         public static final String ADMIN_MATERIAL_PATS = BASE_URL + "/admin/material";
         public static final String ADMIN_MATERIAL_PATS_ALL = ADMIN_MATERIAL_PATS + "/**";
+        public static final String CUSTOMER_MATERIAL_PATS = BASE_URL + "/customer/material";
+        public static final String CUSTOMER_MATERIAL_PATS_ALL = CUSTOMER_MATERIAL_PATS + "/**";
     }
 
     public static final class PromoPats {
@@ -78,6 +93,11 @@ public class Constants {
         public static final String ADMIN_DASHBOARD_PATS = BASE_URL + "/admin/dashboard";
     }
 
+    public static final class WebsocketPats {
+        public static final String BROKER_ALL = "/all/**";
+        public static final String BROKER_USER = "/user/**";
+    }
+
     public static final class CommonPats {
         public static final String[] SECURE_LIST_PATS = {
                 CoursePats.ADMIN_COURSE_PATS_ALL,
@@ -91,7 +111,14 @@ public class Constants {
                 DiscussionPats.CUSTOMER_DISCUSSION_PATS_ALL,
                 CommentPats.CUSTOMER_COMMENT_PATS_ALL,
                 ReplyPats.CUSTOMER_REPLY_PATS_ALL,
-                PurchasePats.ADMIN_PURCHASE_PATS_ALL
+                PurchasePats.ADMIN_PURCHASE_PATS_ALL,
+                MaterialPats.CUSTOMER_MATERIAL_PATS_ALL,
+                NotificationPats.CUSTOMER_NOTIFICATION_PATS_ALL,
+                NotificationPats.ADMIN_NOTIFICATION_PATS_ALL,
+                UserPats.ADMIN_USER_PATS_ALL,
+                UserPats.CUSTOMER_USER_PATS_ALL,
+                WebsocketPats.BROKER_ALL,
+                WebsocketPats.BROKER_USER
         };
     }
 
@@ -109,6 +136,7 @@ public class Constants {
         public static final String REPLY_NOT_FOUND = "Reply not found";
         public static final String TOKEN_NOT_FOUND = "Token not found";
         public static final String TOKEN_EXPIRED = "Token expired";
+        public static final String USER_NOT_FOUND = "User not found";
     }
 
     public static final class TableName {
@@ -118,7 +146,5 @@ public class Constants {
         public static final String COURSE_TABLE = "courses";
         public static final String MATERIAL_TABLE = "materials";
         public static final String PROMO_TABLE = "promos";
-        public static final String CUSTOMER_DETAIL_TABLE = "customer_details";
-        public static final String USER_TABLE = "users";
     }
 }

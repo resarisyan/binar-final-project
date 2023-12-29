@@ -18,8 +18,9 @@ public interface CourseService {
     CompletableFuture<CourseResponse> addCourse(CreateCourseRequest request);
     CompletableFuture<Void> updateCourse(String slugCourse, UpdateCourseRequest request);
     void deleteCourse(String slugCourse);
-    Page<CourseResponse> getAllCourse(Pageable pageable);
-    CourseDetailResponse getCourseDetail(String slugCourse);
+    CustomerCourseDetailResponse getCustomerCourseDetail(String slugCourse);
+    AdminCourseDetailResponse getAdminCourseDetail(String slugCourse);
+    List<CourseResponse> getListCourse();
     Page<Course> getAllCourseByCriteria(List<String> categoryNames,
                                         List<EnumCourseLevel> courseLevels,
                                         List<EnumCourseType> courseTypes,

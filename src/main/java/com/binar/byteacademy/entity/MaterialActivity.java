@@ -31,9 +31,6 @@ public class MaterialActivity {
     @JoinColumn(name = "material_id", referencedColumnName = "material_id", nullable = false)
     private Material material;
 
-    @Column(name = "is_completed", nullable = false)
-    private Boolean isCompleted;
-
     @Column(name = "completed_date")
     private LocalDateTime completedDate;
 

@@ -14,4 +14,5 @@ public interface MaterialService {
     Page<MaterialResponse> getAllMaterial(Pageable pageable);
     MaterialResponse getMaterialDetailAdmin(String slugMaterial);
     MaterialResponse getMaterialDetailCustomer(String slugMaterial, Principal principal);
+    void completeMaterial(String slugMaterial, Principal principal);
 }

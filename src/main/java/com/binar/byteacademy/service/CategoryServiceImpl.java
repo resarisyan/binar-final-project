@@ -11,11 +11,13 @@ import com.binar.byteacademy.exception.DataNotFoundException;
 import com.binar.byteacademy.exception.ServiceBusinessException;
 import com.binar.byteacademy.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -24,6 +26,7 @@ import static com.binar.byteacademy.common.util.Constants.TableName.CATEGORY_TAB
 
 @Service
 @RequiredArgsConstructor
+@CacheConfig(cacheNames = "categories")
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final SlugUtil slugUtil;
@@ -32,6 +35,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Async("asyncExecutor")
+    @CacheEvict(value = "allCategories", allEntries = true)
     public CompletableFuture<CategoryResponse> addCategory(CreateCategoryRequest request) {
         return CompletableFuture.supplyAsync(() -> {
             try {
@@ -63,6 +67,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Async("asyncExecutor")
+    @CachePut(key = "'getCategoryDetail-' + #slugCategory")
+    @CacheEvict(value = {"courses", "allCourses", "allCategories"}, allEntries = true)
     public CompletableFuture<Void> updateCategory(String slugCategory, UpdateCategoryRequest request) {
         return CompletableFuture.runAsync(() -> {
             try {
@@ -91,8 +97,16 @@ public class CategoryServiceImpl implements CategoryService {
         });
     }
 
-
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = {"getCategoryDetail"}, key = "'getCategoryDetail-' + #slugCategory"),
+            @CacheEvict(value = {
+            "allCourses", "chapters", "allChapters", "materials", "allMaterials",
+            "allPurchases", "discussions", "allDiscussion",
+            "allCoursePromos", "coursePromos",
+            "allPromos", "promos", "dashboard", "allCategories"
+    }, allEntries = true)
+    })
     public void deleteCategory(String slugCategory) {
         try {
             categoryRepository.findBySlugCategory(slugCategory)
@@ -111,6 +125,7 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     @Override
+    @Cacheable(value = "allCategories", key = "'getAllCategory-' + #pageable.pageNumber + '-' + #pageable.pageSize")
     public Page<CategoryResponse> getAllCategory(Pageable pageable) {
         try {
             Page<Category> categoryPage = Optional.of(categoryRepository.findAll(pageable))
@@ -129,6 +144,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Cacheable(key = "'getCategoryDetail-' + #slugCategory")
     public CategoryResponse getCategoryDetail(String slugCategory) {
         try {
             Category category = categoryRepository.findBySlugCategory(slugCategory)
@@ -142,6 +158,21 @@ public class CategoryServiceImpl implements CategoryService {
             throw e;
         } catch (Exception e) {
             throw new ServiceBusinessException("Failed to get category detail");
+        }
+    }
+
+    @Override
+    @Cacheable(value = "allCategories", key = "'getListCategory'")
+    public List<CategoryResponse> getListCategory() {
+        try {
+            List<Category> categoryList = categoryRepository.findAll();
+            return categoryList.stream().map(category -> CategoryResponse.builder()
+                    .categoryName(category.getCategoryName())
+                    .pathCategoryImage(category.getPathCategoryImage())
+                    .slugCategory(category.getSlugCategory())
+                    .build()).toList();
+        } catch (Exception e) {
+            throw new ServiceBusinessException("Failed to get list category");
         }
     }
 }

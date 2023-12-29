@@ -1,22 +1,18 @@
 package com.binar.byteacademy.controller.customer;
 
 import com.binar.byteacademy.dto.response.PurchaseResponse;
-import com.binar.byteacademy.dto.response.base.APIResponse;
 import com.binar.byteacademy.dto.response.base.APIResultResponse;
 import com.binar.byteacademy.service.PurchaseService;
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.Map;
 
 import static com.binar.byteacademy.common.util.Constants.PurchasePats.CUSTOMER_PURCHASE_PATS;
 
@@ -46,17 +42,6 @@ public class CustomerPurchaseController {
                 HttpStatus.OK,
                 "Purchase successfully retrieved",
                 purchaseResponses
-        );
-        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
-    }
-
-    @PostMapping(value = "/notification", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Hidden
-    public ResponseEntity<APIResponse> paymentCallback(@RequestBody Map<String, Object> request) {
-        purchaseService.paymentCallback(request);
-        APIResponse responseDTO = new APIResponse(
-                HttpStatus.OK,
-                "Payment successfully updated"
         );
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
