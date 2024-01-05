@@ -9,6 +9,8 @@ import com.binar.byteacademy.exception.ServiceBusinessException;
 import com.binar.byteacademy.repository.CourseRatingRepository;
 import com.binar.byteacademy.repository.UserProgressRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,11 @@ public class CourseRatingServiceImpl implements CourseRatingService{
     private final CourseRatingRepository courseRatingRepository;
     private final UserProgressRepository userProgressRepository;
     @Override
+    @Caching( evict = {
+            @CacheEvict(value = "courses", key = "'getCustomerCourseDetail-' + #request.slugCourse", condition = "#result != null"),
+            @CacheEvict(value = "courses", key = "'getAdminCourseDetail-' + #request.slugCourse", condition = "#result != null"),
+            @CacheEvict(value = "allCourses", allEntries = true, condition = "#result != null")
+    })
     public CourseRatingResponse addCourseRating(CourseRatingRequest request, Principal connectedUser) {
         try{
             User user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();

@@ -9,7 +9,11 @@ import com.binar.byteacademy.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +34,7 @@ public class CustomerCommentController {
     @Schema(name = "AddComment", description = "Add comment")
     @Operation(summary = "Endpoint to handle add comment (User Role : Customer)")
     public ResponseEntity<APIResultResponse<CommentResponse>> addComment(
-            @RequestBody CreateCommentRequest request,
+            @RequestBody @Valid CreateCommentRequest request,
             Principal connectedUser) {
         CommentResponse commentResponse = commentService.addComment(request, connectedUser);
         APIResultResponse<CommentResponse> responseDTO = new APIResultResponse<>(
@@ -39,6 +43,20 @@ public class CustomerCommentController {
                 commentResponse
         );
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/discussion/{slugDiscussion}")
+    @Schema(name = "GetAllCommentByDiscussion", description = "Get all comment by discussion")
+    @Operation(summary = "Endpoint to handle get all comment by discussion (User Role : Customer)")
+    public ResponseEntity<APIResultResponse<Page<CommentResponse>>> getAllCommentByDiscussion(@RequestParam("page") int page, @PathVariable String slugDiscussion) {
+        Pageable pageable = PageRequest.of(page, 5);
+        Page<CommentResponse> commentResponse = commentService.getAllCommentByDiscussion(pageable, slugDiscussion);
+        APIResultResponse<Page<CommentResponse>> responseDTO = new APIResultResponse<>(
+                HttpStatus.OK,
+                "Comment successfully retrieved",
+                commentResponse
+        );
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface ChapterService {
     ChapterResponse addChapter(CreateChapterRequest request);
-    void updateChapter(String slug, UpdateChapterRequest request);
+    ChapterResponse updateChapter(String slug, UpdateChapterRequest request);
     void deleteChapter(String slug);
     Page<ChapterResponse> getAllChapter(Pageable pageable);
     ChapterResponse getChapterDetail(String slug);

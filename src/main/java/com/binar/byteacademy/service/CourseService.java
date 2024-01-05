@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 
 public interface CourseService {
     CompletableFuture<CourseResponse> addCourse(CreateCourseRequest request);
-    CompletableFuture<Void> updateCourse(String slugCourse, UpdateCourseRequest request);
+    CompletableFuture<CourseResponse> updateCourse(String slugCourse, UpdateCourseRequest request);
     void deleteCourse(String slugCourse);
     CustomerCourseDetailResponse getCustomerCourseDetail(String slugCourse);
     AdminCourseDetailResponse getAdminCourseDetail(String slugCourse);

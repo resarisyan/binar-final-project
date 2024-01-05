@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface CoursePromoService {
     CoursePromoResponse addCoursePromo(CoursePromoRequest request);
-    void updateCoursePromo(UUID id, CoursePromoRequest request);
+    CoursePromoResponse updateCoursePromo(UUID id, CoursePromoRequest request);
     void deleteCoursePromo(UUID id);
     Page<CoursePromoResponse> getAllCoursePromo(Pageable pageable);
     CoursePromoResponse getCoursePromoDetail(UUID id);

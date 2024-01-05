@@ -15,7 +15,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import static com.binar.byteacademy.common.util.Constants.CategoryPats.ADMIN_CATEGORY_PATS_ALL;
+import static com.binar.byteacademy.common.util.Constants.ChatOpenAiPats.CUSTOMER_CHAT_OPEN_AI_PATS_ALL;
 import static com.binar.byteacademy.common.util.Constants.CoursePats.ADMIN_COURSE_PATS_ALL;
+import static com.binar.byteacademy.common.util.Constants.CoursePats.CUSTOMER_COURSE_PATS_ALL;
 import static com.binar.byteacademy.common.util.Constants.MaterialPats.ADMIN_MATERIAL_PATS_ALL;
 import static com.binar.byteacademy.common.util.Constants.PromoPats.ADMIN_PROMO_PATS_ALL;
 import static com.binar.byteacademy.common.util.Constants.ChapterPats.ADMIN_CHAPTER_PATS_ALL;
@@ -26,12 +28,12 @@ import static com.binar.byteacademy.common.util.Constants.SettingPats.SETTING_PA
 import static com.binar.byteacademy.common.util.Constants.PurchasePats.CUSTOMER_PURCHASE_PATS_ALL;
 import static com.binar.byteacademy.common.util.Constants.NotificationPats.CUSTOMER_NOTIFICATION_PATS_ALL;
 import static com.binar.byteacademy.common.util.Constants.DiscussionPats.CUSTOMER_DISCUSSION_PATS_ALL;
+import static com.binar.byteacademy.common.util.Constants.DiscussionPats.ADMIN_DISCUSSION_PATS_ALL;
 import static com.binar.byteacademy.common.util.Constants.CommentPats.CUSTOMER_COMMENT_PATS_ALL;
 import static com.binar.byteacademy.common.util.Constants.ReplyPats.CUSTOMER_REPLY_PATS_ALL;
 import static com.binar.byteacademy.common.util.Constants.MaterialPats.CUSTOMER_MATERIAL_PATS_ALL;
 import static com.binar.byteacademy.common.util.Constants.UserPats.CUSTOMER_USER_PATS_ALL;
 import static com.binar.byteacademy.common.util.Constants.UserPats.ADMIN_USER_PATS_ALL;
-
 
 import static com.binar.byteacademy.enumeration.EnumPermission.*;
 import static org.springframework.http.HttpMethod.*;
@@ -46,6 +48,7 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final AuthenticationProvider authenticationProvider;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -121,6 +124,18 @@ public class SecurityConfig {
                                 .requestMatchers(POST, CUSTOMER_USER_PATS_ALL).hasAnyAuthority(CUSTOMER_CREATE.getPermission())
                                 .requestMatchers(PUT, CUSTOMER_USER_PATS_ALL).hasAnyAuthority(CUSTOMER_UPDATE.getPermission())
                                 .requestMatchers(DELETE, CUSTOMER_USER_PATS_ALL).hasAnyAuthority(CUSTOMER_DELETE.getPermission())
+                                .requestMatchers(GET, CUSTOMER_COURSE_PATS_ALL).hasAnyAuthority(CUSTOMER_READ.getPermission())
+                                .requestMatchers(POST, CUSTOMER_COURSE_PATS_ALL).hasAnyAuthority(CUSTOMER_CREATE.getPermission())
+                                .requestMatchers(PUT, CUSTOMER_COURSE_PATS_ALL).hasAnyAuthority(CUSTOMER_UPDATE.getPermission())
+                                .requestMatchers(DELETE, CUSTOMER_COURSE_PATS_ALL).hasAnyAuthority(CUSTOMER_DELETE.getPermission())
+                                .requestMatchers(GET, CUSTOMER_CHAT_OPEN_AI_PATS_ALL).hasAnyAuthority(CUSTOMER_READ.getPermission())
+                                .requestMatchers(POST, CUSTOMER_CHAT_OPEN_AI_PATS_ALL).hasAnyAuthority(CUSTOMER_CREATE.getPermission())
+                                .requestMatchers(PUT, CUSTOMER_CHAT_OPEN_AI_PATS_ALL).hasAnyAuthority(CUSTOMER_UPDATE.getPermission())
+                                .requestMatchers(DELETE, CUSTOMER_CHAT_OPEN_AI_PATS_ALL).hasAnyAuthority(CUSTOMER_DELETE.getPermission())
+                                .requestMatchers(GET, ADMIN_DISCUSSION_PATS_ALL).hasAnyAuthority(ADMIN_READ.getPermission())
+                                .requestMatchers(POST, ADMIN_DISCUSSION_PATS_ALL).hasAnyAuthority(ADMIN_CREATE.getPermission())
+                                .requestMatchers(PUT, ADMIN_DISCUSSION_PATS_ALL).hasAnyAuthority(ADMIN_UPDATE.getPermission())
+                                .requestMatchers(DELETE, ADMIN_DISCUSSION_PATS_ALL).hasAnyAuthority(ADMIN_DELETE.getPermission())
                                 .requestMatchers(SECURE_LIST_PATS)
                                 .authenticated()
                                 .anyRequest()
@@ -136,7 +151,6 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .cors(Customizer.withDefaults());
-
         return http.build();
     }
 }

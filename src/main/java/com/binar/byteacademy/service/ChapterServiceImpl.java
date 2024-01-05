@@ -34,7 +34,7 @@ public class ChapterServiceImpl implements ChapterService {
     private final CheckDataUtil checkDataUtil;
 
     @Override
-    @CacheEvict(value = "allChapters", allEntries = true)
+    @CacheEvict(value = "allChapters", allEntries = true, condition = "#result != null")
     public ChapterResponse addChapter(CreateChapterRequest request) {
         try {
             String slug = Optional.ofNullable(request.getSlugChapter())
@@ -64,7 +64,7 @@ public class ChapterServiceImpl implements ChapterService {
     }
 
     @Override
-    @Cacheable(value = "allChapters", key = "'getListChapterBySlugCourse-' + #slugCourse")
+    @Cacheable(value = "allChapters", key = "'getListChapterBySlugCourse-' + #slugCourse", unless = "#result == null")
     public List<ChapterResponse> getListChapterBySlugCourse(String slugCourse) {
         try {
             List<Chapter> chapterList = chapterRepository.findAllByCourse_SlugCourse(slugCourse).orElseThrow(() -> new DataNotFoundException(CHAPTER_NOT_FOUND));
@@ -82,13 +82,13 @@ public class ChapterServiceImpl implements ChapterService {
     }
 
     @Override
-    @CachePut(key = "'getChapterDetail-' + #slugChapter")
-    @CacheEvict(value = {"allChapters", "materials", "allMaterials"}, allEntries = true)
-    public void updateChapter(String slugChapter, UpdateChapterRequest request) {
+    @CachePut(key = "'getChapterDetail-' + #slugChapter", unless = "#result == null")
+    @CacheEvict(value = {"allChapters", "materials", "allMaterials"}, allEntries = true, condition = "#result != null")
+    public ChapterResponse updateChapter(String slugChapter, UpdateChapterRequest request) {
         try {
-            chapterRepository.findFirstBySlugChapter(slugChapter)
-                    .ifPresentOrElse(chapter -> courseRepository.findFirstBySlugCourse(request.getSlugCourse())
-                            .ifPresentOrElse(course -> {
+            return chapterRepository.findFirstBySlugChapter(slugChapter)
+                    .map(chapter -> courseRepository.findFirstBySlugCourse(request.getSlugCourse())
+                            .map(course -> {
                                 checkDataUtil.checkDataField(CHAPTER_TABLE, "slug_chapter", request.getSlugChapter(), "chapter_id", chapter.getId());
                                 chapter.setSlugChapter(request.getSlugChapter());
                                 chapter.setNoChapter(request.getNoChapter());
@@ -96,11 +96,15 @@ public class ChapterServiceImpl implements ChapterService {
                                 chapter.setChapterDuration(request.getChapterDuration());
                                 chapter.setCourse(course);
                                 chapterRepository.save(chapter);
-                            }, () -> {
-                                throw new DataNotFoundException(COURSE_NOT_FOUND);
-                            }), () -> {
-                        throw new DataNotFoundException(CHAPTER_NOT_FOUND);
-                    });
+                                return ChapterResponse.builder()
+                                        .slugChapter(chapter.getSlugChapter())
+                                        .noChapter(chapter.getNoChapter())
+                                        .title(chapter.getTitle())
+                                        .chapterDuration(chapter.getChapterDuration())
+                                        .build();
+                            })
+                            .orElseThrow(() -> new DataNotFoundException(COURSE_NOT_FOUND)))
+                    .orElseThrow(() -> new DataNotFoundException(CHAPTER_NOT_FOUND));
         } catch (DataNotFoundException e) {
             throw e;
         } catch (Exception e) {
@@ -134,7 +138,7 @@ public class ChapterServiceImpl implements ChapterService {
     }
 
     @Override
-    @Cacheable(value = "allChapters", key = "'getAllChapter-' + #pageable.pageNumber + '-' + #pageable.pageSize")
+    @Cacheable(value = "allChapters", key = "'getAllChapter-' + #pageable.pageNumber + '-' + #pageable.pageSize", unless = "#result == null")
     public Page<ChapterResponse> getAllChapter(Pageable pageable) {
         try {
             Page<Chapter> chapterPage = Optional.of(chapterRepository.findAll(pageable))
@@ -154,7 +158,7 @@ public class ChapterServiceImpl implements ChapterService {
     }
 
     @Override
-    @Cacheable(key = "'getChapterDetail-' + #slugChapter")
+    @Cacheable(key = "'getChapterDetail-' + #slugChapter", unless = "#result == null")
     public ChapterResponse getChapterDetail(String slugChapter) {
         try {
             Chapter chapter = chapterRepository.findFirstBySlugChapter(slugChapter)

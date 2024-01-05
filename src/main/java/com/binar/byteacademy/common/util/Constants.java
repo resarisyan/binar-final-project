@@ -9,6 +9,11 @@ public class Constants {
         public static final String AUTH_PATS = BASE_URL + "/auth";
     }
 
+    public static final class ChatOpenAiPats {
+        public static final String CUSTOMER_CHAT_OPEN_AI_PATS = BASE_URL + "/customer/open-ai";
+        public static final String CUSTOMER_CHAT_OPEN_AI_PATS_ALL = CUSTOMER_CHAT_OPEN_AI_PATS + "/**";
+    }
+
     public static final class SettingPats {
         public static final String SETTING_PATS = BASE_URL + "/setting";
         public static final String SETTING_PATS_ALL = SETTING_PATS + "/**";
@@ -22,7 +27,8 @@ public class Constants {
 
     public static final class CoursePats {
         public static final String COURSE_PATS = BASE_URL + "/course";
-        public static final String CUSTOMER_COURSE_PATS = COURSE_PATS + "/my-course";
+        public static final String CUSTOMER_COURSE_PATS = BASE_URL + "/customer/course";
+        public static final String CUSTOMER_COURSE_PATS_ALL = CUSTOMER_COURSE_PATS + "/**";
         public static final String ADMIN_COURSE_PATS = BASE_URL + "/admin/course";
         public static final String ADMIN_COURSE_PATS_ALL = ADMIN_COURSE_PATS + "/**";
     }
@@ -42,6 +48,8 @@ public class Constants {
     public static final class DiscussionPats {
         public static final String CUSTOMER_DISCUSSION_PATS = BASE_URL + "/customer/discussion";
         public static final String CUSTOMER_DISCUSSION_PATS_ALL = CUSTOMER_DISCUSSION_PATS + "/**";
+        public static final String ADMIN_DISCUSSION_PATS = BASE_URL + "/admin/discussion";
+        public static final String ADMIN_DISCUSSION_PATS_ALL = ADMIN_DISCUSSION_PATS + "/**";
     }
 
     public static final class CommentPats {
@@ -109,6 +117,7 @@ public class Constants {
                 SettingPats.SETTING_PATS_ALL,
                 PurchasePats.CUSTOMER_PURCHASE_PATS_ALL,
                 DiscussionPats.CUSTOMER_DISCUSSION_PATS_ALL,
+                DiscussionPats.ADMIN_DISCUSSION_PATS_ALL,
                 CommentPats.CUSTOMER_COMMENT_PATS_ALL,
                 ReplyPats.CUSTOMER_REPLY_PATS_ALL,
                 PurchasePats.ADMIN_PURCHASE_PATS_ALL,
@@ -117,8 +126,10 @@ public class Constants {
                 NotificationPats.ADMIN_NOTIFICATION_PATS_ALL,
                 UserPats.ADMIN_USER_PATS_ALL,
                 UserPats.CUSTOMER_USER_PATS_ALL,
+                CoursePats.CUSTOMER_COURSE_PATS_ALL,
                 WebsocketPats.BROKER_ALL,
-                WebsocketPats.BROKER_USER
+                WebsocketPats.BROKER_USER,
+                ChatOpenAiPats.CUSTOMER_CHAT_OPEN_AI_PATS_ALL,
         };
     }
 
@@ -137,6 +148,9 @@ public class Constants {
         public static final String TOKEN_NOT_FOUND = "Token not found";
         public static final String TOKEN_EXPIRED = "Token expired";
         public static final String USER_NOT_FOUND = "User not found";
+        public static final String CATEGORY_SUCCESSFULLY_RETRIEVED = "Category successfully retrieved";
+        public static final String CHAPTER_SUCCESSFULLY_RETRIEVED = "Chapter successfully retrieved";
+        public static final String COURSE_SUCCESSFULLY_RETRIEVED = "Course successfully retrieved";
     }
 
     public static final class TableName {

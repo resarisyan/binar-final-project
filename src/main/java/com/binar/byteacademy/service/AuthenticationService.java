@@ -13,9 +13,8 @@ import java.security.Principal;
 
 public interface AuthenticationService {
     RegisterResponse register(RegisterRequest request);
-
     LoginResponse login(LoginRequest request);
     void changePassword(ChangePasswordRequest request, Principal connectedUser);
-
     RefreshTokenResponse refreshToken(HttpServletRequest request, HttpServletResponse response);
+//    LoginResponse oauth2Login(OAuth2AuthenticationToken authenticationToken);
 }

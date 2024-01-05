@@ -34,6 +34,7 @@ public class CoursePromoServiceImpl implements CoursePromoService {
     private final PromoRepository promoRepository;
 
     @Override
+    @CacheEvict(value = {"allCoursePromos"}, allEntries = true, condition = "#result != null")
     public CoursePromoResponse addCoursePromo(CoursePromoRequest request) {
         try {
             Course course = courseRepository.findFirstBySlugCourse(request.getSlugCourse())
@@ -91,12 +92,12 @@ public class CoursePromoServiceImpl implements CoursePromoService {
     }
 
     @Override
-    @CachePut(key = "'getCoursePromoDetail-' + #id")
-    @CacheEvict(value = "allCoursePromos", allEntries = true)
-    public void updateCoursePromo(UUID id, CoursePromoRequest request) {
+    @CachePut(key = "'getCoursePromoDetail-' + #id", unless = "#result == null")
+    @CacheEvict(value = "allCoursePromos", allEntries = true, condition = "#result != null")
+    public CoursePromoResponse updateCoursePromo(UUID id, CoursePromoRequest request) {
         try {
-            coursePromoRepository.findById(id)
-                    .ifPresentOrElse(coursePromo -> {
+            return coursePromoRepository.findById(id)
+                    .map(coursePromo -> {
                         Course course = courseRepository.findFirstBySlugCourse(request.getSlugCourse())
                                 .orElseThrow(() -> new DataNotFoundException("Course not found"));
                         Promo promo = promoRepository.findByPromoCode(request.getPromoCode()).orElseThrow(() -> new DataNotFoundException("Promo not found"));
@@ -109,9 +110,41 @@ public class CoursePromoServiceImpl implements CoursePromoService {
                                     coursePromo.setPromo(promo);
                                     coursePromoRepository.save(coursePromo);
                                 });
-                    }, () -> {
-                        throw new DataNotFoundException(COURSE_PROMO_NOT_FOUND);
-                    });
+                        return CoursePromoResponse.builder()
+                                .course(
+                                        CourseResponse.builder()
+                                                .courseName(course.getCourseName())
+                                                .instructorName(course.getInstructorName())
+                                                .courseLevel(course.getCourseLevel())
+                                                .courseType(course.getCourseType())
+                                                .price(course.getPrice())
+                                                .totalCourseRate(course.getTotalCourseRate())
+                                                .courseDuration(course.getCourseDuration())
+                                                .totalChapters(course.getTotalChapter())
+                                                .slugCourse(course.getSlugCourse())
+                                                .pathCourseImage(course.getPathCourseImage())
+                                                .targetMarket(course.getTargetMarket())
+                                                .category(
+                                                        CategoryResponse.builder().
+                                                                categoryName(course.getCategory().getCategoryName())
+                                                                .slugCategory(course.getCategory().getSlugCategory())
+                                                                .pathCategoryImage(course.getCategory().getPathCategoryImage())
+                                                                .build())
+                                                .build()
+                                )
+                                .promo(
+                                        PromoResponse.builder()
+                                                .promoName(promo.getPromoName())
+                                                .promoCode(promo.getPromoCode())
+                                                .discount(promo.getDiscount())
+                                                .promoDescription(promo.getPromoDescription())
+                                                .startDate(promo.getStartDate())
+                                                .endDate(promo.getEndDate())
+                                                .build()
+                                )
+                                .build();
+                    })
+                    .orElseThrow(() -> new DataNotFoundException(COURSE_PROMO_NOT_FOUND));
         } catch (DataNotFoundException | ValidationException e) {
             throw e;
         } catch (Exception e) {
@@ -138,7 +171,7 @@ public class CoursePromoServiceImpl implements CoursePromoService {
     }
 
     @Override
-    @Cacheable(key = "'getCoursePromoDetail-' + #id")
+    @Cacheable(key = "'getCoursePromoDetail-' + #id", unless = "#result == null")
     public CoursePromoResponse getCoursePromoDetail(UUID id) {
         try {
             return coursePromoRepository.findById(id)
@@ -185,7 +218,7 @@ public class CoursePromoServiceImpl implements CoursePromoService {
     }
 
     @Override
-    @Cacheable(value = "allCoursePromos", key = "'getAllCoursePromo-' + #pageable.pageNumber + '-' + #pageable.pageSize")
+    @Cacheable(value = "allCoursePromos", key = "'getAllCoursePromo-' + #pageable.pageNumber + '-' + #pageable.pageSize", unless = "#result == null")
     public Page<CoursePromoResponse> getAllCoursePromo(Pageable pageable) {
         try {
             Page<CoursePromo> coursePromoPage = Optional.of(coursePromoRepository.findAll(pageable))

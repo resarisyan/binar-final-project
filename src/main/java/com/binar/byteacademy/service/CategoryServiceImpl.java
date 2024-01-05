@@ -35,7 +35,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Async("asyncExecutor")
-    @CacheEvict(value = "allCategories", allEntries = true)
+    @CacheEvict(value = "allCategories", allEntries = true, condition = "#result != null")
     public CompletableFuture<CategoryResponse> addCategory(CreateCategoryRequest request) {
         return CompletableFuture.supplyAsync(() -> {
             try {
@@ -67,12 +67,20 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Async("asyncExecutor")
-    @CachePut(key = "'getCategoryDetail-' + #slugCategory")
-    @CacheEvict(value = {"courses", "allCourses", "allCategories"}, allEntries = true)
-    public CompletableFuture<Void> updateCategory(String slugCategory, UpdateCategoryRequest request) {
-        return CompletableFuture.runAsync(() -> {
+    @Caching(evict = {
+            @CacheEvict(value = {"getCategoryDetail"}, key = "'getCategoryDetail-' + #slugCategory"),
+            @CacheEvict(value = {
+                    "allCourses", "chapters", "allChapters", "materials", "allMaterials",
+                    "allPurchases", "discussions", "allDiscussion",
+                    "allCoursePromos", "coursePromos",
+                    "allPromos", "promos", "allComments", "comments",
+                    "replies", "allReplies", "dashboard", "allCategories"
+    }, allEntries = true)
+    })
+    public CompletableFuture<CategoryResponse> updateCategory(String slugCategory, UpdateCategoryRequest request) {
+        return CompletableFuture.supplyAsync(() -> {
             try {
-                categoryRepository.findBySlugCategory(slugCategory)
+                return categoryRepository.findBySlugCategory(slugCategory)
                         .map(category -> {
                             checkDataUtil.checkDataField(CATEGORY_TABLE, "category_name", request.getCategoryName(), "category_id", category.getId());
                             category.setCategoryName(request.getCategoryName());
@@ -85,10 +93,15 @@ public class CategoryServiceImpl implements CategoryService {
                                         String pathCategoryImage = imageUtil.base64UploadImage(request.getPathCategoryImage()).join();
                                         category.setPathCategoryImage(pathCategoryImage);
                                     });
-                            return category;
-                        }).ifPresentOrElse(categoryRepository::save, () -> {
-                            throw new DataNotFoundException(CATEGORY_NOT_FOUND);
-                        });
+
+                            categoryRepository.save(category);
+                            return CategoryResponse.builder()
+                                    .categoryName(category.getCategoryName())
+                                    .pathCategoryImage(category.getPathCategoryImage())
+                                    .slugCategory(category.getSlugCategory())
+                                    .build();
+                        })
+                        .orElseThrow(() -> new DataNotFoundException(CATEGORY_NOT_FOUND));
             } catch (DataNotFoundException e) {
                 throw e;
             } catch (Exception e) {
@@ -101,10 +114,11 @@ public class CategoryServiceImpl implements CategoryService {
     @Caching(evict = {
             @CacheEvict(value = {"getCategoryDetail"}, key = "'getCategoryDetail-' + #slugCategory"),
             @CacheEvict(value = {
-            "allCourses", "chapters", "allChapters", "materials", "allMaterials",
-            "allPurchases", "discussions", "allDiscussion",
-            "allCoursePromos", "coursePromos",
-            "allPromos", "promos", "dashboard", "allCategories"
+                    "allCourses", "chapters", "allChapters", "materials", "allMaterials",
+                    "allPurchases", "discussions", "allDiscussion",
+                    "allCoursePromos", "coursePromos",
+                    "allPromos", "promos", "allComments", "comments",
+                    "replies", "allReplies", "dashboard", "allCategories"
     }, allEntries = true)
     })
     public void deleteCategory(String slugCategory) {
@@ -125,7 +139,7 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     @Override
-    @Cacheable(value = "allCategories", key = "'getAllCategory-' + #pageable.pageNumber + '-' + #pageable.pageSize")
+    @Cacheable(value = "allCategories", key = "'getAllCategory-' + #pageable.pageNumber + '-' + #pageable.pageSize", unless = "#result == null")
     public Page<CategoryResponse> getAllCategory(Pageable pageable) {
         try {
             Page<Category> categoryPage = Optional.of(categoryRepository.findAll(pageable))
@@ -144,7 +158,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @Cacheable(key = "'getCategoryDetail-' + #slugCategory")
+    @Cacheable(key = "'getCategoryDetail-' + #slugCategory", unless = "#result == null")
     public CategoryResponse getCategoryDetail(String slugCategory) {
         try {
             Category category = categoryRepository.findBySlugCategory(slugCategory)
@@ -162,7 +176,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @Cacheable(value = "allCategories", key = "'getListCategory'")
+    @Cacheable(value = "allCategories", key = "'getListCategory'", unless = "#result == null")
     public List<CategoryResponse> getListCategory() {
         try {
             List<Category> categoryList = categoryRepository.findAll();

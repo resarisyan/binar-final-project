@@ -12,6 +12,5 @@ import java.util.UUID;
 public interface DiscussionRepository extends JpaRepository<Discussion, UUID> {
     Optional<Discussion> findByDiscussionTopic(String discussionTopic);
     Optional<Discussion> findBySlugDiscussion(String slugDiscussion);
-    Optional<Discussion> findBySlugDiscussionAndUser(String slugDiscussion, User user);
     Page<Discussion> findAllByCourse_SlugCourse(Pageable pageable, String slugCourse);
 }

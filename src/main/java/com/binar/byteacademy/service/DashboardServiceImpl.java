@@ -18,7 +18,7 @@ public class DashboardServiceImpl implements DashboardService{
     private final CourseRepository courseRepository;
 
     @Override
-    @Cacheable(key = "#root.method.name")
+    @Cacheable(key = "'dashboard'", unless = "#result == null")
     public DashboardResponse getAdminDashboard() {
         int activeUser = userRepository.countByStatus(EnumStatus.ACTIVE);
         int nonActiveUser = userRepository.countByStatus(EnumStatus.INACTIVE);

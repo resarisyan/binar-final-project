@@ -15,7 +15,7 @@ import java.util.UUID;
 
 @Repository
 public interface PurchaseRepository extends JpaRepository<Purchase, UUID> {
-    Optional<List<Purchase>> findByCourse(Course course);
+    Optional<Purchase> findByCourseAndUser(Course course, User user);
     //find by user and order by created add and add pagination
     Page<Purchase> findByUserOrderByCreatedAtDesc(User user, Pageable pageable);
     Optional<Purchase> findByUserAndCourseAndPurchaseStatus(User user, Course course, EnumPurchaseStatus purchaseStatus);

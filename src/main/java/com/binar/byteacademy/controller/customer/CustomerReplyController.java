@@ -11,6 +11,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +42,19 @@ public class CustomerReplyController {
                 replyResponse
         );
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+    }
+    @GetMapping("/comment/{idComment}")
+    @Schema(name = "GetAllReplyByComment", description = "Get all reply by comment")
+    @Operation(summary = "Endpoint to handle get all reply by comment (User Role : Customer)")
+    public ResponseEntity<APIResultResponse<Page<ReplyResponse>>> getAllReplyByComment(@RequestParam("page") int page, @PathVariable UUID idComment) {
+        Pageable pageable = PageRequest.of(page, 5);
+        Page<ReplyResponse> replyResponses = replyService.getAllReplyByComment(pageable, idComment);
+        APIResultResponse<Page<ReplyResponse>> responseDTO = new APIResultResponse<>(
+                HttpStatus.OK,
+                "Reply successfully retrieved",
+                replyResponses
+        );
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
     @GetMapping("/{idReply}")

@@ -27,6 +27,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -73,8 +74,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
             String jwtToken = jwtUtil.generateToken(user);
             String refreshToken = jwtUtil.generateRefreshToken(user);
-            revokeAllUserTokens(user);
-            saveUserToken(user, jwtToken);
+            user.setLastLogin(LocalDateTime.now());
+            userRepository.save(user);
+
+            saveUserToken(user, jwtToken, EnumTokenAccessType.ACCESS);
+            saveUserToken(user, refreshToken, EnumTokenAccessType.REFRESH);
+
             return LoginResponse.builder()
                     .accessToken(jwtToken)
                     .refreshToken(refreshToken)
@@ -104,7 +109,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .user(user)
                     .build();
             customerDetailRepository.save(customerDetail);
-
             emailVerificationService.sendEmail(user.getEmail(), EnumEmailVerificationType.REGISTER);
             otpService.sendOtp(user.getPhoneNumber(), EnumOtpType.REGISTER);
 
@@ -164,39 +168,75 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             User user = this.userRepository.findFirstByUsername(username)
                     .orElseThrow();
             if (jwtUtil.isTokenValid(refreshToken, user)) {
+                tokenRepository.findByToken(refreshToken)
+                        .ifPresentOrElse(
+                                token -> {
+                                   if (token.getAccessType() != EnumTokenAccessType.REFRESH) {
+                                       throw new ForbiddenException("Token type is invalid");
+                                   }
+                                },
+                                () -> {
+                                    throw new ServiceBusinessException("Refresh token is invalid");
+                                });
+
                 String accessToken = jwtUtil.generateToken(user);
-                revokeAllUserTokens(user);
-                saveUserToken(user, accessToken);
+                saveUserToken(user, accessToken, EnumTokenAccessType.ACCESS);
                 refreshTokenResponse = RefreshTokenResponse.builder()
                         .accessToken(accessToken)
                         .build();
             } else {
                 throw new ServiceBusinessException("Refresh token is invalid");
             }
-        } catch (DataNotFoundException | ServiceBusinessException e) {
+        } catch (DataNotFoundException | ForbiddenException e) {
             throw e;
         } catch (Exception e) {
-            throw new ServiceBusinessException("Failed to refresh token");
+            throw new ServiceBusinessException(e.getMessage());
         }
         return refreshTokenResponse;
     }
 
-    private void revokeAllUserTokens(User user) {
-        List<Token> validUserTokens = tokenRepository.findAllValidTokenByUser(user.getId());
-        if (validUserTokens.isEmpty())
-            return;
-        validUserTokens.forEach(token -> {
-            token.setExpired(true);
-            token.setRevoked(true);
-        });
-        tokenRepository.saveAll(validUserTokens);
-    }
+//    @Override
+//    public LoginResponse oauth2Login(OAuth2AuthenticationToken authenticationToken) {
+//        try {
+//            DefaultOAuth2User principal = (DefaultOAuth2User) authenticationToken.getPrincipal();
+//            Map<String, Object> attributes = principal.getAttributes();
+//            String email = attributes.getOrDefault("email", "").toString();
+//            return userRepository.findFirstByEmail(email)
+//                    .map(user -> {
+//                        String jwtToken = jwtUtil.generateToken(user);
+//                        String refreshToken = jwtUtil.generateRefreshToken(user);
+//                        revokeAllUserTokens(user);
+//                        saveUserToken(user, jwtToken);
+//                        return LoginResponse.builder()
+//                                .accessToken(jwtToken)
+//                                .refreshToken(refreshToken)
+//                                .build();
+//                    })
+//                    .orElseThrow(() -> new DataNotFoundException("User not found"));
+//        } catch (DataNotFoundException | UserNotActiveException e) {
+//            throw e;
+//        } catch (Exception e) {
+//            throw new ServiceBusinessException(e.getMessage());
+//        }
+//    }
 
-    private void saveUserToken(User user, String jwtToken) {
+//    private void revokeAllUserTokens(User user) {
+//        List<Token> validUserTokens = tokenRepository.findAllValidTokenByUser(user.getId());
+//        if (validUserTokens.isEmpty())
+//            return;
+//        validUserTokens.forEach(token -> {
+//            token.setExpired(true);
+//            token.setRevoked(true);
+//        });
+//        tokenRepository.saveAll(validUserTokens);
+//    }
+
+    private void saveUserToken(User user, String jwtToken, EnumTokenAccessType accessType) {
         Token token = Token.builder()
                 .user(user)
                 .token(jwtToken)
                 .tokenType(EnumTokenType.BEARER)
+                .accessType(accessType)
                 .expired(false)
                 .revoked(false)
                 .build();

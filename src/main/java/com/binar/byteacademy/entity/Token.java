@@ -1,5 +1,6 @@
 package com.binar.byteacademy.entity;
 
+import com.binar.byteacademy.enumeration.EnumTokenAccessType;
 import com.binar.byteacademy.enumeration.EnumTokenType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,10 @@ public class Token {
     @Enumerated(EnumType.STRING)
     @Column(name = "token_type", nullable = false)
     private EnumTokenType tokenType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "access_type", nullable = false)
+    private EnumTokenAccessType accessType;
 
     @Column(name = "revoked", nullable = false)
     public boolean revoked;

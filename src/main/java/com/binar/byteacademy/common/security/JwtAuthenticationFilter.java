@@ -1,7 +1,9 @@
 package com.binar.byteacademy.common.security;
 
+import com.binar.byteacademy.enumeration.EnumTokenAccessType;
 import com.binar.byteacademy.repository.TokenRepository;
 import com.binar.byteacademy.common.util.JwtUtil;
+import jakarta.persistence.AccessType;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -56,7 +58,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
                 var isTokenValid = tokenRepository.findByToken(jwt)
-                        .map(t -> !t.isExpired() && !t.isRevoked())
+                        .map(t -> !t.isExpired() && !t.isRevoked() && t.getAccessType() == EnumTokenAccessType.ACCESS)
                         .orElse(false);
 
                 if (jwtUtil.isTokenValid(jwt, userDetails) && Boolean.TRUE.equals(isTokenValid)) {

@@ -1,6 +1,5 @@
 package com.binar.byteacademy.dto.response;
 
-import com.binar.byteacademy.entity.User;
 import com.binar.byteacademy.enumeration.EnumPurchaseStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;

@@ -18,7 +18,7 @@ public class MyCourseResponse implements Serializable {
     private String courseName;
     private String instructorName;
     private Double totalCourseRate;
-    private Integer totalModules;
+    private Integer totalChapter;
     private Integer courseDuration;
     private String slugCourse;
     private EnumCourseLevel courseLevel;

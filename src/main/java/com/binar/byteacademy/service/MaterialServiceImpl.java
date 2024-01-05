@@ -68,37 +68,27 @@ public class MaterialServiceImpl implements MaterialService {
     }
 
     @Override
-    @CacheEvict(value = "allMaterials", allEntries = true)
-    @Caching(put = {
-            @CachePut(key = "'getMaterialDetail-' + #slugMaterial"),
-            @CachePut(key = "'getMaterialDetailCustomer-' + #slugMaterial"),
-            @CachePut(key = "'getMaterialDetailAdmin-' + #slugMaterial")
+    @Caching(evict = {
+            @CacheEvict(key = "'getMaterialDetailAdmin-' + #slugMaterial"),
+            @CacheEvict(key = "'getMaterialDetailCustomer-' + #slugMaterial"),
+            @CacheEvict(value = "allMaterials", allEntries = true, condition = "#result != null")
     })
-    public void updateMaterial(String slugMaterial, MaterialRequest request) {
+    public MaterialResponse updateMaterial(String slugMaterial, MaterialRequest request) {
         try {
-            materialRepository.findBySlugMaterial(slugMaterial).ifPresentOrElse(
-                    material -> chapterRepository.findFirstBySlugChapter(request.getSlugChapter()).ifPresentOrElse(
-                            chapter -> {
-                                material.setMaterialName(request.getMaterialName());
-                                material.setSerialNumber(request.getSerialNumber());
-                                material.setVideoLink(request.getVideoLink());
-                                material.setMaterialDuration(request.getMaterialDuration());
-                                material.setMaterialType(request.getMaterialType());
-                                material.setChapter(chapter);
-                                Optional.ofNullable(request.getSlugMaterial())
-                                        .ifPresent(newSlug -> {
-                                            checkDataUtil.checkDataField(MATERIAL_TABLE, "slug_material", newSlug, "material_id", material.getId());
-                                            material.setSlugMaterial(newSlug);
-                                        });
-                                materialRepository.save(material);
-                            },
-                            () -> {
-                                throw new DataNotFoundException(CHAPTER_NOT_FOUND);
-                            }),
-                    () -> {
-                        throw new DataNotFoundException(MATERIAL_NOT_FOUND);
-                    }
-            );
+            return materialRepository.findBySlugMaterial(slugMaterial).map(material -> {
+                material.setMaterialName(request.getMaterialName());
+                material.setSerialNumber(request.getSerialNumber());
+                material.setVideoLink(request.getVideoLink());
+                material.setMaterialDuration(request.getMaterialDuration());
+                material.setMaterialType(request.getMaterialType());
+                Optional.ofNullable(request.getSlugMaterial())
+                        .ifPresent(newSlug -> {
+                            checkDataUtil.checkDataField(MATERIAL_TABLE, "slug_material", newSlug, "material_id", material.getId());
+                            material.setSlugMaterial(newSlug);
+                        });
+                Material savedMaterial = materialRepository.save(material);
+                return MaterialResponse.builder().materialName(savedMaterial.getMaterialName()).serialNumber(savedMaterial.getSerialNumber()).videoLink(savedMaterial.getVideoLink()).materialDuration(savedMaterial.getMaterialDuration()).materialType(savedMaterial.getMaterialType()).build();
+            }).orElseThrow(() -> new DataNotFoundException(MATERIAL_NOT_FOUND));
         } catch (DataNotFoundException e) {
             throw e;
         } catch (Exception e) {
@@ -108,7 +98,6 @@ public class MaterialServiceImpl implements MaterialService {
 
     @Override
     @Caching(evict = {
-            @CacheEvict(key = "'getMaterialDetail-' + #slugMaterial"),
             @CacheEvict(key = "'getMaterialDetailCustomer-' + #slugMaterial"),
             @CacheEvict(key = "'getMaterialDetailAdmin-' + #slugMaterial"),
             @CacheEvict(value = "allMaterials", allEntries = true)
@@ -129,7 +118,7 @@ public class MaterialServiceImpl implements MaterialService {
     }
 
     @Override
-    @Cacheable(value = "allMaterials",key = "'getAllMaterial-' + #pageable.pageNumber + '-' + #pageable.pageSize")
+    @Cacheable(value = "allMaterials", key = "'getAllMaterial-' + #pageable.pageNumber + '-' + #pageable.pageSize", unless = "#result == null")
     public Page<MaterialResponse> getAllMaterial(Pageable pageable) {
         try {
             Page<Material> materialPage = Optional.of(materialRepository.findAll(pageable))
@@ -151,7 +140,7 @@ public class MaterialServiceImpl implements MaterialService {
     }
 
     @Override
-    @Cacheable(key = "'getMaterialDetail-' + #slugMaterial")
+    @Cacheable(key = "'getMaterialDetailAdmin-' + #slugMaterial", unless = "#result == null")
     public MaterialResponse getMaterialDetailAdmin(String slugMaterial) {
         try {
             return materialRepository.findBySlugMaterial(slugMaterial).map(material -> MaterialResponse.builder()
@@ -169,7 +158,7 @@ public class MaterialServiceImpl implements MaterialService {
     }
 
     @Override
-    @Cacheable(key = "'getMaterialDetailCustomer-' + #slugMaterial")
+    @Cacheable(key = "'getMaterialDetailCustomer-' + #slugMaterial", unless = "#result == null")
     public MaterialResponse getMaterialDetailCustomer(String slugMaterial, Principal principal) {
         try {
             User user = (User) ((UsernamePasswordAuthenticationToken) principal).getPrincipal();
@@ -205,11 +194,10 @@ public class MaterialServiceImpl implements MaterialService {
 
     @Override
     @Transactional
-    @CacheEvict(value = "allMaterials", allEntries = true)
-    @Caching(put = {
-            @CachePut(key = "'getMaterialDetail-' + #slugMaterial"),
-            @CachePut(key = "'getMaterialDetailCustomer-' + #slugMaterial"),
-            @CachePut(key = "'getMaterialDetailAdmin-' + #slugMaterial"),
+    @Caching(evict = {
+            @CacheEvict(value = "allMaterials", allEntries = true),
+            @CacheEvict(key = "'getMaterialDetailCustomer-' + #slugMaterial"),
+            @CacheEvict(key = "'getMaterialDetailAdmin-' + #slugMaterial"),
     })
     public void completeMaterial(String slugMaterial, Principal principal) {
         try {

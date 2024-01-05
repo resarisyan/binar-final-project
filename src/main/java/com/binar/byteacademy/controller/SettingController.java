@@ -46,8 +46,8 @@ public class SettingController {
     @PostMapping("/verify-change-phone")
     @Schema(name = "VerifyChangePhoneRequest", description = "Verify change phone request body")
     @Operation(summary = "Endpoint to handle verify change phone")
-    public ResponseEntity<APIResponse> verifyAccount(@RequestParam String otp) {
-        otpService.verifyChangePhoneNumber(otp);
+    public ResponseEntity<APIResponse> verifyAccount(@RequestBody @Valid OtpRequest request) {
+        otpService.verifyChangePhoneNumber(request);
         APIResponse response = new APIResponse(
                 HttpStatus.OK,
                 "Account successfully verified"

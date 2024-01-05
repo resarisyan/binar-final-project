@@ -18,6 +18,7 @@ import com.binar.byteacademy.repository.PurchaseRepository;
 import com.binar.byteacademy.repository.specification.CourseFilterSpecification;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,6 +39,7 @@ import static com.binar.byteacademy.common.util.Constants.TableName.COURSE_TABLE
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "courses")
+@Slf4j
 public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
     private final CategoryRepository categoryRepository;
@@ -49,7 +51,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     @Async("asyncExecutor")
-    @CacheEvict(value = "allCourses", allEntries = true)
+    @CacheEvict(value = "allCourses", allEntries = true, condition = "#result != null")
     public CompletableFuture<CourseResponse> addCourse(CreateCourseRequest request) {
         return CompletableFuture.supplyAsync(() -> {
             try {
@@ -106,21 +108,23 @@ public class CourseServiceImpl implements CourseService {
 
 
     @Override
-    @Caching(put = {
-            @CachePut(key = "'getCustomerCourseDetail-' + #slugCourse"),
-            @CachePut(key = "'getAdminCourseDetail-' + #slugCourse")
+    @Caching(evict = {
+            @CacheEvict(key = "'getCustomerCourseDetail-' + #slugCourse"),
+            @CacheEvict(key = "'getAdminCourseDetail-' + #slugCourse"),
+            @CacheEvict(value = {
+                    "allCourses", "chapters", "allChapters", "materials", "allMaterials",
+                    "allPurchases", "discussions", "allDiscussion",
+                    "allCoursePromos", "coursePromos",
+                    "allPromos", "promos", "allComments", "comments",
+                    "replies", "allReplies", "dashboard"
+            }, allEntries = true, condition = "#result != null")
     })
-    @CacheEvict(value = {
-            "allCourses", "chapters", "allChapters", "materials", "allMaterials",
-            "allPurchases", "discussions", "allDiscussion",
-            "allCoursePromos", "coursePromos",
-            "allPromos", "promos",
-    }, allEntries = true)    public CompletableFuture<Void> updateCourse(String slugCourse, UpdateCourseRequest request) {
-        return CompletableFuture.runAsync(() -> {
+    public CompletableFuture<CourseResponse> updateCourse(String slugCourse, UpdateCourseRequest request) {
+        return CompletableFuture.supplyAsync(() -> {
             try {
-                categoryRepository.findBySlugCategory(request.getSlugCategory())
-                        .ifPresentOrElse(category -> courseRepository.findFirstBySlugCourse(slugCourse)
-                                .ifPresentOrElse(course -> {
+                return categoryRepository.findBySlugCategory(request.getSlugCategory())
+                        .map(category -> courseRepository.findFirstBySlugCourse(slugCourse)
+                                .map(course -> {
                                     checkDataUtil.checkDataField(COURSE_TABLE, "course_name", request.getCourseName(), "course_id", course.getId());
                                     checkDataUtil.checkDataField(COURSE_TABLE, "slug_course", request.getSlugCourse(), "course_id", course.getId());
                                     course.setCourseName(request.getCourseName());
@@ -142,11 +146,28 @@ public class CourseServiceImpl implements CourseService {
                                             });
                                     course.setCategory(category);
                                     courseRepository.save(course);
-                                }, () -> {
-                                    throw new DataNotFoundException(COURSE_NOT_FOUND);
-                                }), () -> {
-                            throw new DataNotFoundException(CATEGORY_NOT_FOUND);
-                        });
+                                    return CourseResponse.builder()
+                                            .courseName(course.getCourseName())
+                                            .instructorName(course.getInstructorName())
+                                            .courseLevel(course.getCourseLevel())
+                                            .courseType(course.getCourseType())
+                                            .price(course.getPrice())
+                                            .totalCourseRate(course.getTotalCourseRate())
+                                            .courseDuration(course.getCourseDuration())
+                                            .totalChapters(course.getTotalChapter())
+                                            .slugCourse(course.getSlugCourse())
+                                            .pathCourseImage(course.getPathCourseImage())
+                                            .targetMarket(course.getTargetMarket())
+                                            .category(
+                                                    CategoryResponse.builder().
+                                                            categoryName(category.getCategoryName())
+                                                            .slugCategory(category.getSlugCategory())
+                                                            .pathCategoryImage(category.getPathCategoryImage())
+                                                            .build())
+                                            .build();
+                                })
+                                .orElseThrow(() -> new DataNotFoundException(COURSE_NOT_FOUND)))
+                        .orElseThrow(() -> new DataNotFoundException(CATEGORY_NOT_FOUND));
             } catch (DataNotFoundException | DataConflictException e) {
                 throw e;
             } catch (Exception e) {
@@ -156,7 +177,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    @Cacheable(value = "allCourses", key = "'getListCourse'")
+    @Cacheable(value = "allCourses", key = "'getListCourse'", unless = "#result == null")
     public List<CourseResponse> getListCourse() {
         try {
             List<Course> courseList = courseRepository.findAll();
@@ -193,7 +214,8 @@ public class CourseServiceImpl implements CourseService {
                     "allCourses", "chapters", "allChapters", "materials", "allMaterials",
                     "allPurchases", "discussions", "allDiscussion",
                     "allCoursePromos", "coursePromos",
-                    "allPromos", "promos", "dashboard"
+                    "allPromos", "promos", "allComments", "comments",
+                    "replies", "allReplies", "dashboard"
             }, allEntries = true)
     })
     public void deleteCourse(String slugCourse) {
@@ -220,7 +242,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    @Cacheable(value = "allCourses", key = "'getCourseListForWeb-' + #pageable.pageNumber + '-' + #pageable.pageSize")
+    @Cacheable(value = "allCourses", key = "'getCourseListForWeb-' + #pageable.pageNumber + '-' + #pageable.pageSize", unless = "#result == null")
     public Page<CourseResponse> getCourseListForWeb(List<String> categoryNames, List<EnumCourseLevel> courseLevels, List<EnumCourseType> courseTypes, List<EnumStatus> courseStatuses, List<EnumFilterCoursesBy> filterCoursesBy, String keyword, Pageable pageable) {
         try {
             Page<Course> coursePage = getAllCourseByCriteria(categoryNames, courseLevels, courseTypes, courseStatuses, filterCoursesBy, keyword, null, pageable);
@@ -233,7 +255,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    @Cacheable(value = "allCourses", key = "'getCourseListForAdmin-' + #pageable.pageNumber + '-' + #pageable.pageSize")
+    @Cacheable(value = "allCourses", key = "'getCourseListForAdmin-' + #pageable.pageNumber + '-' + #pageable.pageSize", unless = "#result == null")
     public Page<AdminCourseResponse> getCourseListForAdmin(List<String> categoryNames, List<EnumCourseLevel> courseLevels, List<EnumCourseType> courseTypes, List<EnumStatus> courseStatuses, List<EnumFilterCoursesBy> filterCoursesBy, String keyword, Pageable pageable) {
         try {
             Page<Course> coursePage = getAllCourseByCriteria(categoryNames, courseLevels, courseTypes, courseStatuses, filterCoursesBy, keyword, null, pageable);
@@ -246,21 +268,23 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    @Cacheable(value = "allCourses", key = "'getMyCourseList-' + #pageable.pageNumber + '-' + #pageable.pageSize")
+    @Transactional
+    @Cacheable(value = "allCourses", key = "'getMyCourseList-' + #pageable.pageNumber + '-' + #pageable.pageSize", unless = "#result == null")
     public Page<MyCourseResponse> getMyCourseList(List<String> categoryNames, List<EnumCourseLevel> courseLevels, List<EnumCourseType> courseTypes, List<EnumStatus> courseStatuses, List<EnumFilterCoursesBy> filterCoursesBy, String keyword, Pageable pageable) {
         try {
             User user = jwtUtil.getUser();
             Page<Course> coursePage = getAllCourseByCriteria(categoryNames, courseLevels, courseTypes, courseStatuses, filterCoursesBy, keyword, user.getUsername(), pageable);
-            return coursePage.map(course -> MyCourseResponse.builder().courseName(course.getCourseName()).instructorName(course.getInstructorName()).totalCourseRate(course.getTotalCourseRate()).totalModules(course.getTotalChapter()).courseDuration(course.getCourseDuration()).slugCourse(course.getSlugCourse()).courseLevel(course.getCourseLevel()).pathCourseImage(course.getPathCourseImage()).category(CategoryResponse.builder().categoryName(course.getCategory().getCategoryName()).pathCategoryImage(course.getCategory().getPathCategoryImage()).build()).userProgressResponse(UserProgressResponse.builder().completionDate(course.getUserProgresses().get(0).getCompletionDate()).coursePercentage(course.getUserProgresses().get(0).getCoursePercentage()).isCompleted(course.getUserProgresses().get(0).getIsCompleted()).build()).build());
+            return coursePage.map(course -> MyCourseResponse.builder().courseName(course.getCourseName()).instructorName(course.getInstructorName()).totalCourseRate(course.getTotalCourseRate()).totalChapter(course.getTotalChapter()).courseDuration(course.getCourseDuration()).slugCourse(course.getSlugCourse()).courseLevel(course.getCourseLevel()).pathCourseImage(course.getPathCourseImage()).category(CategoryResponse.builder().categoryName(course.getCategory().getCategoryName()).pathCategoryImage(course.getCategory().getPathCategoryImage()).build()).userProgressResponse(UserProgressResponse.builder().completionDate(course.getUserProgresses().get(0).getCompletionDate()).coursePercentage(course.getUserProgresses().get(0).getCoursePercentage()).isCompleted(course.getUserProgresses().get(0).getIsCompleted()).build()).build());
         } catch (DataNotFoundException e) {
             throw e;
         } catch (Exception e) {
-            throw new ServiceBusinessException("Failed get my course with filter");
+            throw new ServiceBusinessException("Failed get course with filter");
         }
     }
 
+
     @Override
-    @Cacheable(key = "'getAdminCourseDetail-' + #slugCourse")
+    @Cacheable(key = "'getAdminCourseDetail-' + #slugCourse", unless = "#result == null")
     public AdminCourseDetailResponse getAdminCourseDetail(String slugCourse) {
         try {
             return courseRepository.findFirstBySlugCourse(slugCourse)

@@ -47,20 +47,22 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     @Override
     @Transactional
-    @CacheEvict(value = "allPurchases", allEntries = true)
+    @CacheEvict(value = "allPurchases", allEntries = true, condition = "#result != null")
     public PurchaseResponse createPurchase(String courseSlug, Principal connectedUser) {
         try {
+            User user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
+
             return courseRepository.findFirstBySlugCourse(courseSlug)
-                    .filter(course -> purchaseRepository.findByCourse(course)
-                            .map(purchases -> purchases.stream()
-                                    .noneMatch(purchase -> purchase.getPurchaseStatus().equals(EnumPurchaseStatus.PAID) ||
-                                            purchase.getPurchaseStatus().equals(EnumPurchaseStatus.PENDING)))
-                            .orElse(true)
+                    .filter(course -> {
+                                boolean isNotPurchasedOrPending = purchaseRepository.findByCourseAndUser(course, user)
+                                        .map(purchase -> purchase.getPurchaseStatus().equals(EnumPurchaseStatus.PAID) || purchase.getPurchaseStatus().equals(EnumPurchaseStatus.PENDING))
+                                        .orElse(false);
+                                return !isNotPurchasedOrPending;
+                            }
                     )
                     .map(course -> {
-                        User user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
                         double ppn = course.getCourseType() == EnumCourseType.FREE ? 0 : 0.1;
-                        if(course.getCourseType() == EnumCourseType.FREE){
+                        if (course.getCourseType() == EnumCourseType.FREE) {
                             Purchase purchase = Purchase.builder()
                                     .course(course)
                                     .purchaseStatus(EnumPurchaseStatus.PAID)
@@ -115,9 +117,11 @@ public class PurchaseServiceImpl implements PurchaseService {
                                     .build();
                         }
                     })
-                    .orElseThrow(() -> new RuntimeException("Course not found or already purchased"));
+                    .orElseThrow(() -> new DataNotFoundException("Course not found or already purchased"));
+        } catch (DataNotFoundException e){
+            throw e;
         } catch (Exception e) {
-            throw new ServiceBusinessException(e.getMessage());
+            throw new ServiceBusinessException("Failed to create purchase");
         }
     }
 
@@ -152,7 +156,8 @@ public class PurchaseServiceImpl implements PurchaseService {
                                         purchaseSuccess(purchase);
                                         notificationPurchaseSuccess(purchase.getUser().getUsername(), purchase.getCourse().getCourseName());
                                     }
-                                    case "refund", "chargeback", "partial_refund", "partial_chargeback" -> purchase.setPurchaseStatus(EnumPurchaseStatus.REFUND);
+                                    case "refund", "chargeback", "partial_refund", "partial_chargeback" ->
+                                            purchase.setPurchaseStatus(EnumPurchaseStatus.REFUND);
                                     default -> throw new ServiceBusinessException("Transaction status not found");
                                 }
                                 purchaseRepository.save(purchase);
@@ -164,12 +169,12 @@ public class PurchaseServiceImpl implements PurchaseService {
         } catch (DataNotFoundException e) {
             throw e;
         } catch (Exception e) {
-            throw new ServiceBusinessException(e.getMessage());
+            throw new ServiceBusinessException("Failed to update purchase status");
         }
     }
 
     @Override
-    @Cacheable(value = "allPurchases", key = "'getAllPurchaseDetailsForCustomer-' + #pageable.pageNumber + '-' + #pageable.pageSize")
+    @Cacheable(value = "allPurchases", key = "'getAllPurchaseDetailsForCustomer-' + #pageable.pageNumber + '-' + #pageable.pageSize", unless = "#result == null")
     public Page<PurchaseResponse> getAllPurchaseDetailsForCustomer(Pageable pageable, Principal connectedUser) {
         try {
             User user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
@@ -191,7 +196,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    @Cacheable(value = "allPurchases", key = "'getAllPurchaseDetailsForAdmin-' + #pageable.pageNumber + '-' + #pageable.pageSize")
+    @Cacheable(value = "allPurchases", key = "'getAllPurchaseDetailsForAdmin-' + #pageable.pageNumber + '-' + #pageable.pageSize", unless = "#result == null")
     public Page<AdminPurchaseResponse> getAllPurchaseDetailsForAdmin(Pageable pageable) {
         try {
             Page<Purchase> purchasePage = Optional.of(purchaseRepository.findAll(pageable))
@@ -212,7 +217,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
     }
 
-    private void purchaseSuccess(Purchase purchase){
+    private void purchaseSuccess(Purchase purchase) {
         userProgressRepository.save(UserProgress.builder()
                 .id(UserProgressKey.builder()
                         .userId(purchase.getUser().getId())
@@ -225,7 +230,7 @@ public class PurchaseServiceImpl implements PurchaseService {
                 .build());
     }
 
-    private void notificationPurchaseSuccess(String username, String courseName){
+    private void notificationPurchaseSuccess(String username, String courseName) {
         notificationService.sendToUser(NotificationRequest.builder()
                 .title("Payment Success")
                 .body("Your payment for " + courseName + " is success")

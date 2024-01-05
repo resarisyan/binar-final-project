@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static com.binar.byteacademy.common.util.Constants.ChapterPats.ADMIN_CHAPTER_PATS;
+import static com.binar.byteacademy.common.util.Constants.ControllerMessage.CHAPTER_SUCCESSFULLY_RETRIEVED;
 
 @RestController
 @RequestMapping(value = ADMIN_CHAPTER_PATS, produces = "application/json")
@@ -73,7 +74,7 @@ public class AdminChapterController {
         Page<ChapterResponse> chapterResponses = chapterService.getAllChapter(pageable);
         APIResultResponse<Page<ChapterResponse>> responseDTO =  new APIResultResponse<>(
                 HttpStatus.OK,
-                "Chapter successfully retrieved",
+                CHAPTER_SUCCESSFULLY_RETRIEVED,
                 chapterResponses
         );
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
@@ -86,7 +87,7 @@ public class AdminChapterController {
         List<ChapterResponse> chapterResponses = chapterService.getListChapterBySlugCourse(slugCourse);
         APIResultResponse<List<ChapterResponse>> responseDTO =  new APIResultResponse<>(
                 HttpStatus.OK,
-                "Chapter successfully retrieved",
+                CHAPTER_SUCCESSFULLY_RETRIEVED,
                 chapterResponses
         );
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
@@ -99,7 +100,7 @@ public class AdminChapterController {
         ChapterResponse chapterResponse = chapterService.getChapterDetail(slug);
         APIResultResponse<ChapterResponse> responseDTO =  new APIResultResponse<>(
                 HttpStatus.OK,
-                "Chapter successfully retrieved",
+                CHAPTER_SUCCESSFULLY_RETRIEVED,
                 chapterResponse
         );
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);

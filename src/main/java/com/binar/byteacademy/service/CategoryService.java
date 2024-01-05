@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture;
 
 public interface CategoryService {
     CompletableFuture<CategoryResponse> addCategory(CreateCategoryRequest request);
-    CompletableFuture<Void> updateCategory(String slugCategory, UpdateCategoryRequest request);
+    CompletableFuture<CategoryResponse> updateCategory(String slugCategory, UpdateCategoryRequest request);
     void deleteCategory(String slugCategory);
     Page<CategoryResponse> getAllCategory(Pageable pageable);
     CategoryResponse getCategoryDetail(String slugCategory);

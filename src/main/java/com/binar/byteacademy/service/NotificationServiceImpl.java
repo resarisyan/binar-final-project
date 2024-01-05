@@ -15,7 +15,6 @@ import com.binar.byteacademy.repository.ReceiverNotificationRepository;
 import com.binar.byteacademy.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -33,7 +32,6 @@ import static com.binar.byteacademy.common.util.Constants.ControllerMessage.USER
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final ReceiverNotificationRepository receiverNotificationRepository;
@@ -52,7 +50,6 @@ public class NotificationServiceImpl implements NotificationService {
                             .build()
             );
             userRepository.findAllByRole(EnumRole.CUSTOMER).ifPresentOrElse(users -> users.forEach(user -> {
-                log.info("User: {}", user.getUsername());
                 ReceiverNotification receiverNotification = ReceiverNotification.builder()
                         .notification(notification)
                         .user(user)

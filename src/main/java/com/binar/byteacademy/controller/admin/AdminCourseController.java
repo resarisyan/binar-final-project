@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static com.binar.byteacademy.common.util.Constants.CoursePats.ADMIN_COURSE_PATS;
+import static com.binar.byteacademy.common.util.Constants.ControllerMessage.COURSE_SUCCESSFULLY_RETRIEVED;
 
 @RestController
 @RequestMapping(value = ADMIN_COURSE_PATS, produces = "application/json")
@@ -56,7 +57,7 @@ public class  AdminCourseController {
     @Schema(name = "UpdateCourseRequest", description = "Update course request body")
     @Operation(summary = "Endpoint to handle update course (User Role : Admin)")
     public ResponseEntity<APIResponse> updateCourse(@PathVariable String courseSlug, @RequestBody @Valid UpdateCourseRequest request) {
-        CompletableFuture<Void> futureResult = courseService.updateCourse(courseSlug, request);
+        CompletableFuture<CourseResponse> futureResult = courseService.updateCourse(courseSlug, request);
         return futureResult.thenApplyAsync(aVoid -> {
             APIResponse responseDTO =  new APIResponse(
                     HttpStatus.OK,
@@ -78,6 +79,19 @@ public class  AdminCourseController {
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
+    @GetMapping("/list")
+    @Schema(name = "GetAllCourseByCriteria", description = "Get all course by criteria")
+    @Operation(summary = "Endpoint to handle get all course by criteria (User Role : Admin)")
+    public ResponseEntity<APIResultResponse<List<CourseResponse>>> getListCourse() {
+        List<CourseResponse> courseResponseList = courseService.getListCourse();
+        APIResultResponse<List<CourseResponse>> responseDTO = new APIResultResponse<>(
+                HttpStatus.OK,
+                COURSE_SUCCESSFULLY_RETRIEVED,
+                courseResponseList
+        );
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
     @GetMapping("/{slugCourse}")
     @Schema(name = "GetAdminCourseDetail", description = "Get course detail")
     @Operation(summary = "Endpoint to handle get course detail (User Role : Admin)")
@@ -85,7 +99,7 @@ public class  AdminCourseController {
         AdminCourseDetailResponse courseResponse = courseService.getAdminCourseDetail(slugCourse);
         APIResultResponse<AdminCourseDetailResponse> responseDTO = new APIResultResponse<>(
                 HttpStatus.OK,
-                "Course successfully retrieved",
+                COURSE_SUCCESSFULLY_RETRIEVED,
                 courseResponse
         );
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
@@ -113,21 +127,8 @@ public class  AdminCourseController {
                 pageable);
         APIResultResponse<Page<AdminCourseResponse>> responseDTO = new APIResultResponse<>(
                 HttpStatus.OK,
-                "Course successfully retrieved",
+                COURSE_SUCCESSFULLY_RETRIEVED,
                 courseResponsePage
-        );
-        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
-    }
-
-    @GetMapping("/list")
-    @Schema(name = "GetAllCourseByCriteria", description = "Get all course by criteria")
-    @Operation(summary = "Endpoint to handle get all course by criteria (User Role : Admin)")
-    public ResponseEntity<APIResultResponse<List<CourseResponse>>> getListCourse() {
-        List<CourseResponse> courseResponseList = courseService.getListCourse();
-        APIResultResponse<List<CourseResponse>> responseDTO = new APIResultResponse<>(
-                HttpStatus.OK,
-                "Course successfully retrieved",
-                courseResponseList
         );
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }

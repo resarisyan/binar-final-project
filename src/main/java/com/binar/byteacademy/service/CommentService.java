@@ -16,7 +16,7 @@ public interface CommentService {
 
     Page<CommentResponse> getAllCommentByDiscussion(Pageable pageable, String slugDiscussion);
 
-    void updateComment(UUID id, UpdateCommentRequest request,  Principal connectedUser);
+    CommentResponse updateComment(UUID id, UpdateCommentRequest request,  Principal connectedUser);
 
     void deleteComment(UUID id);
 

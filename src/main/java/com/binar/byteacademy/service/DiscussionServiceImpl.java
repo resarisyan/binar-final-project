@@ -34,7 +34,7 @@ public class DiscussionServiceImpl implements DiscussionService {
     private final SlugUtil slugUtil;
 
     @Override
-    @Cacheable(key = "'getDiscussionDetail-' + #slug")
+    @Cacheable(key = "'getDiscussionDetail-' + #slug", unless = "#result == null")
     public DiscussionResponse getDiscussionDetail(String slug) {
         try {
             return discussionRepository.findBySlugDiscussion(slug)
@@ -52,7 +52,7 @@ public class DiscussionServiceImpl implements DiscussionService {
     }
 
     @Override
-    @CacheEvict(value = "allDiscussion", allEntries = true)
+    @CacheEvict(value = "allDiscussion", allEntries = true, condition = "#result != null")
     public DiscussionResponse addDiscussion(DiscussionRequest request, Principal connectedUser) {
         try {
             User user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
@@ -90,7 +90,7 @@ public class DiscussionServiceImpl implements DiscussionService {
     }
 
     @Override
-    @Cacheable(value = "allDiscussion", key = "'getDiscussionByCourse-' + #pageable.pageNumber + '-' + #pageable.pageSize + '-' + #slugCourse")
+    @Cacheable(value = "allDiscussion", key = "'getDiscussionByCourse-' + #pageable.pageNumber + '-' + #pageable.pageSize + '-' + #slugCourse", unless = "#result == null")
     public Page<DiscussionResponse> getDiscussionByCourse(Pageable pageable, String slugCourse) {
         try {
             Page<Discussion> discussionPage = Optional.ofNullable(discussionRepository.findAllByCourse_SlugCourse(pageable, slugCourse))
@@ -114,19 +114,27 @@ public class DiscussionServiceImpl implements DiscussionService {
     }
 
     @Override
-    @CachePut(key = "'getDiscussionDetail-' + #slug")
-    @CacheEvict(value = "allDiscussion", allEntries = true)
-    public void updateDiscussion(String slug, DiscussionRequest request, Principal connectedUser) {
+    @CachePut(key = "'getDiscussionDetail-' + #slug", unless = "#result == null")
+    @CacheEvict(value = "allDiscussion", allEntries = true, condition = "#result != null")
+    public DiscussionResponse updateDiscussion(String slug, DiscussionRequest request) {
         try {
-            User user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
-            discussionRepository.findBySlugDiscussionAndUser(slug, user)
-                    .ifPresentOrElse(discussion -> {
+            return discussionRepository.findBySlugDiscussion(slug)
+                    .map(discussion -> {
                         discussion.setDiscussionContent(request.getDiscussionContent());
                         discussion.setDiscussionTopic(request.getDiscussionTopic());
                         discussionRepository.save(discussion);
-                    }, () -> {
-                        throw new DataNotFoundException(DISCUSSION_NOT_FOUND);
-                    });
+                        return DiscussionResponse.builder()
+                                .discussionContent(discussion.getDiscussionContent())
+                                .discussionDate(discussion.getCreatedAt())
+                                .username(discussion.getUser().getUsername())
+                                .discussionDate(discussion.getDiscussionDate())
+                                .slugDiscussion(discussion.getSlugDiscussion())
+                                .discussionTopic(discussion.getDiscussionTopic())
+                                .isComplete(discussion.isComplete())
+                                .courseName(discussion.getCourse().getCourseName())
+                                .build();
+                    })
+                    .orElseThrow(() -> new DataNotFoundException(DISCUSSION_NOT_FOUND));
         } catch (DataNotFoundException e) {
             throw e;
         } catch (Exception e) {
@@ -135,17 +143,50 @@ public class DiscussionServiceImpl implements DiscussionService {
     }
 
     @Override
-    @CachePut(key = "'getDiscussionDetail-' + #slug")
-    @CacheEvict(value = "allDiscussion", allEntries = true)
-    public void updateStatusDiscussion(String slug) {
+    @Cacheable(value = "allDiscussion", key = "'getAllDiscussion-' + #pageable.pageNumber + '-' + #pageable.pageSize", unless = "#result == null")
+    public Page<DiscussionResponse> getAllDiscussion(Pageable pageable) {
         try {
-            discussionRepository.findBySlugDiscussion(slug)
-                    .ifPresentOrElse(discussion -> {
+            Page<Discussion> discussionPage = Optional.of(discussionRepository.findAll(pageable))
+                    .filter(Page::hasContent)
+                    .orElseThrow(() -> new DataNotFoundException(DISCUSSION_NOT_FOUND));
+            return discussionPage.map(discussion -> DiscussionResponse.builder()
+                    .discussionContent(discussion.getDiscussionContent())
+                    .discussionDate(discussion.getCreatedAt())
+                    .username(discussion.getUser().getUsername())
+                    .discussionDate(discussion.getDiscussionDate())
+                    .slugDiscussion(discussion.getSlugDiscussion())
+                    .discussionTopic(discussion.getDiscussionTopic())
+                    .isComplete(discussion.isComplete())
+                    .courseName(discussion.getCourse().getCourseName())
+                    .build());
+        } catch (DataNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ServiceBusinessException("Error get all discussion");
+        }
+    }
+
+    @Override
+    @CachePut(key = "'getDiscussionDetail-' + #slug", unless = "#result == null")
+    @CacheEvict(value = "allDiscussion", allEntries = true, condition = "#result != null")
+    public DiscussionResponse updateStatusDiscussion(String slug) {
+        try {
+            return discussionRepository.findBySlugDiscussion(slug)
+                    .map(discussion -> {
                         discussion.setComplete(!discussion.isComplete());
                         discussionRepository.save(discussion);
-                    }, () -> {
-                        throw new DataNotFoundException(DISCUSSION_NOT_FOUND);
-                    });
+                        return DiscussionResponse.builder()
+                                .discussionContent(discussion.getDiscussionContent())
+                                .discussionDate(discussion.getCreatedAt())
+                                .username(discussion.getUser().getUsername())
+                                .discussionDate(discussion.getDiscussionDate())
+                                .slugDiscussion(discussion.getSlugDiscussion())
+                                .discussionTopic(discussion.getDiscussionTopic())
+                                .isComplete(discussion.isComplete())
+                                .courseName(discussion.getCourse().getCourseName())
+                                .build();
+                    })
+                    .orElseThrow(() -> new DataNotFoundException(DISCUSSION_NOT_FOUND));
         } catch (DataNotFoundException e) {
             throw e;
         } catch (Exception e) {
@@ -156,7 +197,7 @@ public class DiscussionServiceImpl implements DiscussionService {
     @Override
     @Caching(evict = {
             @CacheEvict(key = "'getDiscussionDetail-' + #slug"),
-            @CacheEvict(value = "allDiscussion", allEntries = true)
+            @CacheEvict(value = {"allDiscussion", "allComments", "comments", "replies", "allReplies"}, allEntries = true)
     })
     public void deleteDiscussion(String slug) {
         try {

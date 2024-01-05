@@ -9,7 +9,7 @@ import java.security.Principal;
 
 public interface MaterialService {
     MaterialResponse addMaterial(MaterialRequest request);
-    void updateMaterial(String slugMaterial, MaterialRequest request);
+    MaterialResponse updateMaterial(String slugMaterial, MaterialRequest request);
     void deleteMaterial(String slugMaterial);
     Page<MaterialResponse> getAllMaterial(Pageable pageable);
     MaterialResponse getMaterialDetailAdmin(String slugMaterial);

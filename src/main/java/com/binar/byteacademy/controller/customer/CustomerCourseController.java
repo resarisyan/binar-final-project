@@ -13,6 +13,7 @@ import com.binar.byteacademy.service.CourseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -44,7 +45,7 @@ public class CustomerCourseController {
             @RequestParam(value = "courseType", required = false) List<EnumCourseType> courseTypes,
             @RequestParam(value = "filterCoursesBy", required = false) List<EnumFilterCoursesBy> filterCoursesBy,
             @RequestParam(value = "page") int page) {
-        Pageable pageable = PageRequest.of(page, 6);
+        Pageable pageable = PageRequest.of(page,6);
         List<EnumStatus> courseStatuses = List.of(EnumStatus.ACTIVE);
         Page<MyCourseResponse> courseResponsePage = courseService.getMyCourseList(
                 categoryNames,
@@ -66,7 +67,7 @@ public class CustomerCourseController {
     @Schema(name = "AddCourseRating", description = "Add course rating")
     @Operation(summary = "Endpoint to handle add course rating (User Role : Customer)")
     public ResponseEntity<APIResultResponse<CourseRatingResponse>> addCourseRating(
-            @RequestBody CourseRatingRequest request,
+            @RequestBody @Valid CourseRatingRequest request,
             Principal connectedUser) {
         CourseRatingResponse courseRatingResponse = courseRatingService.addCourseRating(request, connectedUser);
         APIResultResponse<CourseRatingResponse> responseDTO = new APIResultResponse<>(

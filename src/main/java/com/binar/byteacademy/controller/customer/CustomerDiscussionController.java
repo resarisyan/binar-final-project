@@ -2,7 +2,6 @@ package com.binar.byteacademy.controller.customer;
 
 import com.binar.byteacademy.dto.request.DiscussionRequest;
 import com.binar.byteacademy.dto.response.DiscussionResponse;
-import com.binar.byteacademy.dto.response.base.APIResponse;
 import com.binar.byteacademy.dto.response.base.APIResultResponse;
 import com.binar.byteacademy.service.DiscussionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,42 +39,6 @@ public class CustomerDiscussionController {
                 discussionResponse
         );
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
-    }
-
-    @PutMapping("/{slugDiscussion}")
-    @Schema(name = "UpdateDiscussion", description = "Update discussion")
-    @Operation(summary = "Endpoint to handle update discussion (User Role : Customer)")
-    public ResponseEntity<APIResponse> updateDiscussion(@PathVariable String slugDiscussion, @RequestBody @Valid DiscussionRequest request, Principal connectedUser) {
-        discussionService.updateDiscussion(slugDiscussion, request, connectedUser);
-        APIResponse responseDTO =  new APIResponse(
-                HttpStatus.OK,
-                "Discussion successfully updated"
-        );
-        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
-    }
-
-    @DeleteMapping("/{slugDiscussion}")
-    @Schema(name = "DeleteDiscussion", description = "Delete discussion")
-    @Operation(summary = "Endpoint to handle delete discussion (User Role : Customer)")
-    public ResponseEntity<APIResponse> deleteDiscussion(@PathVariable String slugDiscussion) {
-        discussionService.deleteDiscussion(slugDiscussion);
-        APIResponse responseDTO =  new APIResponse(
-                HttpStatus.OK,
-                "Discussion successfully deleted"
-        );
-        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
-    }
-
-    @PutMapping("/{slugDiscussion}/status")
-    @Schema(name = "UpdateStatusDiscussion", description = "Update status discussion")
-    @Operation(summary = "Endpoint to handle update status discussion (User Role : Customer)")
-    public ResponseEntity<APIResponse> updateStatusDiscussion(@PathVariable String slugDiscussion) {
-        discussionService.updateStatusDiscussion(slugDiscussion);
-        APIResponse responseDTO =  new APIResponse(
-                HttpStatus.OK,
-                "Discussion successfully updated"
-        );
-        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
     @GetMapping("/{slugDiscussion}")

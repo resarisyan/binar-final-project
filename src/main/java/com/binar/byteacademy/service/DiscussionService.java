@@ -10,8 +10,9 @@ import java.security.Principal;
 public interface DiscussionService {
     DiscussionResponse getDiscussionDetail(String slug);
     DiscussionResponse addDiscussion(DiscussionRequest request, Principal connectedUser);
+    Page<DiscussionResponse> getAllDiscussion(Pageable pageable);
     Page<DiscussionResponse> getDiscussionByCourse(Pageable pageable, String slugCourse);
-    void updateDiscussion(String slug, DiscussionRequest request, Principal connectedUser);
-    void updateStatusDiscussion(String slug);
+    DiscussionResponse updateDiscussion(String slug, DiscussionRequest request);
+    DiscussionResponse updateStatusDiscussion(String slug);
     void deleteDiscussion(String slug);
 }

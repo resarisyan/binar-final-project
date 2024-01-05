@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static com.binar.byteacademy.common.util.Constants.CategoryPats.ADMIN_CATEGORY_PATS;
+import static com.binar.byteacademy.common.util.Constants.ControllerMessage.CATEGORY_SUCCESSFULLY_RETRIEVED;
 
 @RestController
 @RequestMapping(value = ADMIN_CATEGORY_PATS, produces = "application/json")
@@ -39,7 +40,7 @@ public class AdminCategoryController {
         return futureResult.thenApplyAsync(categoryResponse -> {
             APIResultResponse<CategoryResponse> responseDTO = new APIResultResponse<>(
                     HttpStatus.CREATED,
-                    "Category successfully created",
+                    CATEGORY_SUCCESSFULLY_RETRIEVED,
                     categoryResponse
             );
             return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
@@ -50,7 +51,7 @@ public class AdminCategoryController {
     @Schema(name = "UpdateCategoryRequest", description = "Update category request body")
     @Operation(summary = "Endpoint to handle update category (User Role : Admin)")
     public ResponseEntity<APIResponse> updateCategory(@PathVariable String slugCategory, @RequestBody @Valid UpdateCategoryRequest request) {
-        CompletableFuture<Void> futureResult = categoryService.updateCategory(slugCategory, request);
+        CompletableFuture<CategoryResponse> futureResult = categoryService.updateCategory(slugCategory, request);
         return futureResult.thenApplyAsync(aVoid -> {
             APIResponse responseDTO =  new APIResponse(
                     HttpStatus.OK,
@@ -80,7 +81,7 @@ public class AdminCategoryController {
         Page<CategoryResponse> categoryResponses = categoryService.getAllCategory(pageable);
         APIResultResponse<Page<CategoryResponse>> responseDTO =  new APIResultResponse<>(
                 HttpStatus.OK,
-                "Category successfully retrieved",
+                CATEGORY_SUCCESSFULLY_RETRIEVED,
                 categoryResponses
         );
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
@@ -93,7 +94,7 @@ public class AdminCategoryController {
         List<CategoryResponse> categoryResponses = categoryService.getListCategory();
         APIResultResponse<List<CategoryResponse>> responseDTO =  new APIResultResponse<>(
                 HttpStatus.OK,
-                "Category successfully retrieved",
+                CATEGORY_SUCCESSFULLY_RETRIEVED,
                 categoryResponses
         );
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
@@ -106,7 +107,7 @@ public class AdminCategoryController {
         CategoryResponse categoryResponse = categoryService.getCategoryDetail(slugCategory);
         APIResultResponse<CategoryResponse> responseDTO =  new APIResultResponse<>(
                 HttpStatus.OK,
-                "Category successfully retrieved",
+                CATEGORY_SUCCESSFULLY_RETRIEVED,
                 categoryResponse
         );
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
