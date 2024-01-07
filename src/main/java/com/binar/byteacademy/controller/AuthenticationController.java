@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,6 +50,18 @@ public class AuthenticationController {
         );
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
 
+    }
+
+    @PostMapping("/login-google")
+    @Hidden
+    public ResponseEntity<APIResultResponse<LoginResponse>> loginGoogle(OAuth2AuthenticationToken authenticationToken) {
+        LoginResponse loginResponse = authenticationService.oauth2Login(authenticationToken);
+        APIResultResponse<LoginResponse> responseDTO = new APIResultResponse<>(
+                HttpStatus.CREATED,
+                "Login success",
+                loginResponse
+        );
+        return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")

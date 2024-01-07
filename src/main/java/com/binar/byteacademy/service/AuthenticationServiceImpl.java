@@ -24,11 +24,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Service
@@ -195,30 +198,30 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return refreshTokenResponse;
     }
 
-//    @Override
-//    public LoginResponse oauth2Login(OAuth2AuthenticationToken authenticationToken) {
-//        try {
-//            DefaultOAuth2User principal = (DefaultOAuth2User) authenticationToken.getPrincipal();
-//            Map<String, Object> attributes = principal.getAttributes();
-//            String email = attributes.getOrDefault("email", "").toString();
-//            return userRepository.findFirstByEmail(email)
-//                    .map(user -> {
-//                        String jwtToken = jwtUtil.generateToken(user);
-//                        String refreshToken = jwtUtil.generateRefreshToken(user);
-//                        revokeAllUserTokens(user);
-//                        saveUserToken(user, jwtToken);
-//                        return LoginResponse.builder()
-//                                .accessToken(jwtToken)
-//                                .refreshToken(refreshToken)
-//                                .build();
-//                    })
-//                    .orElseThrow(() -> new DataNotFoundException("User not found"));
-//        } catch (DataNotFoundException | UserNotActiveException e) {
-//            throw e;
-//        } catch (Exception e) {
-//            throw new ServiceBusinessException(e.getMessage());
-//        }
-//    }
+    @Override
+    public LoginResponse oauth2Login(OAuth2AuthenticationToken authenticationToken) {
+        try {
+            DefaultOAuth2User principal = (DefaultOAuth2User) authenticationToken.getPrincipal();
+            Map<String, Object> attributes = principal.getAttributes();
+            String email = attributes.getOrDefault("email", "").toString();
+            return userRepository.findFirstByEmail(email)
+                    .map(user -> {
+                        String jwtToken = jwtUtil.generateToken(user);
+                        String refreshToken = jwtUtil.generateRefreshToken(user);
+                        saveUserToken(user, jwtToken, EnumTokenAccessType.ACCESS);
+                        saveUserToken(user, refreshToken, EnumTokenAccessType.REFRESH);
+                        return LoginResponse.builder()
+                                .accessToken(jwtToken)
+                                .refreshToken(refreshToken)
+                                .build();
+                    })
+                    .orElseThrow(() -> new DataNotFoundException("User not found"));
+        } catch (DataNotFoundException | UserNotActiveException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ServiceBusinessException(e.getMessage());
+        }
+    }
 
 //    private void revokeAllUserTokens(User user) {
 //        List<Token> validUserTokens = tokenRepository.findAllValidTokenByUser(user.getId());
