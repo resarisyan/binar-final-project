@@ -1,4 +1,4 @@
-# Final Project - Online Course Platform ByteAcademy
+# Binar Final Project - API Online Course Platform ByteAcademy
 
 ## Overview
 
@@ -10,12 +10,12 @@ To get started with the project, follow these steps:
 
 ```bash
 git clone https://github.com/resarisyan/binar-final-project
-cd fbinar-final-project
+cd binar-final-project
 mvn clean install
 ```
 ## Configuration
 
-Configure the application by rename the `env-example.properties` file with the necessary information for PostgreSQL, Twilio, JWT, SMTP Gmail, Cloudinary, OpenAI, and OAuth Google.
+Configure the application by rename the `env-example.properties` to `env.properties` with the necessary information for PostgreSQL, Twilio, JWT, SMTP Gmail, Cloudinary, OpenAI, and OAuth Google.
 
 ```bash
 # Database Configuration
