@@ -3,7 +3,7 @@ package com.binar.byteacademy.controller.admin;
 import com.binar.byteacademy.dto.request.CreateCourseRequest;
 import com.binar.byteacademy.dto.request.UpdateCourseRequest;
 import com.binar.byteacademy.dto.response.AdminCourseResponse;
-import com.binar.byteacademy.dto.response.CourseDetailResponse;
+import com.binar.byteacademy.dto.response.AdminCourseDetailResponse;
 import com.binar.byteacademy.dto.response.CourseResponse;
 import com.binar.byteacademy.dto.response.base.APIResponse;
 import com.binar.byteacademy.dto.response.base.APIResultResponse;
@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static com.binar.byteacademy.common.util.Constants.CoursePats.ADMIN_COURSE_PATS;
+import static com.binar.byteacademy.common.util.Constants.ControllerMessage.COURSE_SUCCESSFULLY_RETRIEVED;
 
 @RestController
 @RequestMapping(value = ADMIN_COURSE_PATS, produces = "application/json")
@@ -39,30 +40,31 @@ public class  AdminCourseController {
     @PostMapping
     @Schema(name = "CreateCourseRequest", description = "Create course request body")
     @Operation(summary = "Endpoint to handle create new course (User Role : Admin)")
-    public CompletableFuture<ResponseEntity<APIResultResponse<CourseResponse>>> createNewCourse(@RequestBody @Valid CreateCourseRequest request) {
-        return courseService.addCourse(request)
-                .thenApplyAsync(courseResponse -> {
-                    APIResultResponse<CourseResponse> responseDTO = new APIResultResponse<>(
-                            HttpStatus.CREATED,
-                            "Course successfully created",
-                            courseResponse
-                    );
-                    return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
-                });
+    public ResponseEntity<APIResultResponse<CourseResponse>> createNewCourse(@RequestBody @Valid CreateCourseRequest request) {
+        CompletableFuture<CourseResponse> futureResult = courseService.addCourse(request);
+        return futureResult.thenApplyAsync(courseResponse -> {
+            APIResultResponse<CourseResponse> responseDTO = new APIResultResponse<>(
+                    HttpStatus.CREATED,
+                    "Course successfully created",
+                    courseResponse
+            );
+            return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+        }).join();
     }
+
 
     @PutMapping("/{courseSlug}")
     @Schema(name = "UpdateCourseRequest", description = "Update course request body")
     @Operation(summary = "Endpoint to handle update course (User Role : Admin)")
-    public CompletableFuture<ResponseEntity<APIResponse>> updateCourse(@PathVariable String courseSlug, @RequestBody @Valid UpdateCourseRequest request) {
-        return courseService.updateCourse(courseSlug, request)
-                .thenApplyAsync(courseResponse -> {
-                    APIResponse responseDTO = new APIResponse(
-                            HttpStatus.OK,
-                            "Course successfully updated"
-                    );
-                    return new ResponseEntity<>(responseDTO, HttpStatus.OK);
-                });
+    public ResponseEntity<APIResponse> updateCourse(@PathVariable String courseSlug, @RequestBody @Valid UpdateCourseRequest request) {
+        CompletableFuture<CourseResponse> futureResult = courseService.updateCourse(courseSlug, request);
+        return futureResult.thenApplyAsync(aVoid -> {
+            APIResponse responseDTO =  new APIResponse(
+                    HttpStatus.OK,
+                    "Course successfully updated"
+            );
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+        }).join();
     }
 
     @DeleteMapping("/{slugCourse}")
@@ -77,14 +79,27 @@ public class  AdminCourseController {
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
-    @GetMapping("/{slugCourse}")
-    @Schema(name = "GetCourseDetail", description = "Get course detail")
-    @Operation(summary = "Endpoint to handle get course detail (User Role : Admin)")
-    public ResponseEntity<APIResultResponse<CourseDetailResponse>> getCourseDetail(@PathVariable String slugCourse) {
-        CourseDetailResponse courseResponse = courseService.getCourseDetail(slugCourse);
-        APIResultResponse<CourseDetailResponse> responseDTO = new APIResultResponse<>(
+    @GetMapping("/list")
+    @Schema(name = "GetAllCourseByCriteria", description = "Get all course by criteria")
+    @Operation(summary = "Endpoint to handle get all course by criteria (User Role : Admin)")
+    public ResponseEntity<APIResultResponse<List<CourseResponse>>> getListCourse() {
+        List<CourseResponse> courseResponseList = courseService.getListCourse();
+        APIResultResponse<List<CourseResponse>> responseDTO = new APIResultResponse<>(
                 HttpStatus.OK,
-                "Course successfully retrieved",
+                COURSE_SUCCESSFULLY_RETRIEVED,
+                courseResponseList
+        );
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
+    @GetMapping("/{slugCourse}")
+    @Schema(name = "GetAdminCourseDetail", description = "Get course detail")
+    @Operation(summary = "Endpoint to handle get course detail (User Role : Admin)")
+    public ResponseEntity<APIResultResponse<AdminCourseDetailResponse>> getAdminCourseDetail(@PathVariable String slugCourse) {
+        AdminCourseDetailResponse courseResponse = courseService.getAdminCourseDetail(slugCourse);
+        APIResultResponse<AdminCourseDetailResponse> responseDTO = new APIResultResponse<>(
+                HttpStatus.OK,
+                COURSE_SUCCESSFULLY_RETRIEVED,
                 courseResponse
         );
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
@@ -112,7 +127,7 @@ public class  AdminCourseController {
                 pageable);
         APIResultResponse<Page<AdminCourseResponse>> responseDTO = new APIResultResponse<>(
                 HttpStatus.OK,
-                "Course successfully retrieved",
+                COURSE_SUCCESSFULLY_RETRIEVED,
                 courseResponsePage
         );
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);

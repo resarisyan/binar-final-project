@@ -5,6 +5,8 @@ import com.binar.byteacademy.dto.response.MaterialResponse;
 import com.binar.byteacademy.dto.response.base.APIResponse;
 import com.binar.byteacademy.dto.response.base.APIResultResponse;
 import com.binar.byteacademy.service.MaterialService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,8 @@ public class AdminMaterialController {
     private final MaterialService materialService;
 
     @PostMapping
+    @Schema(name = "MaterialRequest", description = "Create material request body")
+    @Operation(summary = "Endpoint to handle create new material (User Role : Admin)")
     public ResponseEntity<APIResultResponse<MaterialResponse>> createNewChapter(
             @RequestBody @Valid MaterialRequest request) {
         MaterialResponse materialResponse = materialService.addMaterial(request);
@@ -37,6 +41,8 @@ public class AdminMaterialController {
     }
 
     @PutMapping("/{slugMaterial}")
+    @Schema(name = "MaterialRequest", description = "Update material request body")
+    @Operation(summary = "Endpoint to handle update material (User Role : Admin)")
     public ResponseEntity<APIResponse> updateMaterial(@PathVariable String slugMaterial, @RequestBody @Valid MaterialRequest request) {
         materialService.updateMaterial(slugMaterial, request);
         APIResponse responseDTO = new APIResponse(
@@ -47,6 +53,8 @@ public class AdminMaterialController {
     }
 
     @DeleteMapping("/{slugMaterial}")
+    @Schema(name = "MaterialRequest", description = "Delete material request body")
+    @Operation(summary = "Endpoint to handle delete material (User Role : Admin)")
     public ResponseEntity<APIResponse> deleteMaterial(@PathVariable String slugMaterial) {
         materialService.deleteMaterial(slugMaterial);
         APIResponse responseDTO = new APIResponse(
@@ -57,6 +65,8 @@ public class AdminMaterialController {
     }
 
     @GetMapping
+    @Schema(name = "MaterialRequest", description = "Get material request body")
+    @Operation(summary = "Endpoint to handle get material (User Role : Admin)")
     public ResponseEntity<APIResultResponse<Page<MaterialResponse>>> getCategory(@RequestParam("page") int page) {
         Pageable pageable = PageRequest.of(page, 10);
         Page<MaterialResponse> materialResponses = materialService.getAllMaterial(pageable);
@@ -69,8 +79,10 @@ public class AdminMaterialController {
     }
 
     @GetMapping("/{slugMaterial}")
+    @Schema(name = "MaterialRequest", description = "Get material request body")
+    @Operation(summary = "Endpoint to handle get material (User Role : Admin)")
     public ResponseEntity<APIResultResponse<MaterialResponse>> getMaterial(@PathVariable String slugMaterial) {
-        MaterialResponse materialResponse = materialService.getMaterialDetail(slugMaterial);
+        MaterialResponse materialResponse = materialService.getMaterialDetailAdmin(slugMaterial);
         APIResultResponse<MaterialResponse> responseDTO = new APIResultResponse<>(
                 HttpStatus.OK,
                 "Material successfully retrieved",

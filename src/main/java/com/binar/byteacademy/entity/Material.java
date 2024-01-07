@@ -10,6 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -46,6 +47,9 @@ public class Material {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "chapter_id", referencedColumnName = "chapter_id", nullable = false)
     private Chapter chapter;
+
+    @OneToMany(mappedBy = "material", cascade = {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    private List<MaterialActivity> materialActivities;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

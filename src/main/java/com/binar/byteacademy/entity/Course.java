@@ -34,13 +34,13 @@ public class Course {
     private String instructorName;
 
     @Column(nullable = false)
-    private Double price;
+    private Integer price;
 
     @Column(name = "total_course_rate")
     private Double totalCourseRate;
 
-    @Column(name = "total_modules", nullable = false)
-    private Integer totalModules;
+    @Column(name = "total_chapter", nullable = false)
+    private Integer totalChapter;
 
     @Column(name = "course_duration", nullable = false)
     private Integer courseDuration;
@@ -72,6 +72,10 @@ public class Course {
     @Enumerated(EnumType.STRING)
     private EnumStatus courseStatus;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "category_id", referencedColumnName = "category_id")
+    private Category category;
+
     @OneToMany(mappedBy = "course", cascade = {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private List<Chapter> chapters;
 
@@ -81,12 +85,17 @@ public class Course {
     @OneToMany(mappedBy = "course", cascade = {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private List<Purchase> purchases;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "category_id", referencedColumnName = "category_id")
-    private Category category;
-
     @OneToMany(mappedBy = "course", cascade = {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private List<CoursePromo> coursePromos;
+
+    @OneToMany(mappedBy = "course", cascade = {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    private List<CourseRating> courseRatings;
+
+    @OneToMany(mappedBy = "course", cascade = {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    private List<Discussion> discussions;
+
+    @OneToMany(mappedBy = "course", cascade = {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    private List<UserProgress> userProgress;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

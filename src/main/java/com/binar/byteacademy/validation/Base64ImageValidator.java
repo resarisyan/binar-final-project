@@ -14,6 +14,7 @@ public class Base64ImageValidator implements ConstraintValidator<Base64Image, St
 
     @Override
     public void initialize(Base64Image base64Image) {
+        // Auto-generated method stub
     }
 
     @Override

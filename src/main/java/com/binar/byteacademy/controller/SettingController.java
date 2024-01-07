@@ -10,6 +10,7 @@ import com.binar.byteacademy.service.OtpService;
 import com.binar.byteacademy.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ import static com.binar.byteacademy.common.util.Constants.SettingPats.SETTING_PA
 @RestController
 @RequestMapping(value = SETTING_PATS, produces = "application/json")
 @RequiredArgsConstructor
+@Tag(name = "Setting", description = "Setting API")
 public class SettingController {
     private final AuthenticationService authenticationService;
     private final OtpService otpService;
@@ -44,8 +46,8 @@ public class SettingController {
     @PostMapping("/verify-change-phone")
     @Schema(name = "VerifyChangePhoneRequest", description = "Verify change phone request body")
     @Operation(summary = "Endpoint to handle verify change phone")
-    public ResponseEntity<APIResponse> verifyAccount(@RequestParam String otp) {
-        otpService.verifyChangePhoneNumber(otp);
+    public ResponseEntity<APIResponse> verifyAccount(@RequestBody @Valid OtpRequest request) {
+        otpService.verifyChangePhoneNumber(request);
         APIResponse response = new APIResponse(
                 HttpStatus.OK,
                 "Account successfully verified"

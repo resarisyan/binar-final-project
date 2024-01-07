@@ -5,6 +5,9 @@ import com.binar.byteacademy.dto.response.CoursePromoResponse;
 import com.binar.byteacademy.dto.response.base.APIResponse;
 import com.binar.byteacademy.dto.response.base.APIResultResponse;
 import com.binar.byteacademy.service.CoursePromoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,10 +24,13 @@ import static com.binar.byteacademy.common.util.Constants.CoursePromoPats.ADMIN_
 @RestController
 @RequestMapping(value = ADMIN_COURSE_PROMO_PATS, produces = "application/json")
 @RequiredArgsConstructor
+@Tag(name = "Admin Course Promo", description = "Admin Course Promo")
 public class AdminCoursePromoController {
     private final CoursePromoService coursePromoService;
 
     @PostMapping
+    @Schema(name = "CoursePromoRequest", description = "Create course promo request body")
+    @Operation(summary = "Endpoint to handle create new course promo (User Role : Admin)")
     public ResponseEntity<APIResultResponse<CoursePromoResponse>> createNewPromo(
             @RequestBody @Valid CoursePromoRequest request) {
         CoursePromoResponse coursePromoResponse = coursePromoService.addCoursePromo(request);
@@ -37,6 +43,8 @@ public class AdminCoursePromoController {
     }
 
     @PutMapping("/{id}")
+    @Schema(name = "CoursePromoRequest", description = "Update course promo request body")
+    @Operation(summary = "Endpoint to handle update course promo (User Role : Admin)")
     public ResponseEntity<APIResponse> updatePromo(@PathVariable UUID id, @RequestBody @Valid CoursePromoRequest request) {
         coursePromoService.updateCoursePromo(id, request);
         APIResponse responseDTO = new APIResponse(
@@ -47,6 +55,8 @@ public class AdminCoursePromoController {
     }
 
     @DeleteMapping("/{id}")
+    @Schema(name = "CoursePromoRequest", description = "Delete course promo request body")
+    @Operation(summary = "Endpoint to handle delete course promo (User Role : Admin)")
     public ResponseEntity<APIResponse> deletePromo(@PathVariable UUID id) {
         coursePromoService.deleteCoursePromo(id);
         APIResponse responseDTO = new APIResponse(
@@ -57,6 +67,8 @@ public class AdminCoursePromoController {
     }
 
     @GetMapping
+    @Schema(name = "CoursePromoRequest", description = "Get course promo request body")
+    @Operation(summary = "Endpoint to handle get course promo (User Role : Admin)")
     public ResponseEntity<APIResultResponse<Page<CoursePromoResponse>>> getPromo(@RequestParam("page") int page) {
         Pageable pageable = PageRequest.of(page, 10);
         Page<CoursePromoResponse> coursePromoResponses = coursePromoService.getAllCoursePromo(pageable);
@@ -69,6 +81,8 @@ public class AdminCoursePromoController {
     }
 
     @GetMapping("/{id}")
+    @Schema(name = "CoursePromoRequest", description = "Get course promo request body")
+    @Operation(summary = "Endpoint to handle get course promo detail (User Role : Admin)")
     public ResponseEntity<APIResultResponse<CoursePromoResponse>> getPromoDetail(@PathVariable UUID id) {
         CoursePromoResponse coursePromoResponse = coursePromoService.getCoursePromoDetail(id);
         APIResultResponse<CoursePromoResponse> responseDTO = new APIResultResponse<>(

@@ -5,6 +5,8 @@ import com.binar.byteacademy.dto.response.PromoResponse;
 import com.binar.byteacademy.dto.response.base.APIResponse;
 import com.binar.byteacademy.dto.response.base.APIResultResponse;
 import com.binar.byteacademy.service.PromoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,8 @@ public class AdminPromoController {
     private final PromoService promoService;
 
     @PostMapping
+    @Schema(name = "PromoRequest", description = "Promo request body")
+    @Operation(summary = "Endpoint to handle create new promo (User Role : Admin)")
     public ResponseEntity<APIResultResponse<PromoResponse>> createNewPromo(
             @RequestBody @Valid PromoRequest request) {
         PromoResponse promoResponse = promoService.addPromo(request);
@@ -37,6 +41,8 @@ public class AdminPromoController {
     }
 
     @PutMapping("/{promoCode}")
+    @Schema(name = "PromoRequest", description = "Promo request body")
+    @Operation(summary = "Endpoint to handle update promo (User Role : Admin)")
     public ResponseEntity<APIResponse> updatePromo(@PathVariable String promoCode, @RequestBody @Valid PromoRequest request) {
         promoService.updatePromo(promoCode, request);
         APIResponse responseDTO = new APIResponse(
@@ -47,6 +53,8 @@ public class AdminPromoController {
     }
 
     @DeleteMapping("/{promoCode}")
+    @Schema(name = "PromoRequest", description = "Promo request body")
+    @Operation(summary = "Endpoint to handle delete promo (User Role : Admin)")
     public ResponseEntity<APIResponse> deletePromo(@PathVariable String promoCode) {
         promoService.deletePromo(promoCode);
         APIResponse responseDTO = new APIResponse(
@@ -57,6 +65,8 @@ public class AdminPromoController {
     }
 
     @GetMapping
+    @Schema(name = "PromoRequest", description = "Promo request body")
+    @Operation(summary = "Endpoint to handle get all promo (User Role : Admin)")
     public ResponseEntity<APIResultResponse<Page<PromoResponse>>> getPromo(@RequestParam("page") int page) {
         Pageable pageable = PageRequest.of(page, 10);
         Page<PromoResponse> promoResponses = promoService.getAllPromo(pageable);
@@ -69,6 +79,8 @@ public class AdminPromoController {
     }
 
     @GetMapping("/{promoCode}")
+    @Schema(name = "PromoRequest", description = "Promo request body")
+    @Operation(summary = "Endpoint to handle get promo detail (User Role : Admin)")
     public ResponseEntity<APIResultResponse<PromoResponse>> getPromoDetail(@PathVariable String promoCode) {
         PromoResponse promoResponse = promoService.getPromoDetail(promoCode);
         APIResultResponse<PromoResponse> responseDTO = new APIResultResponse<>(

@@ -13,6 +13,7 @@ public class ValidSlugValidator implements ConstraintValidator<ValidSlug, String
 
     @Override
     public void initialize(ValidSlug constraintAnnotation) {
+        // Auto-generated method stub
     }
 
     @Override

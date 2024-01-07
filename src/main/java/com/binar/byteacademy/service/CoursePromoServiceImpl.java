@@ -15,6 +15,7 @@ import com.binar.byteacademy.repository.CoursePromoRepository;
 import com.binar.byteacademy.repository.CourseRepository;
 import com.binar.byteacademy.repository.PromoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,12 +27,14 @@ import static com.binar.byteacademy.common.util.Constants.ControllerMessage.COUR
 
 @Service
 @RequiredArgsConstructor
-public class CoursePromoImpl implements CoursePromoService {
+@CacheConfig(cacheNames = "coursePromos")
+public class CoursePromoServiceImpl implements CoursePromoService {
     private final CoursePromoRepository coursePromoRepository;
     private final CourseRepository courseRepository;
     private final PromoRepository promoRepository;
 
     @Override
+    @CacheEvict(value = {"allCoursePromos"}, allEntries = true, condition = "#result != null")
     public CoursePromoResponse addCoursePromo(CoursePromoRequest request) {
         try {
             Course course = courseRepository.findFirstBySlugCourse(request.getSlugCourse())
@@ -58,7 +61,7 @@ public class CoursePromoImpl implements CoursePromoService {
                                     .price(course.getPrice())
                                     .totalCourseRate(course.getTotalCourseRate())
                                     .courseDuration(course.getCourseDuration())
-                                    .totalModules(course.getTotalModules())
+                                    .totalChapters(course.getTotalChapter())
                                     .slugCourse(course.getSlugCourse())
                                     .pathCourseImage(course.getPathCourseImage())
                                     .targetMarket(course.getTargetMarket())
@@ -89,10 +92,12 @@ public class CoursePromoImpl implements CoursePromoService {
     }
 
     @Override
-    public void updateCoursePromo(UUID id, CoursePromoRequest request) {
+    @CachePut(key = "'getCoursePromoDetail-' + #id", unless = "#result == null")
+    @CacheEvict(value = "allCoursePromos", allEntries = true, condition = "#result != null")
+    public CoursePromoResponse updateCoursePromo(UUID id, CoursePromoRequest request) {
         try {
-            coursePromoRepository.findById(id)
-                    .ifPresentOrElse(coursePromo -> {
+            return coursePromoRepository.findById(id)
+                    .map(coursePromo -> {
                         Course course = courseRepository.findFirstBySlugCourse(request.getSlugCourse())
                                 .orElseThrow(() -> new DataNotFoundException("Course not found"));
                         Promo promo = promoRepository.findByPromoCode(request.getPromoCode()).orElseThrow(() -> new DataNotFoundException("Promo not found"));
@@ -105,9 +110,41 @@ public class CoursePromoImpl implements CoursePromoService {
                                     coursePromo.setPromo(promo);
                                     coursePromoRepository.save(coursePromo);
                                 });
-                    }, () -> {
-                        throw new DataNotFoundException(COURSE_PROMO_NOT_FOUND);
-                    });
+                        return CoursePromoResponse.builder()
+                                .course(
+                                        CourseResponse.builder()
+                                                .courseName(course.getCourseName())
+                                                .instructorName(course.getInstructorName())
+                                                .courseLevel(course.getCourseLevel())
+                                                .courseType(course.getCourseType())
+                                                .price(course.getPrice())
+                                                .totalCourseRate(course.getTotalCourseRate())
+                                                .courseDuration(course.getCourseDuration())
+                                                .totalChapters(course.getTotalChapter())
+                                                .slugCourse(course.getSlugCourse())
+                                                .pathCourseImage(course.getPathCourseImage())
+                                                .targetMarket(course.getTargetMarket())
+                                                .category(
+                                                        CategoryResponse.builder().
+                                                                categoryName(course.getCategory().getCategoryName())
+                                                                .slugCategory(course.getCategory().getSlugCategory())
+                                                                .pathCategoryImage(course.getCategory().getPathCategoryImage())
+                                                                .build())
+                                                .build()
+                                )
+                                .promo(
+                                        PromoResponse.builder()
+                                                .promoName(promo.getPromoName())
+                                                .promoCode(promo.getPromoCode())
+                                                .discount(promo.getDiscount())
+                                                .promoDescription(promo.getPromoDescription())
+                                                .startDate(promo.getStartDate())
+                                                .endDate(promo.getEndDate())
+                                                .build()
+                                )
+                                .build();
+                    })
+                    .orElseThrow(() -> new DataNotFoundException(COURSE_PROMO_NOT_FOUND));
         } catch (DataNotFoundException | ValidationException e) {
             throw e;
         } catch (Exception e) {
@@ -116,6 +153,10 @@ public class CoursePromoImpl implements CoursePromoService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(key = "'getCoursePromoDetail-' + #id"),
+            @CacheEvict(value = "allCoursePromos", allEntries = true)
+    })
     public void deleteCoursePromo(UUID id) {
         try {
             coursePromoRepository.findById(id)
@@ -130,6 +171,7 @@ public class CoursePromoImpl implements CoursePromoService {
     }
 
     @Override
+    @Cacheable(key = "'getCoursePromoDetail-' + #id", unless = "#result == null")
     public CoursePromoResponse getCoursePromoDetail(UUID id) {
         try {
             return coursePromoRepository.findById(id)
@@ -144,7 +186,7 @@ public class CoursePromoImpl implements CoursePromoService {
                                             .price(coursePromo.getCourse().getPrice())
                                             .totalCourseRate(coursePromo.getCourse().getTotalCourseRate())
                                             .courseDuration(coursePromo.getCourse().getCourseDuration())
-                                            .totalModules(coursePromo.getCourse().getTotalModules())
+                                            .totalChapters(coursePromo.getCourse().getTotalChapter())
                                             .slugCourse(coursePromo.getCourse().getSlugCourse())
                                             .pathCourseImage(coursePromo.getCourse().getPathCourseImage())
                                             .targetMarket(coursePromo.getCourse().getTargetMarket())
@@ -176,6 +218,7 @@ public class CoursePromoImpl implements CoursePromoService {
     }
 
     @Override
+    @Cacheable(value = "allCoursePromos", key = "'getAllCoursePromo-' + #pageable.pageNumber + '-' + #pageable.pageSize", unless = "#result == null")
     public Page<CoursePromoResponse> getAllCoursePromo(Pageable pageable) {
         try {
             Page<CoursePromo> coursePromoPage = Optional.of(coursePromoRepository.findAll(pageable))
@@ -192,7 +235,7 @@ public class CoursePromoImpl implements CoursePromoService {
                                     .price(coursePromo.getCourse().getPrice())
                                     .totalCourseRate(coursePromo.getCourse().getTotalCourseRate())
                                     .courseDuration(coursePromo.getCourse().getCourseDuration())
-                                    .totalModules(coursePromo.getCourse().getTotalModules())
+                                    .totalChapters(coursePromo.getCourse().getTotalChapter())
                                     .slugCourse(coursePromo.getCourse().getSlugCourse())
                                     .pathCourseImage(coursePromo.getCourse().getPathCourseImage())
                                     .targetMarket(coursePromo.getCourse().getTargetMarket())

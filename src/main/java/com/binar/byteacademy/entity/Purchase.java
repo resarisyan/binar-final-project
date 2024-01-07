@@ -1,6 +1,5 @@
 package com.binar.byteacademy.entity;
 
-import com.binar.byteacademy.enumeration.EnumPaymentMethod;
 import com.binar.byteacademy.enumeration.EnumPurchaseStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -25,28 +24,21 @@ public class Purchase {
     @Column(name = "purchase_id")
     private UUID id;
 
-    @Column(name = "path_proof_payment")
-    private String pathProofPayment;
-
     @Column(name = "ppn")
     private Double ppn;
 
     @Column(name = "amount_paid", nullable = false)
-    private Double amountPaid;
+    private Integer amountPaid;
 
     @Column(name = "purchase_date")
     private LocalDateTime purchaseDate;
-
-    @Column(name = "end_payment_time", nullable = false)
-    private LocalDateTime endPaymentDate;
 
     @Column(name = "purchase_status", nullable = false)
     @Enumerated(EnumType.STRING)
     private EnumPurchaseStatus purchaseStatus;
 
-    @Column(name = "payment_method", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private EnumPaymentMethod paymentMethod;
+    @Column(name = "token_purchase")
+    private String tokenPurchase;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)

@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 @Data
@@ -13,8 +14,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class CoursePromoResponse {
+public class CoursePromoResponse implements Serializable {
     private UUID id;
     private CourseResponse course;
-    private PromoResponse promo;
+    private transient PromoResponse promo;
 }

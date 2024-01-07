@@ -20,8 +20,8 @@ public class PromoRequest {
     @NotBlank
     private String promoCode;
     @NotNull
-    @Digits(integer = 3, fraction = 2)
-    private Double discount;
+    @Digits(integer = 3, fraction = 0)
+    private Integer discount;
     @NotNull
     private LocalDateTime startDate;
     @NotNull

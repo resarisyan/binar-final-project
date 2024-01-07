@@ -2,6 +2,7 @@ package com.binar.byteacademy.common.config;
 
 import com.binar.byteacademy.common.property.WebConfigProperty;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +19,7 @@ public class WebConfig {
     public WebMvcConfigurer corsMappingConfigurer() {
         return new WebMvcConfigurer() {
             @Override
-            public void addCorsMappings(CorsRegistry registry) {
+            public void addCorsMappings(@NotNull CorsRegistry registry) {
                 WebConfigProperty.Cors cors = webConfigProperty.getCors();
                 registry.addMapping("/**")
                         .allowedOrigins(cors.getAllowedOrigins())

@@ -68,6 +68,21 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.MERGE} , fetch = FetchType.LAZY)
     private List<Token> tokens;
 
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    private List<Discussion> discussions;
+
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    private List<Reply> replies;
+
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    private List<Comment> comments;
+
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    private List<MaterialActivity> materialActivities;
+
+    @Column(name = "last_login")
+    private LocalDateTime lastLogin;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 

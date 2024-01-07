@@ -5,10 +5,14 @@ import com.binar.byteacademy.dto.response.MaterialResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.security.Principal;
+
 public interface MaterialService {
     MaterialResponse addMaterial(MaterialRequest request);
-    void updateMaterial(String slugMaterial, MaterialRequest request);
+    MaterialResponse updateMaterial(String slugMaterial, MaterialRequest request);
     void deleteMaterial(String slugMaterial);
     Page<MaterialResponse> getAllMaterial(Pageable pageable);
-    MaterialResponse getMaterialDetail(String slugMaterial);
+    MaterialResponse getMaterialDetailAdmin(String slugMaterial);
+    MaterialResponse getMaterialDetailCustomer(String slugMaterial, Principal principal);
+    void completeMaterial(String slugMaterial, Principal principal);
 }

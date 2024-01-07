@@ -6,16 +6,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.List;
-import java.util.UUID;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ChapterResponse {
-    private UUID id;
+public class ChapterResponse implements Serializable {
+    private String slugChapter;
     private Integer noChapter;
     private String title;
     private Integer chapterDuration;

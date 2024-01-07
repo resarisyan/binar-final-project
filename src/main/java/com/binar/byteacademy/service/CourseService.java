@@ -16,10 +16,11 @@ import java.util.concurrent.CompletableFuture;
 
 public interface CourseService {
     CompletableFuture<CourseResponse> addCourse(CreateCourseRequest request);
-    CompletableFuture<Void> updateCourse(String slugCourse, UpdateCourseRequest request);
+    CompletableFuture<CourseResponse> updateCourse(String slugCourse, UpdateCourseRequest request);
     void deleteCourse(String slugCourse);
-    Page<CourseResponse> getAllCourse(Pageable pageable);
-    CourseDetailResponse getCourseDetail(String slugCourse);
+    CustomerCourseDetailResponse getCustomerCourseDetail(String slugCourse);
+    AdminCourseDetailResponse getAdminCourseDetail(String slugCourse);
+    List<CourseResponse> getListCourse();
     Page<Course> getAllCourseByCriteria(List<String> categoryNames,
                                         List<EnumCourseLevel> courseLevels,
                                         List<EnumCourseType> courseTypes,
@@ -28,7 +29,7 @@ public interface CourseService {
                                         String keyword,
                                         String username,
                                         Pageable pageable);
-    Page<SearchCourseResponse> getCourseListForWeb(List<String> categoryNames,
+    Page<CourseResponse> getCourseListForWeb(List<String> categoryNames,
                                                    List<EnumCourseLevel> courseLevels,
                                                    List<EnumCourseType> courseTypes,
                                                    List<EnumStatus> courseStatuses,

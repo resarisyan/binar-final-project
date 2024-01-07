@@ -24,7 +24,7 @@ public class CreateCourseRequest {
     private String instructorName;
     @NotNull
     @Digits(integer = 10, fraction = 2)
-    private Double price;
+    private Integer price;
     @NotNull
     @Digits(integer = 10, fraction = 0)
     private Integer courseDuration;
@@ -33,6 +33,7 @@ public class CreateCourseRequest {
     @NotBlank
     private String targetMarket;
     @ValidSlug
+    @FieldExistence(tableName = "courses", fieldName = "slug_course", shouldExist = false, message = "Slug course already exists")
     private String slugCourse;
     @NotBlank
     @Base64Image

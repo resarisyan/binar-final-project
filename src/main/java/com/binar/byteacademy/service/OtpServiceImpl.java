@@ -2,6 +2,7 @@ package com.binar.byteacademy.service;
 
 import com.binar.byteacademy.common.util.JwtUtil;
 import com.binar.byteacademy.common.util.OtpUtil;
+import com.binar.byteacademy.dto.request.OtpRequest;
 import com.binar.byteacademy.dto.request.VerifyRegisterPhoneRequest;
 import com.binar.byteacademy.entity.Otp;
 import com.binar.byteacademy.entity.User;
@@ -56,10 +57,10 @@ public class OtpServiceImpl implements OtpService {
 
     @Override
     @Transactional
-    public void verifyChangePhoneNumber(String otpCode) {
+    public void verifyChangePhoneNumber(OtpRequest request) {
         try {
             User user = jwtUtil.getUser();
-            otpRepository.findFirstByOtpCodeAndUserAndOtpType(otpCode, user, EnumOtpType.CHANGE_PHONE_NUMBER).ifPresentOrElse(otp -> {
+            otpRepository.findFirstByOtpCodeAndUserAndOtpType(request.getOtp(), user, EnumOtpType.CHANGE_PHONE_NUMBER).ifPresentOrElse(otp -> {
                 if (otp.getExpTime().isBefore(LocalDateTime.now())) {
                     throw new ForbiddenException("OTP code expired");
                 }
@@ -97,7 +98,7 @@ public class OtpServiceImpl implements OtpService {
                 }
             }).ifPresentOrElse(user -> {
                 String message;
-                String otpCode = generateOtpCode(user, otpType);
+                String otpCode = generateOtpCode(user, otpType, phoneNumber);
 
                 if (EnumOtpType.REGISTER.equals(otpType)) {
                     message = "Your OTP Code for registration is " + otpCode;
@@ -124,13 +125,11 @@ public class OtpServiceImpl implements OtpService {
         }
     }
 
-    private String generateOtpCode(User user, EnumOtpType type) {
+    private String generateOtpCode(User user, EnumOtpType type, String phoneNumber) {
         try {
             LocalDateTime currentDateTime = LocalDateTime.now();
             otpRepository.findFirstByUserAndOtpType(user, type).ifPresent(
                     otp -> {
-                        log.info("OTP: {}", otp.getExpTime());
-                        log.info("Current: {}", currentDateTime);
                         if (otp.getExpTime().isAfter(currentDateTime)) {
                             throw new ForbiddenException("Please wait for 5 minutes to generate new token");
                         } else {
@@ -144,6 +143,7 @@ public class OtpServiceImpl implements OtpService {
                     .otpCode(otpCode)
                     .user(user)
                     .otpType(type)
+                    .phoneNumber(phoneNumber)
                     .expTime(currentDateTime.plusMinutes(5))
                     .build();
             otpRepository.save(newOtp);

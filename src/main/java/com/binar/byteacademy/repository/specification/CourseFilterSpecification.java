@@ -1,10 +1,7 @@
 package com.binar.byteacademy.repository.specification;
 
 import com.binar.byteacademy.entity.*;
-import com.binar.byteacademy.enumeration.EnumCourseLevel;
-import com.binar.byteacademy.enumeration.EnumCourseType;
-import com.binar.byteacademy.enumeration.EnumFilterCoursesBy;
-import com.binar.byteacademy.enumeration.EnumStatus;
+import com.binar.byteacademy.enumeration.*;
 import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -46,6 +43,7 @@ public class CourseFilterSpecification {
                 Join<Course, UserProgress> userProgressJoin = root.join("userProgresses");
                 Join<Purchase, User> userJoin1 = purchaseJoin.join("user");
                 Join<UserProgress, User> userJoin2 = userProgressJoin.join("user");
+                predicates.add(criteriaBuilder.equal(purchaseJoin.get("purchaseStatus"), EnumPurchaseStatus.PAID));
                 predicates.add(criteriaBuilder.equal(userJoin1.get("username"), username));
                 predicates.add(criteriaBuilder.equal(userJoin2.get("username"), username));
             }

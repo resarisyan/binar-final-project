@@ -1,7 +1,6 @@
 package com.binar.byteacademy.entity;
 
 import com.binar.byteacademy.enumeration.EnumOtpType;
-import com.binar.byteacademy.enumeration.EnumRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

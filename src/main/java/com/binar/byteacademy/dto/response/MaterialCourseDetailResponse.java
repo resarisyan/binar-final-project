@@ -13,8 +13,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MaterialCourseDetailResponse {
+    private String materialName;
     private Integer serialNumber;
     private Integer materialDuration;
     private String slugMaterial;
     private EnumMaterialType materialType;
+    private Boolean isLocked;
+    private Boolean isCompleted;
 }

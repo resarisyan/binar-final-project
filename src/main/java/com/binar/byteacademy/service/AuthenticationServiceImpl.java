@@ -23,13 +23,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Service
@@ -43,6 +45,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final OtpService otpService;
     private final EmailVerificationService emailVerificationService;
+
+    @Transactional
     public LoginResponse login(LoginRequest request) {
         try {
             boolean isEmail = request.getCredential().contains("@");
@@ -64,7 +68,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     )
             );
 
-            if (!user.isVerifiedEmail() || !user.isVerifiedPhoneNumber()) {
+            if (!user.isVerifiedPhoneNumber()) {
                 throw new UserNotActiveException("User is not verified");
             }
             if (user.getStatus() == EnumStatus.INACTIVE) {
@@ -73,8 +77,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
             String jwtToken = jwtUtil.generateToken(user);
             String refreshToken = jwtUtil.generateRefreshToken(user);
-            revokeAllUserTokens(user);
-            saveUserToken(user, jwtToken);
+            user.setLastLogin(LocalDateTime.now());
+            userRepository.save(user);
+
+            saveUserToken(user, jwtToken, EnumTokenAccessType.ACCESS);
+            saveUserToken(user, refreshToken, EnumTokenAccessType.REFRESH);
+
             return LoginResponse.builder()
                     .accessToken(jwtToken)
                     .refreshToken(refreshToken)
@@ -86,10 +94,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
     }
 
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional
     public RegisterResponse register(RegisterRequest request) {
-        RegisterResponse registerResponse;
-
         try {
             User user = User.builder()
                     .username(request.getUsername())
@@ -106,23 +112,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .user(user)
                     .build();
             customerDetailRepository.save(customerDetail);
+            emailVerificationService.sendEmail(user.getEmail(), EnumEmailVerificationType.REGISTER);
+            otpService.sendOtp(user.getPhoneNumber(), EnumOtpType.REGISTER);
 
-            registerResponse = RegisterResponse.builder()
+            return RegisterResponse.builder()
                     .username(user.getUsername())
                     .email(user.getEmail())
                     .name(customerDetail.getName())
                     .phoneNumber(user.getPhoneNumber())
                     .build();
-
-            emailVerificationService.sendEmail(user.getEmail(), EnumEmailVerificationType.REGISTER);
-            otpService.sendOtp(user.getPhoneNumber(), EnumOtpType.REGISTER);
         } catch (DataConflictException e) {
             throw e;
         } catch (Exception e) {
             throw new ServiceBusinessException(e.getMessage());
         }
-
-        return registerResponse;
     }
 
     public void changePassword(ChangePasswordRequest request, Principal connectedUser) {
@@ -142,28 +145,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw e;
         } catch (Exception e) {
             throw new ServiceBusinessException(e.getMessage());
-        }
-    }
-
-    @Override
-    public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-        try {
-            final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-            final String accessToken;
-            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                throw new DataNotFoundException("Access token is missing");
-            }
-            accessToken = authHeader.substring(7);
-            Token storedToken = tokenRepository.findByToken(accessToken)
-                    .orElseThrow(() -> new DataNotFoundException("Access token is invalid"));
-            storedToken.setExpired(true);
-            storedToken.setRevoked(true);
-            tokenRepository.save(storedToken);
-            SecurityContextHolder.clearContext();
-        } catch (DataNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new ServiceBusinessException("Failed to logout");
         }
     }
 
@@ -190,39 +171,75 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             User user = this.userRepository.findFirstByUsername(username)
                     .orElseThrow();
             if (jwtUtil.isTokenValid(refreshToken, user)) {
+                tokenRepository.findByToken(refreshToken)
+                        .ifPresentOrElse(
+                                token -> {
+                                   if (token.getAccessType() != EnumTokenAccessType.REFRESH) {
+                                       throw new ForbiddenException("Token type is invalid");
+                                   }
+                                },
+                                () -> {
+                                    throw new ServiceBusinessException("Refresh token is invalid");
+                                });
+
                 String accessToken = jwtUtil.generateToken(user);
-                revokeAllUserTokens(user);
-                saveUserToken(user, accessToken);
+                saveUserToken(user, accessToken, EnumTokenAccessType.ACCESS);
                 refreshTokenResponse = RefreshTokenResponse.builder()
                         .accessToken(accessToken)
                         .build();
             } else {
                 throw new ServiceBusinessException("Refresh token is invalid");
             }
-        } catch (DataNotFoundException | ServiceBusinessException e) {
+        } catch (DataNotFoundException | ForbiddenException e) {
             throw e;
         } catch (Exception e) {
-            throw new ServiceBusinessException("Failed to refresh token");
+            throw new ServiceBusinessException(e.getMessage());
         }
         return refreshTokenResponse;
     }
 
-    private void revokeAllUserTokens(User user) {
-        List<Token> validUserTokens = tokenRepository.findAllValidTokenByUser(user.getId());
-        if (validUserTokens.isEmpty())
-            return;
-        validUserTokens.forEach(token -> {
-            token.setExpired(true);
-            token.setRevoked(true);
-        });
-        tokenRepository.saveAll(validUserTokens);
+    @Override
+    public LoginResponse oauth2Login(OAuth2AuthenticationToken authenticationToken) {
+        try {
+            DefaultOAuth2User principal = (DefaultOAuth2User) authenticationToken.getPrincipal();
+            Map<String, Object> attributes = principal.getAttributes();
+            String email = attributes.getOrDefault("email", "").toString();
+            return userRepository.findFirstByEmail(email)
+                    .map(user -> {
+                        String jwtToken = jwtUtil.generateToken(user);
+                        String refreshToken = jwtUtil.generateRefreshToken(user);
+                        saveUserToken(user, jwtToken, EnumTokenAccessType.ACCESS);
+                        saveUserToken(user, refreshToken, EnumTokenAccessType.REFRESH);
+                        return LoginResponse.builder()
+                                .accessToken(jwtToken)
+                                .refreshToken(refreshToken)
+                                .build();
+                    })
+                    .orElseThrow(() -> new DataNotFoundException("User not found"));
+        } catch (DataNotFoundException | UserNotActiveException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ServiceBusinessException(e.getMessage());
+        }
     }
 
-    private void saveUserToken(User user, String jwtToken) {
+//    private void revokeAllUserTokens(User user) {
+//        List<Token> validUserTokens = tokenRepository.findAllValidTokenByUser(user.getId());
+//        if (validUserTokens.isEmpty())
+//            return;
+//        validUserTokens.forEach(token -> {
+//            token.setExpired(true);
+//            token.setRevoked(true);
+//        });
+//        tokenRepository.saveAll(validUserTokens);
+//    }
+
+    private void saveUserToken(User user, String jwtToken, EnumTokenAccessType accessType) {
         Token token = Token.builder()
                 .user(user)
                 .token(jwtToken)
                 .tokenType(EnumTokenType.BEARER)
+                .accessType(accessType)
                 .expired(false)
                 .revoked(false)
                 .build();

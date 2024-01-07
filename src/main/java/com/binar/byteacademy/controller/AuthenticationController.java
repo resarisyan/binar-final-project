@@ -21,6 +21,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.web.bind.annotation.*;
 
 import static com.binar.byteacademy.common.util.Constants.AuthPats.AUTH_PATS;
@@ -33,6 +36,7 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
     private final OtpService otpService;
     private final EmailVerificationService emailVerificationService;
+    private final LogoutHandler logoutHandler;
 
     @PostMapping("/register")
     @Schema(name = "RegisterRequest", description = "Register request body")
@@ -46,6 +50,18 @@ public class AuthenticationController {
         );
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
 
+    }
+
+    @PostMapping("/login-google")
+    @Hidden
+    public ResponseEntity<APIResultResponse<LoginResponse>> loginGoogle(OAuth2AuthenticationToken authenticationToken) {
+        LoginResponse loginResponse = authenticationService.oauth2Login(authenticationToken);
+        APIResultResponse<LoginResponse> responseDTO = new APIResultResponse<>(
+                HttpStatus.CREATED,
+                "Login success",
+                loginResponse
+        );
+        return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
@@ -143,6 +159,18 @@ public class AuthenticationController {
                 "Email successfully regenerated"
         );
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/logout")
+    @Schema(name = "LogoutRequest", description = "Logout request body")
+    @Operation(summary = "Endpoint to handle logout")
+    public ResponseEntity<APIResponse> logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        logoutHandler.logout(request, response, authentication);
+        APIResponse responseDTO = new APIResponse(
+                HttpStatus.OK,
+                "Logout success"
+        );
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 }
 
