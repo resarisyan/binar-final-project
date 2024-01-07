@@ -85,6 +85,7 @@ We would like to express our gratitude to the following technologies and framewo
 - Cloudinary
 - OpenAI
 - OAuth Google
+- Swagger
 
 ## License
 
